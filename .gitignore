@@ -1,0 +1,44 @@
+# TuitionPro ERP — Git Ignore
+
+# ─── Environment & Secrets ─────────────────────────────────────────────────────
+.env
+*.env.local
+*.env.production
+
+# ─── Composer ──────────────────────────────────────────────────────────────────
+vendor/
+composer.lock
+
+# ─── Storage (non-committed runtime data) ─────────────────────────────────────
+storage/logs/*.log
+storage/cache/*
+storage/backups/*
+storage/temp/*
+storage/uploads/*
+
+# Keep storage directory structure
+!storage/logs/.gitkeep
+!storage/cache/.gitkeep
+!storage/backups/.gitkeep
+!storage/temp/.gitkeep
+!storage/uploads/.gitkeep
+!storage/uploads/students/.gitkeep
+!storage/uploads/teachers/.gitkeep
+!storage/uploads/materials/.gitkeep
+!storage/uploads/assignments/.gitkeep
+!storage/uploads/expenses/.gitkeep
+
+# ─── IDE ───────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+Thumbs.db
+
+# ─── PHP ───────────────────────────────────────────────────────────────────────
+*.log
+*.cache
+
+# ─── OS Files ──────────────────────────────────────────────────────────────────
+desktop.ini
+

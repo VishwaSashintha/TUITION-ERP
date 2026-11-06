@@ -1,0 +1,15 @@
+# Apache configuration for TuitionPro ERP
+# Place this in the project root (or configure via XAMPP Virtual Host)
+
+Options -Indexes
+DirectoryIndex public/index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Redirect to public directory
+    RewriteRule ^$ public/ [L]
+    RewriteRule ^((?!public/).*)$ public/$1 [L,QSA]
+</IfModule>
+

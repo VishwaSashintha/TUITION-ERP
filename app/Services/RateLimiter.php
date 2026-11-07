@@ -6,7 +6,7 @@ namespace App\Services;
 
 use App\Core\Database;
 
-// Auth
+//Auth
 class RateLimiter
 {
     private Database $db;
@@ -20,7 +20,7 @@ class RateLimiter
         $this->decaySeconds = $decaySeconds;
     }
 
-    // Auth
+    //Auth
     public function isRateLimited(string $ip, string $identifier): bool
     {
         $cutoff = date('Y-m-d H:i:s', time() - $this->decaySeconds);
@@ -36,7 +36,7 @@ class RateLimiter
         return ((int) ($res['failed_count'] ?? 0)) >= $this->maxAttempts;
     }
 
-    // Auth
+    //Auth
     public function recordAttempt(string $ip, string $identifier, bool $success): void
     {
         $this->db->execute(
@@ -46,7 +46,7 @@ class RateLimiter
         );
     }
 
-    // Auth
+    //Auth
     public function clear(string $ip, string $identifier): void
     {
         $this->db->execute(

@@ -2,21 +2,6 @@
 
 declare(strict_types=1);
 
-/**
- * TuitionPro ERP — Role-Based Dashboard Architecture & Security Test Suite
- *
- * Verifies live role-based dashboard dispatch, data isolation, and RBAC defense:
- * 1. Super Admin Dashboard (/platform/dashboard)
- * 2. Institute Owner Dashboard (Executive overview with full financials)
- * 3. Receptionist Dashboard (Dedicated front-desk, zero financial/payroll exposure)
- * 4. Receptionist RBAC Protection (Direct URL attempts to /accounting/*, /teacher-payments, /expenses receive HTTP 403)
- * 5. Teacher Dashboard (Dedicated academic/batch scope, zero institute financial exposure)
- * 6. Teacher RBAC Protection (Direct URL attempts to /fees, /accounting/*, /settings receive HTTP 403)
- * 7. Student Portal Dashboard (Personal academic data only)
- * 8. Parent Portal Dashboard (Linked children data only, IDOR injection strictly blocked)
- * 9. Design System Verification (Exact 6-color palette, Roboto typography, Poppins 700 numbers)
- */
-
 $baseUrl = 'http://localhost:8080';
 $passed = 0;
 $failed = 0;
@@ -122,8 +107,6 @@ echo "======================================================\n";
 echo "TuitionPro ERP — Role-Based Dashboard & RBAC Security\n";
 echo "Target: {$baseUrl}\n";
 echo "======================================================\n\n";
-
-// ─── 1. Super Admin Dashboard ───────────────────────────────────────────────
 echo "1. Testing Platform Super Admin Dashboard...\n";
 $superClient = new TestClient();
 $superClient->login($baseUrl, 'superadmin@tuitionpro.lk', 'Password@123');
@@ -148,8 +131,6 @@ runTest("Super Admin accessing /dashboard redirects to /platform/dashboard", fun
         throw new \RuntimeException("Expected 302 redirect to platform/dashboard, got {$res['code']}");
     }
 });
-
-// ─── 2. Institute Owner / Admin Dashboard ───────────────────────────────────
 echo "\n2. Testing Institute Owner / Executive Dashboard...\n";
 $ownerClient = new TestClient();
 $ownerClient->login($baseUrl, 'apex.owner@tuitionpro.lk', 'Password@123');
@@ -170,8 +151,6 @@ runTest("Institute Owner receives Executive Dashboard with full financials", fun
         throw new \RuntimeException("Net Cash Surplus not found");
     }
 });
-
-// ─── 3. Receptionist Dashboard ──────────────────────────────────────────────
 echo "\n3. Testing Receptionist Dedicated Front-Desk Dashboard...\n";
 $receptionClient = new TestClient();
 $receptionClient->login($baseUrl, 'apex.reception@tuitionpro.lk', 'Password@123');
@@ -210,8 +189,6 @@ runTest("Receptionist dashboard strictly conceals private administrative financi
         throw new \RuntimeException("Data Leak: Receptionist dashboard exposed Audited System Ledgers!");
     }
 });
-
-// ─── 4. Receptionist RBAC Route Protection ──────────────────────────────────
 echo "\n4. Testing Receptionist Server-Side Route Restrictions (403 Forbidden)...\n";
 
 $receptionRestricted = [
@@ -232,8 +209,6 @@ foreach ($receptionRestricted as $path => $label) {
         }
     });
 }
-
-// ─── 5. Teacher Dashboard ───────────────────────────────────────────────────
 echo "\n5. Testing Teacher Dedicated Academic Dashboard...\n";
 $teacherClient = new TestClient();
 $teacherClient->login($baseUrl, 'apex.fernando@tuitionpro.lk', 'Password@123');
@@ -266,8 +241,6 @@ runTest("Teacher dashboard strictly conceals institute-wide financial data", fun
         throw new \RuntimeException("Data Leak: Teacher dashboard exposed Net Cash Surplus!");
     }
 });
-
-// ─── 6. Teacher RBAC Route Protection ───────────────────────────────────────
 echo "\n6. Testing Teacher Server-Side Route Restrictions (403 Forbidden)...\n";
 
 $teacherRestricted = [
@@ -287,8 +260,6 @@ foreach ($teacherRestricted as $path => $label) {
         }
     });
 }
-
-// ─── 7. Student Portal Dashboard ────────────────────────────────────────────
 echo "\n7. Testing Student Portal Dashboard...\n";
 $studentClient = new TestClient();
 $studentClient->login($baseUrl, 'apex.student1@tuitionpro.lk', 'Password@123');
@@ -310,8 +281,6 @@ runTest("Student accessing /dashboard redirects to /portal/student", function ()
         throw new \RuntimeException("Expected 302 redirect to portal/student, got {$res['code']}");
     }
 });
-
-// ─── 8. Parent Portal Dashboard & IDOR Defense ──────────────────────────────
 echo "\n8. Testing Parent Portal Dashboard & Anti-IDOR Data Isolation...\n";
 $parentClient = new TestClient();
 $parentClient->login($baseUrl, 'apex.parent1@tuitionpro.lk', 'Password@123');
@@ -335,10 +304,9 @@ runTest("Parent accessing /dashboard redirects to /portal/parent", function () u
 });
 
 runTest("Anti-IDOR Defense: Parent cannot manipulate ?child_id to access unrelated student", function () use ($baseUrl, $parentClient) {
-    // Attempt to access student #15 (Sahan Wickramasinghe - not child of Parent 1)
+    //Students
     $res = $parentClient->get("{$baseUrl}/portal/parent?child_id=15");
     if ($res['code'] !== 200) throw new \RuntimeException("Expected 200, got {$res['code']}");
-    // Must lock to linked child Kasun, and NOT leak Sahan's profile
     if (str_contains($res['body'], 'Sahan Thisara Wickramasinghe')) {
         throw new \RuntimeException("IDOR Vulnerability: Parent accessed unrelated student profile!");
     }
@@ -346,8 +314,6 @@ runTest("Anti-IDOR Defense: Parent cannot manipulate ?child_id to access unrelat
         throw new \RuntimeException("Expected active child to remain Kasun Chamara Perera");
     }
 });
-
-// ─── 9. Design System & Typography Verification ─────────────────────────────
 echo "\n9. Testing Design System, 6-Color Palette & Typography...\n";
 
 runTest("Layout loads Google Fonts Roboto and Poppins", function () use ($baseUrl, $ownerClient) {

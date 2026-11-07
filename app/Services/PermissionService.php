@@ -6,9 +6,6 @@ namespace App\Services;
 
 use App\Core\Database;
 
-/**
- * TuitionPro ERP — Role & Permission Verification Service
- */
 class PermissionService
 {
     private Database $db;
@@ -19,9 +16,6 @@ class PermissionService
         $this->db = Database::getInstance();
     }
 
-    /**
-     * Check if a given user role possesses a specific permission.
-     */
     public function hasPermission(string $permissionName, ?int $roleId = null): bool
     {
         $user = auth_user();
@@ -29,7 +23,6 @@ class PermissionService
             return false;
         }
 
-        // Platform Super Admin and Institute Owner have full access
         if (in_array($user['role_name'] ?? '', ['super_admin', 'institute_owner'], true)) {
             return true;
         }

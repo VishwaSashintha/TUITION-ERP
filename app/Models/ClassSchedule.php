@@ -12,9 +12,6 @@ class ClassSchedule extends Model
     protected bool $tenantScoped = true;
     protected bool $supportsSoftDeletes = false;
 
-    /**
-     * Check for teacher, room, or batch conflicts.
-     */
     public function detectConflicts(
         int $teacherId,
         int $dayOfWeek,
@@ -26,7 +23,7 @@ class ClassSchedule extends Model
         $tenantId = $this->getActiveTenantId();
         $conflicts = [];
 
-        // 1. Teacher conflict check
+        //Conflict
         $sql = "SELECT cs.*, b.name AS batch_name, t.full_name AS teacher_name 
                 FROM `class_schedules` cs 
                 JOIN `batches` b ON cs.batch_id = b.id 
@@ -55,7 +52,6 @@ class ClassSchedule extends Model
             $conflicts[] = "Teacher {$teacherClash['teacher_name']} has a schedule clash with batch '{$teacherClash['batch_name']}' ({$teacherClash['start_time']} - {$teacherClash['end_time']}).";
         }
 
-        // 2. Classroom conflict check
         if (!empty($classroom)) {
             $sqlRoom = "SELECT cs.*, b.name AS batch_name 
                         FROM `class_schedules` cs 

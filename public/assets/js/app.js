@@ -1,9 +1,4 @@
-/**
- * TuitionPro ERP — Client Application Scripts
- */
-
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Mobile Sidebar Toggle
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebarBackdrop = document.getElementById('sidebar-backdrop');
@@ -24,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. Auto-dismiss alerts after 5 seconds
     const alerts = document.querySelectorAll('.alert-dismissible');
     alerts.forEach(alert => {
         setTimeout(() => {
@@ -35,7 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     });
 
-    // 3. Prevent Double Form Submission
     const forms = document.querySelectorAll('form:not(.no-disable)');
     forms.forEach(form => {
         form.addEventListener('submit', function () {
@@ -48,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 4. Client-side Table Filter helper
+    //TableFilter
     const searchInputs = document.querySelectorAll('[data-table-filter]');
     searchInputs.forEach(input => {
         const tableId = input.dataset.tableFilter;
@@ -66,9 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-/**
- * Confirm action dialog helper
- */
 function confirmAction(message, onConfirm) {
     if (confirm(message)) {
         if (typeof onConfirm === 'function') {
@@ -78,4 +68,3 @@ function confirmAction(message, onConfirm) {
         }
     }
 }
-

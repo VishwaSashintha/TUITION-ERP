@@ -10,16 +10,6 @@ use App\Models\Payment;
 use App\Models\PaymentAllocation;
 use App\Models\Refund;
 
-/**
- * TuitionPro ERP — Student Billing, Invoicing & Payment Engine
- *
- * Enforces financial integrity:
- * - Invoices, payments, and allocations are strictly separated.
- * - Supports partial payments across multiple installments.
- * - Prevents overpayment or duplicate allocations.
- * - All multi-table updates are executed within atomic database transactions.
- * - Never uses floating point arithmetic for monetary calculations.
- */
 class BillingService
 {
     private Database $db;
@@ -35,22 +25,12 @@ class BillingService
         $this->paymentModel = new Payment();
     }
 
-    /**
-     * Issue an invoice to a student.
-     *
-     * @param int $studentId
-     * @param string $feePeriod Format 'YYYY-MM'
-     * @param string $dueDate
-     * @param array $items Array of ['description' => string, 'amount' => float, 'discount' => float, 'batch_id' => ?int, 'fee_type_id' => ?int]
-     * @param string|null $notes
-     * @return int Created invoice ID
-     */
     public function createInvoice(int $studentId, string $feePeriod, string $dueDate, array $items, ?string $notes = null): int
     {
         return $this->db->transaction(function () use ($studentId, $feePeriod, $dueDate, $items, $notes) {
             $tenantId = current_tenant_id();
 
-            // Find student's branch
+            //Students
             $student = $this->db->queryOne(
                 "SELECT id, branch_id FROM `students` WHERE `id` = :id AND `tenant_id` = :tid",
                 ['id' => $studentId, 'tid' => $tenantId]
@@ -121,17 +101,6 @@ class BillingService
         });
     }
 
-    /**
-     * Record a student payment and allocate it against one or more invoices.
-     *
-     * @param int $studentId
-     * @param float $amount Payment amount in LKR
-     * @param string $paymentMethod cash, bank_transfer, card, etc.
-     * @param array $allocations Array of ['invoice_id' => int, 'amount' => float]
-     * @param string|null $referenceNumber
-     * @param string|null $notes
-     * @return int Payment ID
-     */
     public function recordPayment(
         int $studentId,
         float $amount,
@@ -148,7 +117,6 @@ class BillingService
                 throw new \RuntimeException('Payment amount must be greater than zero.');
             }
 
-            // Verify allocated sum does not exceed payment amount
             $allocatedTotal = 0.00;
             foreach ($allocations as $alloc) {
                 $allocatedTotal += round((float) ($alloc['amount'] ?? 0), 2);
@@ -160,7 +128,7 @@ class BillingService
                 );
             }
 
-            // Student check
+            //Students
             $student = $this->db->queryOne(
                 "SELECT id, branch_id FROM `students` WHERE `id` = :id AND `tenant_id` = :tid",
                 ['id' => $studentId, 'tid' => $tenantId]
@@ -173,7 +141,6 @@ class BillingService
             $paymentNumber = $numbers['payment_number'];
             $receiptNumber = $numbers['receipt_number'];
 
-            // 1. Create Payment Record
             $paymentId = $this->paymentModel->create([
                 'tenant_id'        => $tenantId,
                 'branch_id'        => $student['branch_id'],
@@ -189,7 +156,6 @@ class BillingService
                 'status'           => 'confirmed',
             ]);
 
-            // 2. Process Allocations
             $paStmt = $this->db->getConnection()->prepare(
                 "INSERT INTO `payment_allocations` (`tenant_id`, `payment_id`, `invoice_id`, `amount`, `created_at`) 
                  VALUES (:tid, :pid, :inv_id, :amt, NOW())"
@@ -203,7 +169,6 @@ class BillingService
                     continue;
                 }
 
-                // Verify invoice exists and has enough outstanding balance
                 $invoice = $this->invoiceModel->find($invId);
                 if (!$invoice) {
                     throw new \RuntimeException("Invoice #{$invId} not found.");
@@ -216,7 +181,6 @@ class BillingService
                     );
                 }
 
-                // Record allocation
                 $paStmt->execute([
                     'tid'    => $tenantId,
                     'pid'    => $paymentId,
@@ -224,7 +188,6 @@ class BillingService
                     'amt'    => $allocAmt,
                 ]);
 
-                // Update invoice paid & balance amounts
                 $newPaid    = round((float)$invoice['paid_amount'] + $allocAmt, 2);
                 $newBalance = max(0.00, round((float)$invoice['total_amount'] - $newPaid, 2));
                 $newStatus  = ($newBalance <= 0.00) ? 'paid' : 'partially_paid';
@@ -236,7 +199,6 @@ class BillingService
                 ]);
             }
 
-            // 3. Update Cash/Bank account balance
             $cashAccount = $this->db->queryOne(
                 "SELECT id, current_balance FROM `financial_accounts` WHERE `tenant_id` = :tid AND `account_type` = 'cash' AND `is_active` = 1 LIMIT 1",
                 ['tid' => $tenantId]
@@ -255,9 +217,6 @@ class BillingService
         });
     }
 
-    /**
-     * Process an authorized refund or reversal for a payment.
-     */
     public function refundPayment(int $paymentId, float $refundAmount, string $reason): int
     {
         return $this->processRefund($paymentId, $refundAmount, $reason);
@@ -283,12 +242,10 @@ class BillingService
                 throw new \RuntimeException("Refund amount (Rs. {$refundAmount}) cannot exceed paid amount (Rs. {$paidAmount}).");
             }
 
-            // Generate refund number
             $tenant = $this->db->queryOne("SELECT code FROM `tenants` WHERE `id` = :tid", ['tid' => $tenantId]);
             $tCode  = strtoupper($tenant['code'] ?? 'TP');
             $refundNumber = "{$tCode}-REF-" . date('Ym') . "-" . substr(uniqid(), -4);
 
-            // Revert allocations
             $allocations = $this->db->query(
                 "SELECT * FROM `payment_allocations` WHERE `payment_id` = :pid AND `tenant_id` = :tid",
                 ['pid' => $paymentId, 'tid' => $tenantId]
@@ -309,7 +266,6 @@ class BillingService
                 }
             }
 
-            // Create Refund Record
             $refundModel = new Refund();
             $refundId = $refundModel->create([
                 'tenant_id'     => $tenantId,
@@ -321,13 +277,11 @@ class BillingService
                 'authorized_by' => auth_id() ?? 1,
             ]);
 
-            // Update payment status
             $this->db->execute(
                 "UPDATE `payments` SET `status` = 'refunded' WHERE `id` = :id AND `tenant_id` = :tid",
                 ['id' => $paymentId, 'tid' => $tenantId]
             );
 
-            // Deduct from Cash/Bank account
             $cashAccount = $this->db->queryOne(
                 "SELECT id, current_balance FROM `financial_accounts` WHERE `tenant_id` = :tid AND `account_type` = 'cash' AND `is_active` = 1 LIMIT 1",
                 ['tid' => $tenantId]
@@ -346,32 +300,25 @@ class BillingService
         });
     }
 
-    /**
-     * Get aggregate financial metrics for the active tenant.
-     */
     public function getFinancialKPIs(): array
     {
         $tenantId = current_tenant_id();
 
-        // Total Billed
         $billedRow = $this->db->queryOne(
             "SELECT COALESCE(SUM(total_amount), 0) AS total FROM `invoices` WHERE `tenant_id` = :tid AND `deleted_at` IS NULL AND `status` != 'cancelled'",
             ['tid' => $tenantId]
         );
 
-        // Total Collected
         $collectedRow = $this->db->queryOne(
             "SELECT COALESCE(SUM(amount), 0) AS total FROM `payments` WHERE `tenant_id` = :tid AND `status` = 'confirmed'",
             ['tid' => $tenantId]
         );
 
-        // Outstanding Receivables
         $outstandingRow = $this->db->queryOne(
             "SELECT COALESCE(SUM(balance_amount), 0) AS total FROM `invoices` WHERE `tenant_id` = :tid AND `deleted_at` IS NULL AND `status` IN ('issued', 'partially_paid', 'overdue')",
             ['tid' => $tenantId]
         );
 
-        // Total Expenses
         $expenseRow = $this->db->queryOne(
             "SELECT COALESCE(SUM(amount), 0) AS total FROM `expenses` WHERE `tenant_id` = :tid AND `deleted_at` IS NULL AND `payment_status` != 'cancelled'",
             ['tid' => $tenantId]

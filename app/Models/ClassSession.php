@@ -12,9 +12,6 @@ class ClassSession extends Model
     protected bool $tenantScoped = true;
     protected bool $supportsSoftDeletes = false;
 
-    /**
-     * Get class session with batch, teacher, and subject details.
-     */
     public function findWithDetails(int $id): ?array
     {
         $tenantId = $this->getActiveTenantId();

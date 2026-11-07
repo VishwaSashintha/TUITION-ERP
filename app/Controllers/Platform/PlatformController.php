@@ -10,15 +10,6 @@ use App\Core\Request;
 use App\Models\Tenant;
 use App\Services\AuditService;
 
-/**
- * TuitionPro ERP — Developer / System Super Administrator Controller
- *
- * Per requirements:
- * - Developer-controlled system administrator for setup & maintenance
- * - Manages the installation's Institute Admin account (creation / recovery)
- * - Monitors system health, database integrity, and audit logs
- * - No SaaS multi-tenant self-service onboarding or runtime tenant switching
- */
 class PlatformController extends Controller
 {
     private Tenant $tenantModel;
@@ -32,14 +23,10 @@ class PlatformController extends Controller
         $this->db          = Database::getInstance();
     }
 
-    /**
-     * System Administration Dashboard & Health Monitor.
-     */
     public function dashboard(Request $request): void
     {
         $code = strtolower((string) env('INSTITUTE_CODE', 'apex'));
 
-        // 1. Active Institute Profile
         $activeInstitute = $this->db->queryOne(
             "SELECT t.*, 
                     (SELECT COUNT(*) FROM `students` s WHERE s.tenant_id = t.id AND s.deleted_at IS NULL) AS student_count,
@@ -52,7 +39,6 @@ class PlatformController extends Controller
         );
 
         if (!$activeInstitute) {
-            // Fallback to first tenant
             $activeInstitute = $this->db->queryOne(
                 "SELECT t.*, 
                         (SELECT COUNT(*) FROM `students` s WHERE s.tenant_id = t.id AND s.deleted_at IS NULL) AS student_count,
@@ -64,7 +50,6 @@ class PlatformController extends Controller
             );
         }
 
-        // 2. System & Platform-Wide Statistics
         $totalTenants = (int) $this->db->queryOne("SELECT COUNT(*) AS c FROM `tenants` WHERE `deleted_at` IS NULL")['c'];
         $activeTenants = (int) $this->db->queryOne("SELECT COUNT(*) AS c FROM `tenants` WHERE `status` = 'active' AND `deleted_at` IS NULL")['c'];
         $inactiveTenants = max(0, $totalTenants - $activeTenants);
@@ -76,7 +61,6 @@ class PlatformController extends Controller
         $activeTokens = (int) $this->db->queryOne("SELECT COUNT(*) AS c FROM `refresh_tokens` WHERE `revoked_at` IS NULL AND `expires_at` > NOW()")['c'];
         $totalAudits = (int) $this->db->queryOne("SELECT COUNT(*) AS c FROM `audit_logs`")['c'];
 
-        // 3. System Environment Info
         $systemInfo = [
             'php_version'    => PHP_VERSION,
             'mysql_version'  => $this->db->getConnection()->getAttribute(\PDO::ATTR_SERVER_VERSION),
@@ -87,7 +71,6 @@ class PlatformController extends Controller
             'storage_status' => is_writable(STORAGE_PATH) ? 'Writable' : 'Read-Only',
         ];
 
-        // 4. Recent Audit Logs
         $recentAudits = $this->db->query(
             "SELECT a.*, COALESCE(u.name, 'System') AS user_name 
              FROM `audit_logs` a 
@@ -113,9 +96,6 @@ class PlatformController extends Controller
         ]);
     }
 
-    /**
-     * Institute Admin Account & Installation Configuration Management.
-     */
     public function tenants(Request $request): void
     {
         $code = strtolower((string) env('INSTITUTE_CODE', 'apex'));
@@ -149,9 +129,6 @@ class PlatformController extends Controller
         ]);
     }
 
-    /**
-     * Create or Assign an Institute Admin Account.
-     */
     public function storeTenant(Request $request): void
     {
         $rules = [
@@ -181,11 +158,10 @@ class PlatformController extends Controller
             return;
         }
 
-        // Get institute_admin role id
+        //Permissions
         $adminRole = $this->db->queryOne("SELECT id FROM `roles` WHERE `name` = 'institute_admin' LIMIT 1");
         $roleId = $adminRole ? (int) $adminRole['id'] : 2;
 
-        // Get main branch
         $mainBranch = $this->db->queryOne("SELECT id FROM `branches` WHERE `tenant_id` = :tid ORDER BY is_main DESC, id ASC LIMIT 1", ['tid' => $tenantId]);
         $branchId = $mainBranch ? (int) $mainBranch['id'] : null;
 
@@ -208,9 +184,6 @@ class PlatformController extends Controller
         $this->back('success', "Institute Admin account for '{$email}' created successfully.");
     }
 
-    /**
-     * Reset Institute Admin Password.
-     */
     public function resetAdminPassword(Request $request): void
     {
         $userId   = (int) $request->input('user_id');
@@ -221,7 +194,6 @@ class PlatformController extends Controller
             return;
         }
 
-        // Verify user is an institute admin
         $user = $this->db->queryOne(
             "SELECT u.*, r.name AS role_name 
              FROM `users` u 
@@ -241,7 +213,7 @@ class PlatformController extends Controller
             ['hash' => $hash, 'id' => $userId]
         );
 
-        // Revoke active refresh tokens for this user for security
+        //Authentication
         $this->db->execute(
             "UPDATE `refresh_tokens` SET `revoked_at` = NOW() WHERE `user_id` = :uid AND `user_type` = 'institute'",
             ['uid' => $userId]
@@ -252,9 +224,6 @@ class PlatformController extends Controller
         $this->back('success', "Password successfully reset for {$user['name']} ({$user['email']}).");
     }
 
-    /**
-     * Update Institute Profile Configuration.
-     */
     public function updateInstitute(Request $request): void
     {
         $instituteId = (int) $request->input('institute_id');

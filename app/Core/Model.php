@@ -4,28 +4,12 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/**
- * TuitionPro ERP — Base Model with Automatic Tenant Isolation
- *
- * Every tenant-owned model automatically scopes all reads, inserts,
- * updates, and deletes to the authenticated tenant ID, ensuring rigorous
- * tenant isolation at the data-access layer.
- */
 abstract class Model
 {
-    /** @var string The database table associated with the model */
     protected string $table;
-
-    /** @var string Primary key column */
     protected string $primaryKey = 'id';
-
-    /** @var bool Whether this table belongs to a tenant and requires tenant_id scoping */
     protected bool $tenantScoped = true;
-
-    /** @var bool Whether this table supports soft deletes via deleted_at timestamp */
     protected bool $supportsSoftDeletes = true;
-
-    /** @var bool Whether this table has an updated_at column */
     protected bool $hasUpdatedAt = true;
 
     protected Database $db;
@@ -35,10 +19,6 @@ abstract class Model
         $this->db = Database::getInstance();
     }
 
-    /**
-     * Get the active tenant ID for scoping.
-     * Throws an exception if a tenant-scoped model is accessed without an active tenant context.
-     */
     protected function getActiveTenantId(): int
     {
         $tenantId = current_tenant_id();
@@ -48,11 +28,6 @@ abstract class Model
         return $tenantId;
     }
 
-    // ─── Query Operations ────────────────────────────────────────────────────
-
-    /**
-     * Find a record by its primary key, strictly checking tenant scoping.
-     */
     public function find(int|string $id): ?array
     {
         $sql = "SELECT * FROM `{$this->table}` WHERE `{$this->primaryKey}` = :id";
@@ -72,11 +47,6 @@ abstract class Model
         return $this->db->queryOne($sql, $params);
     }
 
-    /**
-     * Get all records matching conditions, strictly scoped to active tenant.
-     *
-     * @param array<string,mixed> $where Key-value conditions
-     */
     public function all(
         array $where = [],
         string $orderBy = 'id DESC',
@@ -107,7 +77,7 @@ abstract class Model
         }
 
         if (!empty($orderBy)) {
-            // Sanitize order by to prevent injection
+            //Sanitize
             $cleanOrder = preg_replace('/[^a-zA-Z0-9_, ]/', '', $orderBy);
             $sql .= " ORDER BY {$cleanOrder}";
         }
@@ -122,18 +92,12 @@ abstract class Model
         return $this->db->query($sql, $params);
     }
 
-    /**
-     * Find the first record matching given criteria.
-     */
     public function first(array $where = [], string $orderBy = 'id ASC'): ?array
     {
         $results = $this->all($where, $orderBy, 1);
         return $results[0] ?? null;
     }
 
-    /**
-     * Count total records matching criteria within active tenant.
-     */
     public function count(array $where = []): int
     {
         $conditions = [];
@@ -163,14 +127,6 @@ abstract class Model
         return (int) ($row['total'] ?? 0);
     }
 
-    // ─── Write Operations ────────────────────────────────────────────────────
-
-    /**
-     * Create a new record, automatically attaching tenant_id if tenant-scoped.
-     *
-     * @param array<string,mixed> $data
-     * @return int The newly inserted ID
-     */
     public function create(array $data): int
     {
         if ($this->tenantScoped && !isset($data['tenant_id'])) {
@@ -199,16 +155,8 @@ abstract class Model
         return $this->db->insert($sql, $data);
     }
 
-    /**
-     * Update an existing record, strictly verifying tenant ownership.
-     *
-     * @param int|string $id
-     * @param array<string,mixed> $data
-     * @return int Number of affected rows
-     */
     public function update(int|string $id, array $data): int
     {
-        // Prevent changing tenant_id or primary key
         unset($data['id'], $data['tenant_id'], $data['created_at']);
         $data['updated_at'] = date('Y-m-d H:i:s');
 
@@ -235,10 +183,6 @@ abstract class Model
         return $this->db->execute($sql, $params);
     }
 
-    /**
-     * Delete a record (soft delete by default if supported).
-     * Strictly verifies tenant ownership before deletion.
-     */
     public function delete(int|string $id, bool $forceHardDelete = false): int
     {
         $params = ['pk_id' => $id];
@@ -258,4 +202,3 @@ abstract class Model
         return $this->db->execute($sql, $params);
     }
 }
-

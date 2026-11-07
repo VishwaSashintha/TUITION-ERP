@@ -7,12 +7,6 @@ namespace App\Core;
 use PDO;
 use PDOException;
 
-/**
- * TuitionPro ERP — Database Singleton
- *
- * Provides a single PDO connection shared across the request lifecycle.
- * All queries must use prepared statements to prevent SQL injection.
- */
 class Database
 {
     private static ?self $instance = null;
@@ -57,7 +51,6 @@ class Database
         try {
             $this->pdo = new PDO($dsn, $user, $pass, $options);
         } catch (PDOException $e) {
-            // Never expose credentials or full DSN in logs
             throw new \RuntimeException(
                 'Database connection failed. Check your .env configuration.',
                 0,
@@ -66,26 +59,12 @@ class Database
         }
     }
 
-    // ─── Query Helpers ───────────────────────────────────────────────────────
-
-    /**
-     * Execute a query and return all rows.
-     *
-     * @param array<string,mixed> $params
-     * @return array<int,array<string,mixed>>
-     */
     public function query(string $sql, array $params = []): array
     {
         $stmt = $this->prepare($sql, $params);
         return $stmt->fetchAll();
     }
 
-    /**
-     * Execute a query and return a single row.
-     *
-     * @param array<string,mixed> $params
-     * @return array<string,mixed>|null
-     */
     public function queryOne(string $sql, array $params = []): ?array
     {
         $stmt   = $this->prepare($sql, $params);
@@ -93,29 +72,17 @@ class Database
         return $result !== false ? $result : null;
     }
 
-    /**
-     * Execute an INSERT/UPDATE/DELETE and return affected rows.
-     *
-     * @param array<string,mixed> $params
-     */
     public function execute(string $sql, array $params = []): int
     {
         $stmt = $this->prepare($sql, $params);
         return $stmt->rowCount();
     }
 
-    /**
-     * Execute an INSERT and return the last inserted ID.
-     *
-     * @param array<string,mixed> $params
-     */
     public function insert(string $sql, array $params = []): int
     {
         $this->prepare($sql, $params);
         return (int) $this->pdo->lastInsertId();
     }
-
-    // ─── Transaction Helpers ─────────────────────────────────────────────────
 
     public function beginTransaction(): void
     {
@@ -132,14 +99,6 @@ class Database
         $this->getConnection()->rollBack();
     }
 
-    /**
-     * Execute a callable inside a database transaction.
-     * Automatically commits on success and rolls back on failure.
-     *
-     * @template T
-     * @param callable(): T $callback
-     * @return T
-     */
     public function transaction(callable $callback): mixed
     {
         $this->beginTransaction();
@@ -153,11 +112,6 @@ class Database
         }
     }
 
-    // ─── Internal ────────────────────────────────────────────────────────────
-
-    /**
-     * @param array<string,mixed> $params
-     */
     private function prepare(string $sql, array $params): \PDOStatement
     {
         $pdo  = $this->getConnection();
@@ -166,4 +120,3 @@ class Database
         return $stmt;
     }
 }
-

@@ -136,7 +136,6 @@ function playBeep(success = true) {
             osc.stop(audioCtx.currentTime + 0.3);
         }
     } catch (e) {
-        // audio context not allowed without prior user interaction
     }
 }
 
@@ -185,7 +184,6 @@ async function processScan(code) {
             msgEl.textContent = data.message;
             msgEl.className = isDup ? 'small mt-1 text-warning fw-bold' : 'small mt-1 text-success fw-bold';
 
-            // Prepend row to table
             scanCount++;
             document.getElementById('scanCountBadge').textContent = scanCount + ' Recorded';
             const tbody = document.getElementById('scanFeedBody');

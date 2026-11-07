@@ -12,9 +12,6 @@ class Examination extends Model
     protected bool $tenantScoped = true;
     protected bool $supportsSoftDeletes = true;
 
-    /**
-     * Find examination with marks and student details.
-     */
     public function findWithMarks(int $id): ?array
     {
         $tenantId = $this->getActiveTenantId();

@@ -2,18 +2,6 @@
 
 declare(strict_types=1);
 
-/**
- * TuitionPro ERP — Full HTTP Route Smoke & Workflow Verification Suite
- *
- * Verifies live HTTP endpoints against the running server on http://localhost:8080:
- * - Guest access & redirect protection
- * - Super Admin authentication & system management
- * - Institute Admin full operations & all 14 modules
- * - Student & Parent portals
- * - Route parameter resolution (/students/{id}, /teachers/{id})
- * - JWT issuance & session cookie persistence
- */
-
 $baseUrl = 'http://localhost:8080';
 $passed = 0;
 $failed = 0;
@@ -103,8 +91,6 @@ echo "======================================================\n";
 echo "TuitionPro ERP — Full HTTP Route Smoke Verification\n";
 echo "Server Target: {$baseUrl}\n";
 echo "======================================================\n\n";
-
-// ─── 1. Guest Unauthenticated Route Protection ──────────────────────────────
 echo "1. Testing Guest Protection & Redirects...\n";
 
 runTest("GET /login returns 200 OK", function () use ($baseUrl) {
@@ -144,8 +130,6 @@ runTest("GET /platform/dashboard without auth redirects to /login (302)", functi
         throw new \RuntimeException("Expected 302, got {$res['code']}");
     }
 });
-
-// ─── 2. Super Administrator Authentication & System Admin ───────────────────
 echo "\n2. Testing Developer / Super Admin Workflows...\n";
 
 $superClient = new HttpClient();
@@ -191,8 +175,6 @@ runTest("GET /platform/tenants loads Institute Admin Setup with 200 OK", functio
         throw new \RuntimeException("Institute admin setup title missing");
     }
 });
-
-// ─── 3. Institute Admin Authentication & Full Modules ───────────────────────
 echo "\n3. Testing Institute Admin & Core Tuition Modules...\n";
 
 $adminClient = new HttpClient();
@@ -280,8 +262,6 @@ foreach ($instituteRoutes as $route => $expectedSubstring) {
         }
     });
 }
-
-// ─── 4. Student & Parent Portals ────────────────────────────────────────────
 echo "\n4. Testing Student & Parent Portals...\n";
 
 $studentClient = new HttpClient();
@@ -321,8 +301,6 @@ runTest("Parent login and portal access", function () use ($baseUrl, $parentClie
         throw new \RuntimeException("Parent portal view content not found");
     }
 });
-
-// ─── 5. Logout & Token Invalidation ─────────────────────────────────────────
 echo "\n5. Testing Secure Logout & Session Clearance...\n";
 
 runTest("POST /logout terminates session and clears cookies", function () use ($baseUrl, $adminClient) {
@@ -337,7 +315,7 @@ runTest("POST /logout terminates session and clears cookies", function () use ($
         throw new \RuntimeException("Expected 302 redirect after logout, got {$res['code']}");
     }
 
-    // Now attempt to access /dashboard — must redirect to /login
+    //Authentication
     $res2 = $adminClient->get("{$baseUrl}/dashboard");
     if ($res2['code'] !== 302) {
         throw new \RuntimeException("Expected 302 to login after logout, got {$res2['code']}");

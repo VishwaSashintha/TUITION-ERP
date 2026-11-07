@@ -2,12 +2,6 @@
 
 declare(strict_types=1);
 
-/**
- * TuitionPro ERP — Single-Institute Installation Configuration
- *
- * Each customer deployment (e.g., Iskole, Pasala, Apex) operates with its own
- * dedicated configuration, database, branding, and contact details.
- */
 return [
     'name'            => env('INSTITUTE_NAME', 'Apex Higher Education Institute'),
     'code'            => env('INSTITUTE_CODE', 'apex'),

@@ -12,9 +12,6 @@ class User extends Model
     protected bool $tenantScoped = true;
     protected bool $supportsSoftDeletes = true;
 
-    /**
-     * Find user with role and branch details.
-     */
     public function findWithDetails(int $id): ?array
     {
         $tenantId = $this->getActiveTenantId();

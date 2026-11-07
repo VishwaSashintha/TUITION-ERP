@@ -12,9 +12,6 @@ class Guardian extends Model
     protected bool $tenantScoped = true;
     protected bool $supportsSoftDeletes = true;
 
-    /**
-     * Get students linked to a specific guardian.
-     */
     public function getLinkedStudents(int $guardianId): array
     {
         $tenantId = $this->getActiveTenantId();

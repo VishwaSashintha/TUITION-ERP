@@ -26,9 +26,6 @@ class CommunicationController extends Controller
         $this->db                = Database::getInstance();
     }
 
-    /**
-     * List announcements.
-     */
     public function announcements(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -56,9 +53,6 @@ class CommunicationController extends Controller
         ]);
     }
 
-    /**
-     * Post a new announcement.
-     */
     public function storeAnnouncement(Request $request): void
     {
         $rules = [
@@ -95,9 +89,6 @@ class CommunicationController extends Controller
         }
     }
 
-    /**
-     * Notifications feed for logged-in user.
-     */
     public function notifications(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -115,9 +106,6 @@ class CommunicationController extends Controller
         ]);
     }
 
-    /**
-     * Mark notification as read.
-     */
     public function markNotificationRead(Request $request): void
     {
         $id       = (int) $request->input('id');

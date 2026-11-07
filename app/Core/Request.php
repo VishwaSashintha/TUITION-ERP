@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/**
- * TuitionPro ERP — HTTP Request Encapsulation
- */
 class Request
 {
     private string $method;
@@ -28,7 +25,6 @@ class Request
         $this->files   = $_FILES;
         $this->headers = $this->extractHeaders();
 
-        // Support _method spoofing for PUT/DELETE via POST form
         if ($this->method === 'POST' && isset($this->post['_method'])) {
             $spoofed = strtoupper((string) $this->post['_method']);
             if (in_array($spoofed, ['PUT', 'PATCH', 'DELETE'], true)) {
@@ -41,7 +37,6 @@ class Request
         $this->uri  = $rawUri;
         $this->path = $this->normalizePath($parsedUri['path'] ?? '/');
 
-        // Parse JSON body if Content-Type is application/json
         $contentType = $this->header('Content-Type', '');
         if (str_contains($contentType, 'application/json')) {
             $input = file_get_contents('php://input');
@@ -56,7 +51,6 @@ class Request
 
     private function normalizePath(string $rawPath): string
     {
-        // Strip base folder if running under subfolder like /tuitionpro/public/
         $scriptName = $this->server['SCRIPT_NAME'] ?? '';
         $baseDir    = str_replace('\\', '/', dirname($scriptName));
 
@@ -201,4 +195,3 @@ class Request
         return $this->server['HTTP_USER_AGENT'] ?? '';
     }
 }
-

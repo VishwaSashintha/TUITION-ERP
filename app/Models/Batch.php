@@ -12,9 +12,6 @@ class Batch extends Model
     protected bool $tenantScoped = true;
     protected bool $supportsSoftDeletes = true;
 
-    /**
-     * Get batch with joined subject, course, teacher, and branch information.
-     */
     public function findWithDetails(int $id): ?array
     {
         $tenantId = $this->getActiveTenantId();
@@ -31,9 +28,6 @@ class Batch extends Model
         );
     }
 
-    /**
-     * List all batches with active enrollment count and capacity check.
-     */
     public function allWithDetails(?int $branchId = null): array
     {
         $tenantId = $this->getActiveTenantId();

@@ -20,9 +20,6 @@ class AuthController extends Controller
         $this->tenantManager = new TenantManager();
     }
 
-    /**
-     * Display sign-in page.
-     */
     public function showLogin(Request $request): void
     {
         $this->render('auth/login', [
@@ -30,9 +27,6 @@ class AuthController extends Controller
         ], 'layouts/auth');
     }
 
-    /**
-     * Handle sign-in submission.
-     */
     public function login(Request $request): void
     {
         $login       = (string) $request->input('login', '');
@@ -52,7 +46,7 @@ class AuthController extends Controller
                 return;
             }
 
-            // Redirect based on role
+            //Redirect
             $role = $user['role_name'] ?? ($user['role'] ?? 'guest');
             if (in_array($role, ['super_admin', 'support_admin'], true)) {
                 $this->redirect(url('platform/dashboard'), 'success', 'Welcome back, Platform Administrator.');
@@ -75,11 +69,9 @@ class AuthController extends Controller
         }
     }
 
-    // Auth
     public function logout(Request $request): void
     {
         $this->auth->logout();
         $this->redirect(url('login'), 'success', 'You have been signed out safely.');
     }
 }
-

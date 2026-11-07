@@ -23,9 +23,6 @@ class TeacherPaymentController extends Controller
         $this->db             = Database::getInstance();
     }
 
-    /**
-     * Dashboard & list of teacher payments and calculations.
-     */
     public function index(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -57,7 +54,6 @@ class TeacherPaymentController extends Controller
             ['tid' => $tenantId]
         );
 
-        // Summary KPI
         $summary = $this->db->queryOne(
             "SELECT 
                 COALESCE(SUM(amount), 0.00) AS total_disbursed,
@@ -77,9 +73,6 @@ class TeacherPaymentController extends Controller
         ]);
     }
 
-    /**
-     * Calculation preview generator page.
-     */
     public function calculate(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -107,7 +100,6 @@ class TeacherPaymentController extends Controller
                     $calc['teacher_name'] = $t['full_name'];
                     $calculatedList[] = $calc;
                 } catch (\Throwable $e) {
-                    // skip or log
                 }
             }
         }
@@ -121,9 +113,6 @@ class TeacherPaymentController extends Controller
         ]);
     }
 
-    /**
-     * Save and approve calculated compensation.
-     */
     public function saveCalculation(Request $request): void
     {
         $teacherId = (int) $request->input('teacher_id');
@@ -142,9 +131,6 @@ class TeacherPaymentController extends Controller
         }
     }
 
-    /**
-     * Payslip & Statement view.
-     */
     public function statement(Request $request): void
     {
         $id = (int) $request->query('id');
@@ -181,9 +167,6 @@ class TeacherPaymentController extends Controller
         ]);
     }
 
-    /**
-     * Disburse payment voucher.
-     */
     public function disburse(Request $request): void
     {
         $calcId        = (int) $request->input('calculation_id');

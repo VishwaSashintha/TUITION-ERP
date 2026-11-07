@@ -4,38 +4,23 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/**
- * TuitionPro ERP — Base Controller
- */
 abstract class Controller
 {
-    /**
-     * Render a view and echo the output.
-     */
     protected function render(string $view, array $data = [], ?string $layout = 'layouts/app'): void
     {
         echo View::render($view, $data, $layout);
     }
 
-    /**
-     * Alias for render().
-     */
     protected function view(string $view, array $data = [], ?string $layout = 'layouts/app'): void
     {
         $this->render($view, $data, $layout);
     }
 
-    /**
-     * Send a JSON response.
-     */
     protected function json(mixed $data, int $statusCode = 200): void
     {
         Response::json($data, $statusCode);
     }
 
-    /**
-     * Redirect to another URL with optional flash message.
-     */
     protected function redirect(string $url, ?string $flashKey = null, ?string $flashMessage = null): void
     {
         if ($flashKey !== null && $flashMessage !== null) {
@@ -44,9 +29,6 @@ abstract class Controller
         Response::redirect($url);
     }
 
-    /**
-     * Redirect back to the previous page with optional flash message and old input.
-     */
     protected function back(?string $flashKey = null, ?string $flashMessage = null, array $oldInput = []): void
     {
         if (!empty($oldInput)) {
@@ -59,14 +41,6 @@ abstract class Controller
         Response::redirect($referer);
     }
 
-    /**
-     * Basic server-side input validation helper.
-     * Throws an exception or returns errors array.
-     *
-     * @param array<string,string> $rules e.g. ['name' => 'required|min:3', 'email' => 'required|email']
-     * @param array<string,mixed> $data
-     * @return array<string,string> Array of errors, empty if valid
-     */
     protected function validate(array $rules, array $data): array
     {
         $errors = [];
@@ -128,4 +102,3 @@ abstract class Controller
         return current_branch_id();
     }
 }
-

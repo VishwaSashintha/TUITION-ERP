@@ -12,9 +12,6 @@ class TeacherPaymentCalculation extends Model
     protected bool $tenantScoped = true;
     protected bool $supportsSoftDeletes = false;
 
-    /**
-     * Get calculation with teacher, period, and batch info.
-     */
     public function findWithDetails(int $id): ?array
     {
         $tenantId = $this->getActiveTenantId();

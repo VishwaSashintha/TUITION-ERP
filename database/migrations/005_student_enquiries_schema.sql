@@ -1,5 +1,3 @@
--- TuitionPro ERP: Student Enquiries and Follow-Up Lifecycle Schema
--- Migration 005: Creates student_enquiries and enquiry_followups tables
 
 CREATE TABLE IF NOT EXISTS `student_enquiries` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -45,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `enquiry_followups` (
     CONSTRAINT `fk_followups_contacted` FOREIGN KEY (`contacted_by`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Seed demonstration inquiries for active tenant (Tenant 1: Apex)
+--Seeds
 INSERT IGNORE INTO `student_enquiries` (`id`, `tenant_id`, `branch_id`, `first_name`, `last_name`, `phone`, `email`, `grade`, `course_interest`, `source`, `status`, `notes`, `next_followup_date`, `created_at`)
 VALUES
     (1, 1, 1, 'Roshan', 'Jayasinghe', '0779911223', 'roshan.j@gmail.com', '12', 'A/L Combined Mathematics', 'walk_in', 'follow_up', 'Interested in weekday revision batch. Requested timetable.', CURDATE() + INTERVAL 1 DAY, NOW()),

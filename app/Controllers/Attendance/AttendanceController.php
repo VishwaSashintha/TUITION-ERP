@@ -26,16 +26,12 @@ class AttendanceController extends Controller
         $this->db              = Database::getInstance();
     }
 
-    /**
-     * Sheet for marking attendance for a specific session.
-     */
     public function take(Request $request): void
     {
         $sessionId = (int) $request->query('session_id');
         $tenantId = current_tenant_id();
 
         if ($sessionId <= 0) {
-            // Find next or today's session
             $today = date('Y-m-d');
             $session = $this->db->queryOne(
                 "SELECT id FROM `class_sessions` WHERE `tenant_id` = :tid AND `session_date` = :date ORDER BY `start_time` ASC LIMIT 1",
@@ -76,7 +72,7 @@ class AttendanceController extends Controller
             return;
         }
 
-        // Fetch students enrolled in this batch
+        //Students
         $students = $this->db->query(
             "SELECT st.id, st.admission_number, st.full_name, st.phone, st.status AS student_status,
                     ar.id AS attendance_id, ar.status AS attendance_status, ar.check_in_time, ar.notes
@@ -93,7 +89,6 @@ class AttendanceController extends Controller
             ]
         );
 
-        // Fetch other sessions on the same day for easy switching
         $daySessions = $this->db->query(
             "SELECT cs.id, cs.start_time, cs.end_time, b.name AS batch_name
              FROM `class_sessions` cs
@@ -112,9 +107,6 @@ class AttendanceController extends Controller
         ]);
     }
 
-    /**
-     * Save manual bulk attendance.
-     */
     public function save(Request $request): void
     {
         $sessionId = (int) $request->input('session_id');
@@ -160,7 +152,6 @@ class AttendanceController extends Controller
             $markedCount++;
         }
 
-        // Mark session as completed
         $this->db->execute(
             "UPDATE `class_sessions` SET `status` = 'completed' WHERE `id` = :id AND `tenant_id` = :tid",
             ['id' => $sessionId, 'tid' => $tenantId]
@@ -171,15 +162,11 @@ class AttendanceController extends Controller
         $this->redirect(url("attendance/take?session_id={$sessionId}"), 'success', "Attendance saved successfully for {$markedCount} students.");
     }
 
-    /**
-     * Interactive QR Scanner page.
-     */
     public function qrScanner(Request $request): void
     {
         $tenantId = current_tenant_id();
         $sessionId = (int) $request->query('session_id');
 
-        // Fetch active sessions today
         $today = date('Y-m-d');
         $sessions = $this->db->query(
             "SELECT cs.id, cs.start_time, cs.end_time, b.name AS batch_name, s.name AS subject_name, t.full_name AS teacher_name
@@ -200,9 +187,6 @@ class AttendanceController extends Controller
         ]);
     }
 
-    /**
-     * AJAX endpoint for QR scan.
-     */
     public function scanQr(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -226,7 +210,7 @@ class AttendanceController extends Controller
             return;
         }
 
-        // Find student
+        //Students
         $student = $this->db->queryOne(
             "SELECT s.* FROM `students` s WHERE (s.`admission_number` = :code OR s.`id` = :code_id) AND s.`tenant_id` = :tid AND s.`deleted_at` IS NULL",
             ['code' => $code, 'code_id' => is_numeric($code) ? (int)$code : 0, 'tid' => $tenantId]
@@ -237,7 +221,6 @@ class AttendanceController extends Controller
             return;
         }
 
-        // Check enrollment
         $enrollment = $this->db->queryOne(
             "SELECT id FROM `enrollments` WHERE `student_id` = :stuid AND `batch_id` = :bid AND `tenant_id` = :tid AND `status` = 'active'",
             ['stuid' => $student['id'], 'bid' => $session['batch_id'], 'tid' => $tenantId]
@@ -245,7 +228,7 @@ class AttendanceController extends Controller
 
         $isEnrolled = (bool) $enrollment;
 
-        // Upsert attendance record
+        //Attendance
         $existing = $this->db->queryOne(
             "SELECT id, status, check_in_time FROM `attendance_records` WHERE `class_session_id` = :sid AND `student_id` = :stuid AND `tenant_id` = :tid",
             ['sid' => $sessionId, 'stuid' => $student['id'], 'tid' => $tenantId]
@@ -299,9 +282,6 @@ class AttendanceController extends Controller
         ]);
     }
 
-    /**
-     * Attendance history and reporting with filters.
-     */
     public function history(Request $request): void
     {
         $tenantId  = current_tenant_id();
@@ -337,7 +317,7 @@ class AttendanceController extends Controller
         $records = $this->db->query($sql, $params);
         $batches = $this->db->query("SELECT id, name FROM `batches` WHERE `tenant_id` = :tid AND `status` = 'active'", ['tid' => $tenantId]);
 
-        // Calculate summary rates
+        //Calculation
         $summary = $this->db->queryOne(
             "SELECT 
                 COUNT(*) AS total_count,
@@ -366,9 +346,6 @@ class AttendanceController extends Controller
         ]);
     }
 
-    /**
-     * Correct attendance record with mandatory audit note.
-     */
     public function correct(Request $request): void
     {
         $id = (int) $request->input('id');

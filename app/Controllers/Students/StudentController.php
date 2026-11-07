@@ -29,9 +29,6 @@ class StudentController extends Controller
         $this->db             = Database::getInstance();
     }
 
-    /**
-     * List all students with search, filters, and pagination.
-     */
     public function index(Request $request): void
     {
         $term     = $request->query('term');
@@ -60,12 +57,9 @@ class StudentController extends Controller
         ]);
     }
 
-    /**
-     * Display student admission form.
-     */
     public function create(Request $request): void
     {
-        // Check student limit
+        //Students
         if (!$this->tenantManager->canAddStudent()) {
             $this->redirect(url('students'), 'error', 'Subscription limit reached: Please upgrade your subscription plan to add more students.');
             return;
@@ -83,9 +77,6 @@ class StudentController extends Controller
         ]);
     }
 
-    /**
-     * Store new student admission and guardian details.
-     */
     public function store(Request $request): void
     {
         if (!$this->tenantManager->canAddStudent()) {
@@ -112,7 +103,6 @@ class StudentController extends Controller
             $studentId = $this->db->transaction(function () use ($request) {
                 $tenantId = current_tenant_id();
 
-                // Auto-generate admission number if not provided
                 $admNo = $request->input('admission_number');
                 if (empty($admNo)) {
                     $tenant = $this->db->queryOne("SELECT code FROM `tenants` WHERE `id` = :tid", ['tid' => $tenantId]);
@@ -128,7 +118,7 @@ class StudentController extends Controller
 
                 $fullName = trim($request->input('first_name') . ' ' . $request->input('last_name'));
 
-                // 1. Create Student
+                //Students
                 $studentId = $this->studentModel->create([
                     'tenant_id'              => $tenantId,
                     'branch_id'              => (int) $request->input('branch_id'),
@@ -151,7 +141,6 @@ class StudentController extends Controller
                     'notes'                  => $request->input('notes') ?: null,
                 ]);
 
-                // 2. Create Guardian
                 $gParts = explode(' ', (string) $request->input('guardian_name'));
                 $guardianId = $this->guardianModel->create([
                     'tenant_id'    => $tenantId,
@@ -164,7 +153,7 @@ class StudentController extends Controller
                     'occupation'   => $request->input('guardian_occupation') ?: null,
                 ]);
 
-                // 3. Link Student & Guardian
+                //Students
                 $this->db->execute(
                     "INSERT INTO `student_guardians` (`tenant_id`, `student_id`, `guardian_id`, `relationship`, `is_primary`, `is_emergency`) 
                      VALUES (:tid, :sid, :gid, :rel, 1, 1)",
@@ -176,7 +165,6 @@ class StudentController extends Controller
                     ]
                 );
 
-                // 4. Enroll in Batch if selected
                 $batchId = $request->input('batch_id');
                 if (!empty($batchId)) {
                     $acadYear = $this->db->queryOne("SELECT id FROM `academic_years` WHERE `tenant_id` = :tid AND `is_active` = 1 LIMIT 1", ['tid' => $tenantId]);
@@ -204,9 +192,6 @@ class StudentController extends Controller
         }
     }
 
-    /**
-     * Show detailed student profile with academic and financial history.
-     */
     public function show(Request $request, string $id = ''): void
     {
         $studentId = (int) ($id !== '' ? $id : $request->query('id', 0));
@@ -219,10 +204,9 @@ class StudentController extends Controller
 
         $tenantId = current_tenant_id();
 
-        // Guardians
+        //Guardians
         $guardians = $this->guardianModel->getLinkedStudents($studentId);
 
-        // Enrolled Batches
         $enrollments = $this->db->query(
             "SELECT e.*, b.name AS batch_name, b.monthly_fee, s.name AS subject_name, t.full_name AS teacher_name 
              FROM `enrollments` e 
@@ -233,22 +217,20 @@ class StudentController extends Controller
             ['sid' => $studentId, 'tid' => $tenantId]
         );
 
-        // Invoices
+        //Invoices
         $invoices = $this->db->query(
             "SELECT * FROM `invoices` WHERE `student_id` = :sid AND `tenant_id` = :tid AND `deleted_at` IS NULL ORDER BY `id` DESC",
             ['sid' => $studentId, 'tid' => $tenantId]
         );
 
-        // Payment History
         $payments = $this->db->query(
             "SELECT * FROM `payments` WHERE `student_id` = :sid AND `tenant_id` = :tid ORDER BY `id` DESC",
             ['sid' => $studentId, 'tid' => $tenantId]
         );
 
-        // Attendance stats
+        //Attendance
         $attSummary = (new \App\Models\AttendanceRecord())->getStudentSummary($studentId);
 
-        // Exam results
         $examMarks = $this->db->query(
             "SELECT em.*, e.name AS exam_name, e.max_marks, s.name AS subject_name 
              FROM `exam_marks` em 
@@ -271,9 +253,6 @@ class StudentController extends Controller
         ]);
     }
 
-    /**
-     * Printable student ID card with QR code.
-     */
     public function idCard(Request $request, string $id): void
     {
         $student = $this->studentModel->find((int)$id);
@@ -285,13 +264,9 @@ class StudentController extends Controller
         $tenant = $this->db->queryOne("SELECT * FROM `tenants` WHERE `id` = :tid", ['tid' => current_tenant_id()]);
         $branch = $this->db->queryOne("SELECT * FROM `branches` WHERE `id` = :bid", ['bid' => $student['branch_id']]);
 
-        // Render standalone printable view
         require VIEW_PATH . '/students/id_card.php';
     }
 
-    /**
-     * Export students as CSV.
-     */
     public function exportCsv(Request $request): void
     {
         $tenantId = current_tenant_id();

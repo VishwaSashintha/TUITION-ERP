@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/**
- * TuitionPro ERP — Centralized Daily File Logger
- *
- * Supports PSR-3 style levels: DEBUG, INFO, WARNING, ERROR, CRITICAL.
- * Log entries are written to daily rotating files in storage/logs/.
- */
 class Logger
 {
     private string $logDirectory;
@@ -63,4 +57,3 @@ class Logger
         file_put_contents($file, $line, FILE_APPEND | LOCK_EX);
     }
 }
-

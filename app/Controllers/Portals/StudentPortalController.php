@@ -17,15 +17,12 @@ class StudentPortalController extends Controller
         $this->db = Database::getInstance();
     }
 
-    /**
-     * Student Portal Dashboard.
-     */
     public function dashboard(Request $request): void
     {
         $tenantId = current_tenant_id();
         $user     = auth_user();
 
-        // Find linked student record
+        //Students
         $student = $this->db->queryOne(
             "SELECT st.*, br.name AS branch_name
              FROM `students` st
@@ -35,7 +32,7 @@ class StudentPortalController extends Controller
         );
 
         if (!$student) {
-            // Fallback: pick first student in tenant if test login
+            //Authentication
             $student = $this->db->queryOne(
                 "SELECT st.*, br.name AS branch_name FROM `students` st JOIN `branches` br ON st.branch_id = br.id WHERE st.`tenant_id` = :tid AND st.`deleted_at` IS NULL LIMIT 1",
                 ['tid' => $tenantId]
@@ -44,7 +41,6 @@ class StudentPortalController extends Controller
 
         $studentId = (int) $student['id'];
 
-        // Enrolled batches
         $batches = $this->db->query(
             "SELECT b.*, s.name AS subject_name, t.full_name AS teacher_name, e.enrollment_date
              FROM `enrollments` e
@@ -55,7 +51,7 @@ class StudentPortalController extends Controller
             ['stuid' => $studentId, 'tid' => $tenantId]
         );
 
-        // Attendance stats
+        //Attendance
         $attSummary = $this->db->queryOne(
             "SELECT 
                 COUNT(*) AS total_sessions,
@@ -69,7 +65,6 @@ class StudentPortalController extends Controller
         $attSessions = (int)($attSummary['attended_sessions'] ?? 0);
         $attRate = $totSessions > 0 ? round(($attSessions / $totSessions) * 100, 1) : 100.0;
 
-        // Invoices and payments
         $invoices = $this->db->query(
             "SELECT * FROM `invoices` WHERE `student_id` = :stuid AND `tenant_id` = :tid AND `deleted_at` IS NULL ORDER BY `id` DESC LIMIT 10",
             ['stuid' => $studentId, 'tid' => $tenantId]
@@ -80,7 +75,6 @@ class StudentPortalController extends Controller
             ['stuid' => $studentId, 'tid' => $tenantId]
         );
 
-        // Exam results
         $results = $this->db->query(
             "SELECT em.*, ex.name AS exam_name, ex.exam_date, ex.max_marks, s.name AS subject_name
              FROM `exam_marks` em
@@ -91,13 +85,12 @@ class StudentPortalController extends Controller
             ['stuid' => $studentId, 'tid' => $tenantId]
         );
 
-        // Announcements
+        //Announcements
         $announcements = $this->db->query(
             "SELECT * FROM `announcements` WHERE `tenant_id` = :tid AND `target_audience` IN ('all', 'students') AND `is_published` = 1 ORDER BY `published_at` DESC LIMIT 5",
             ['tid' => $tenantId]
         );
 
-        // Learning Materials & Assignments for Enrolled Batches
         $batchIds = array_column($batches, 'id');
         $materials = [];
         $assignments = [];

@@ -7,11 +7,6 @@ namespace App\Services;
 use App\Core\Database;
 use App\Core\Request;
 
-/**
- * TuitionPro ERP — Centralized Audit Logging Service
- *
- * Implements immutable auditing for security, administrative, and financial activities.
- */
 class AuditService
 {
     private Database $db;
@@ -21,9 +16,6 @@ class AuditService
         $this->db = Database::getInstance();
     }
 
-    /**
-     * Record an audit event into audit_logs.
-     */
     public function log(
         string $action,
         string $entityType,

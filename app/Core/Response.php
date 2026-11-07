@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/**
- * TuitionPro ERP — HTTP Response Encapsulation
- */
 class Response
 {
     private int   $statusCode = 200;

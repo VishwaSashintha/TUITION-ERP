@@ -11,16 +11,6 @@ use App\Core\Database;
 use App\Services\BillingService;
 use App\Services\AccountingService;
 
-/**
- * TuitionPro ERP — Reports & Analytics Controller
- *
- * Provides management-level reporting across all modules:
- * - Student & attendance reports
- * - Fee collection & outstanding receivables
- * - Teacher payment summaries
- * - Expense & profit-loss reports
- * - Branch performance comparison
- */
 class ReportController extends Controller
 {
     private Database $db;
@@ -30,13 +20,10 @@ class ReportController extends Controller
         $this->db = Database::getInstance();
     }
 
-    // ─── Reports Dashboard ────────────────────────────────────────────────────
-
     public function index(Request $request, Response $response): void
     {
         $tenantId = current_tenant_id();
 
-        // Quick KPI summary cards for the reports hub
         $kpis = [
             'total_students'  => (int)($this->db->queryOne(
                 "SELECT COUNT(*) AS c FROM `students` WHERE `tenant_id` = :tid AND `status` = 'active' AND `deleted_at` IS NULL",
@@ -59,8 +46,6 @@ class ReportController extends Controller
         $this->view('reports/index', compact('kpis'));
     }
 
-    // ─── Attendance Report ────────────────────────────────────────────────────
-
     public function attendance(Request $request, Response $response): void
     {
         $tenantId = current_tenant_id();
@@ -73,19 +58,19 @@ class ReportController extends Controller
         $startDate = "$yearStr-$monthStr-01";
         $endDate   = date('Y-m-t', strtotime($startDate));
 
-        // Batches for filter
+        //Query
         $batches = $this->db->query(
             "SELECT id, name FROM `batches` WHERE `tenant_id` = :tid AND `status` = 'active' AND `deleted_at` IS NULL ORDER BY name",
             ['tid' => $tenantId]
         );
 
-        // Branches for filter
+        //Query
         $branches = $this->db->query(
             "SELECT id, name FROM `branches` WHERE `tenant_id` = :tid AND `status` = 'active' AND `deleted_at` IS NULL ORDER BY name",
             ['tid' => $tenantId]
         );
 
-        // Attendance summary per student
+        //Attendance
         $params = ['tid' => $tenantId, 'start' => $startDate, 'end' => $endDate];
         $batchFilter = '';
         if ($batchId > 0) {
@@ -110,7 +95,6 @@ class ReportController extends Controller
             $params
         );
 
-        // Summary totals
         $totalSessions = array_sum(array_column($rows, 'total_sessions'));
         $totalPresent  = array_sum(array_column($rows, 'present_count'));
         $overallPct    = $totalSessions > 0 ? round($totalPresent * 100.0 / $totalSessions, 1) : 0;
@@ -120,8 +104,6 @@ class ReportController extends Controller
             'startDate', 'endDate', 'totalSessions', 'totalPresent', 'overallPct'
         ));
     }
-
-    // ─── Fee Collection Report ────────────────────────────────────────────────
 
     public function feeCollection(Request $request, Response $response): void
     {
@@ -145,7 +127,6 @@ class ReportController extends Controller
             $params['bid'] = $branchId;
         }
 
-        // Daily collection breakdown
         $dailyRows = $this->db->query(
             "SELECT DATE(p.payment_date) AS pay_date,
                     COUNT(p.id) AS payment_count,
@@ -162,7 +143,7 @@ class ReportController extends Controller
             $params
         );
 
-        // Student-level collection
+        //Students
         $studentRows = $this->db->query(
             "SELECT s.admission_number, s.full_name,
                     SUM(p.amount) AS paid_total,
@@ -187,8 +168,6 @@ class ReportController extends Controller
             'grandTotal', 'cashTotal', 'bankTotal', 'startDate', 'endDate'
         ));
     }
-
-    // ─── Outstanding Receivables Report ───────────────────────────────────────
 
     public function outstanding(Request $request, Response $response): void
     {
@@ -241,8 +220,6 @@ class ReportController extends Controller
         ));
     }
 
-    // ─── Teacher Payment Report ───────────────────────────────────────────────
-
     public function teacherPayments(Request $request, Response $response): void
     {
         $tenantId = current_tenant_id();
@@ -272,8 +249,6 @@ class ReportController extends Controller
         $this->view('reports/teacher_payments', compact('rows', 'month', 'grandTotal', 'startDate', 'endDate'));
     }
 
-    // ─── Expense Summary Report ───────────────────────────────────────────────
-
     public function expenses(Request $request, Response $response): void
     {
         $tenantId = current_tenant_id();
@@ -296,7 +271,6 @@ class ReportController extends Controller
             $params['bid'] = $branchId;
         }
 
-        // By category
         $byCat = $this->db->query(
             "SELECT ec.name AS category, SUM(e.amount) AS total, COUNT(e.id) AS count
              FROM `expenses` e
@@ -311,7 +285,6 @@ class ReportController extends Controller
             $params
         );
 
-        // Individual expenses
         $rows = $this->db->query(
             "SELECT e.expense_number, e.expense_date, ec.name AS category,
                     e.payee, e.description, e.amount, e.payment_status
@@ -332,8 +305,6 @@ class ReportController extends Controller
             'grandTotal', 'startDate', 'endDate'
         ));
     }
-
-    // ─── Student Performance Report ───────────────────────────────────────────
 
     public function studentPerformance(Request $request, Response $response): void
     {

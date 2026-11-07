@@ -10,9 +10,6 @@ use App\Core\Request;
 use App\Models\Assignment;
 use App\Services\AuditService;
 
-/**
- * TuitionPro ERP — Assignments & Coursework Controller
- */
 class AssignmentController extends Controller
 {
     private Assignment $assignmentModel;
@@ -26,9 +23,6 @@ class AssignmentController extends Controller
         $this->audit           = new AuditService();
     }
 
-    /**
-     * List all assignments.
-     */
     public function index(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -72,9 +66,6 @@ class AssignmentController extends Controller
         ]);
     }
 
-    /**
-     * Create assignment form.
-     */
     public function create(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -91,9 +82,6 @@ class AssignmentController extends Controller
         ]);
     }
 
-    /**
-     * Store new assignment.
-     */
     public function store(Request $request): void
     {
         $rules = [
@@ -161,9 +149,6 @@ class AssignmentController extends Controller
         $this->redirect(url('academic/assignments'), 'success', 'Assignment created and published to class batch successfully.');
     }
 
-    /**
-     * Show assignment details.
-     */
     public function show(Request $request, string $id = ''): void
     {
         $assignmentId = (int) ($id !== '' ? $id : $request->query('id', 0));
@@ -184,7 +169,6 @@ class AssignmentController extends Controller
             return;
         }
 
-        // Fetch enrolled students in batch
         $students = $this->db->query(
             "SELECT st.id, st.admission_number, st.full_name, st.phone
              FROM `enrollments` e
@@ -194,7 +178,6 @@ class AssignmentController extends Controller
             ['bid' => $assignment['batch_id'], 'tid' => $tenantId]
         );
 
-        // Fetch submissions
         $submissions = $this->db->query(
             "SELECT sub.*, st.full_name AS student_name, st.admission_number, u.name AS graded_by_name
              FROM `student_submissions` sub
@@ -214,9 +197,6 @@ class AssignmentController extends Controller
         ]);
     }
 
-    /**
-     * Submit coursework solution (Student action).
-     */
     public function submit(Request $request): void
     {
         $tenantId     = current_tenant_id();
@@ -226,7 +206,6 @@ class AssignmentController extends Controller
 
         $user = auth_user();
         if ($user && ($user['role_name'] ?? '') === 'student') {
-            // Find student linked to this user email or id
             $stu = $this->db->queryOne("SELECT id FROM `students` WHERE `email` = :em AND `tenant_id` = :tid", [
                 'em'  => $user['email'] ?? '',
                 'tid' => $tenantId,
@@ -264,9 +243,6 @@ class AssignmentController extends Controller
         $this->redirect(url("academic/assignments/{$assignmentId}"), 'success', 'Coursework solution submitted successfully!');
     }
 
-    /**
-     * Grade student submission and provide feedback (Teacher action).
-     */
     public function grade(Request $request): void
     {
         $tenantId     = current_tenant_id();
@@ -292,9 +268,6 @@ class AssignmentController extends Controller
         $this->redirect(url("academic/assignments/{$assignmentId}"), 'success', 'Submission graded successfully with feedback saved.');
     }
 
-    /**
-     * Download assignment attachment safely.
-     */
     public function download(Request $request, string $id = ''): void
     {
         $assignmentId = (int) ($id !== '' ? $id : $request->query('id', 0));
@@ -323,4 +296,3 @@ class AssignmentController extends Controller
         exit;
     }
 }
-

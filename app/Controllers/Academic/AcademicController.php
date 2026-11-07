@@ -29,9 +29,6 @@ class AcademicController extends Controller
         $this->db              = Database::getInstance();
     }
 
-    /**
-     * Subject management view.
-     */
     public function subjects(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -51,9 +48,6 @@ class AcademicController extends Controller
         ]);
     }
 
-    /**
-     * Store new subject.
-     */
     public function storeSubject(Request $request): void
     {
         $rules = [
@@ -71,7 +65,7 @@ class AcademicController extends Controller
             $tenantId = current_tenant_id();
             $code = strtoupper(trim((string)$request->input('code')));
 
-            // Duplicate code check within tenant
+            //Validation
             $exists = $this->db->queryOne("SELECT id FROM `subjects` WHERE `tenant_id` = :tid AND `code` = :code", ['tid' => $tenantId, 'code' => $code]);
             if ($exists) {
                 $this->back('error', "Subject code '{$code}' already exists.", $request->all());
@@ -94,9 +88,6 @@ class AcademicController extends Controller
         }
     }
 
-    /**
-     * Batches list with seat capacity indicators.
-     */
     public function batches(Request $request): void
     {
         $batches = $this->batchModel->allWithDetails();
@@ -108,9 +99,6 @@ class AcademicController extends Controller
         ]);
     }
 
-    /**
-     * Create batch form.
-     */
     public function createBatch(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -127,9 +115,6 @@ class AcademicController extends Controller
         ]);
     }
 
-    /**
-     * Store new batch.
-     */
     public function storeBatch(Request $request): void
     {
         $rules = [
@@ -180,9 +165,6 @@ class AcademicController extends Controller
         $this->batchShow($request, $id);
     }
 
-    /**
-     * Show batch details and student roster with capacity controls.
-     */
     public function batchShow(Request $request, string $id = ''): void
     {
         $batchId = (int) ($id !== '' ? $id : $request->query('id', 0));
@@ -196,7 +178,6 @@ class AcademicController extends Controller
         $tenantId = current_tenant_id();
         $students = $this->enrollmentModel->getBatchStudents($batchId);
 
-        // Fetch students not yet enrolled in this batch for the quick-enroll modal
         $availableStudents = $this->db->query(
             "SELECT s.id, s.admission_number, s.full_name, s.grade_level 
              FROM `students` s 
@@ -217,9 +198,6 @@ class AcademicController extends Controller
         ]);
     }
 
-    /**
-     * Enroll student into batch (enforcing maximum batch capacity).
-     */
     public function enrollStudent(Request $request): void
     {
         $batchId   = (int) $request->input('batch_id');
@@ -236,7 +214,7 @@ class AcademicController extends Controller
             return;
         }
 
-        // Capacity check
+        //Validation
         $enrolledCount = (int) $batch['enrolled_students_count'];
         $maxCapacity   = (int) $batch['max_capacity'];
 
@@ -267,4 +245,3 @@ class AcademicController extends Controller
         }
     }
 }
-

@@ -26,9 +26,6 @@ class SettingsController extends Controller
         $this->db          = Database::getInstance();
     }
 
-    /**
-     * General institute settings.
-     */
     public function index(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -41,9 +38,6 @@ class SettingsController extends Controller
         ]);
     }
 
-    /**
-     * Update institute settings.
-     */
     public function updateSettings(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -71,9 +65,6 @@ class SettingsController extends Controller
         $this->back('success', 'Institute settings saved successfully.');
     }
 
-    /**
-     * Branch management.
-     */
     public function branches(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -95,9 +86,6 @@ class SettingsController extends Controller
         ]);
     }
 
-    /**
-     * Store new branch.
-     */
     public function storeBranch(Request $request): void
     {
         $rules = [
@@ -130,9 +118,6 @@ class SettingsController extends Controller
         }
     }
 
-    /**
-     * User and staff account management.
-     */
     public function users(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -159,9 +144,6 @@ class SettingsController extends Controller
         ]);
     }
 
-    /**
-     * Store new staff user.
-     */
     public function storeUser(Request $request): void
     {
         $rules = [
@@ -177,7 +159,6 @@ class SettingsController extends Controller
             return;
         }
 
-        // Account hierarchy check: prevent creating platform super admins
         $roleId = (int) $request->input('role_id');
         $targetRole = $this->db->queryOne("SELECT id, name FROM `roles` WHERE `id` = :id", ['id' => $roleId]);
         if (!$targetRole || in_array($targetRole['name'], ['super_admin', 'support_admin'], true)) {
@@ -213,9 +194,6 @@ class SettingsController extends Controller
         }
     }
 
-    /**
-     * Database backup & restore interface.
-     */
     public function backups(Request $request): void
     {
         $backupDir = dirname(__DIR__, 2) . '/storage/backups';
@@ -241,9 +219,6 @@ class SettingsController extends Controller
         ]);
     }
 
-    /**
-     * Create backup now.
-     */
     public function createBackup(Request $request): void
     {
         $backupDir = dirname(__DIR__, 2) . '/storage/backups';
@@ -254,7 +229,6 @@ class SettingsController extends Controller
         $filename = 'tuitionpro_backup_' . date('Ymd_His') . '.sql';
         $filepath = $backupDir . '/' . $filename;
 
-        // Perform mysqldump via command or PDO dump
         $dumpCmd = sprintf(
             '"C:\xampp\mysql\bin\mysqldump.exe" -u root tuitionpro > "%s"',
             $filepath
@@ -266,7 +240,6 @@ class SettingsController extends Controller
             $this->audit->log('backup_created', 'system', 0, "Database backup created: {$filename}");
             $this->redirect(url('settings/backups'), 'success', "Backup archive '{$filename}' generated successfully.");
         } else {
-            // Native PHP SQL table export fallback
             $tables = $this->db->query("SHOW TABLES");
             $sqlDump = "-- TuitionPro ERP Database Backup\n-- Generated: " . date('Y-m-d H:i:s') . "\n\n";
 
@@ -290,9 +263,6 @@ class SettingsController extends Controller
         }
     }
 
-    /**
-     * Download backup archive safely.
-     */
     public function downloadBackup(Request $request): void
     {
         $filename  = basename((string)$request->query('file'));
@@ -311,9 +281,6 @@ class SettingsController extends Controller
         exit;
     }
 
-    /**
-     * Restore database from an existing backup archive.
-     */
     public function restoreBackup(Request $request): void
     {
         $filename  = basename((string)$request->input('filename'));
@@ -332,7 +299,6 @@ class SettingsController extends Controller
                 return;
             }
 
-            // Disable foreign keys temporarily for clean table reload
             $pdo = $this->db->getConnection();
             $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
             $pdo->exec($sql);

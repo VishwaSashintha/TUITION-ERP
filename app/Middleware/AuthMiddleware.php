@@ -8,7 +8,7 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Services\JwtService;
 
-// Auth
+//Auth
 class AuthMiddleware implements MiddlewareInterface
 {
     private JwtService $jwt;
@@ -18,12 +18,11 @@ class AuthMiddleware implements MiddlewareInterface
         $this->jwt = new JwtService();
     }
 
-    // Auth
+    //Auth
     public function handle(Request $request, Response $response, callable $next, ?string $param = null): mixed
     {
         $user = auth_user();
 
-        // JWT verification
         if ($user === null) {
             $token = $this->extractToken($request);
 
@@ -34,7 +33,7 @@ class AuthMiddleware implements MiddlewareInterface
                     $this->establishUserContext($payload);
                     $user = auth_user();
                 } else {
-                    // Refresh token rotation
+                    //Authentication
                     $refreshToken = $_COOKIE['tuitionpro_refresh'] ?? $request->header('X-Refresh-Token');
                     if ($refreshToken) {
                         $rotated = $this->jwt->rotateRefreshToken($refreshToken);
@@ -63,7 +62,7 @@ class AuthMiddleware implements MiddlewareInterface
         return $next();
     }
 
-    // JWT
+    //JWT
     private function extractToken(Request $request): ?string
     {
         $authHeader = $request->header('Authorization');
@@ -74,7 +73,7 @@ class AuthMiddleware implements MiddlewareInterface
         return $_COOKIE['tuitionpro_jwt'] ?? null;
     }
 
-    // Auth
+    //Auth
     private function establishUserContext(array $payload): void
     {
         $userData = [
@@ -97,7 +96,7 @@ class AuthMiddleware implements MiddlewareInterface
         }
     }
 
-    // JWT
+    //JWT
     private function setAuthCookies(string $accessToken, string $refreshToken): void
     {
         if (headers_sent()) {

@@ -399,10 +399,8 @@
     </div>
 </div>
 
-<!-- ─── Chart.js Execution (Exact 6-Color Palette) ────────────────────────── -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // 1. Financial Performance Bar Chart
     const finCtx = document.getElementById('financialChart');
     if (finCtx) {
         new Chart(finCtx.getContext('2d'), {
@@ -418,10 +416,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         <?= (float)($financials['net_profit'] ?? 0) ?>
                     ],
                     backgroundColor: [
-                        '#9985FB', // Purple
-                        '#4BA95F', // Green
-                        '#FF908D', // Coral
-                        '#FEA339'  // Orange
+                        '#9985FB',
+                        '#4BA95F',
+                        '#FF908D',
+                        '#FEA339'
                     ],
                     borderRadius: 8,
                     maxBarThickness: 48
@@ -460,7 +458,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 2. Attendance Doughnut Chart
     const attCtx = document.getElementById('attendanceDoughnut');
     if (attCtx) {
         new Chart(attCtx.getContext('2d'), {

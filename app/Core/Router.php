@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/**
- * TuitionPro ERP — HTTP Router
- *
- * Supports dynamic URL parameters (e.g. /students/{id}/edit),
- * HTTP methods (GET, POST, PUT, DELETE), route groups, and middleware pipelines.
- */
 class Router
 {
     private array $routes = [];
@@ -32,8 +26,6 @@ class Router
     {
         return $this->response;
     }
-
-    // ─── Route Registration ──────────────────────────────────────────────────
 
     public function get(string $path, array|callable|string $handler, array $middleware = []): self
     {
@@ -82,7 +74,6 @@ class Router
             $fullPath = '/';
         }
 
-        // Convert {param} placeholders to named regex groups
         $pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<$1>[^/]+)', $fullPath);
         $regex   = '#^' . $pattern . '$#';
 
@@ -97,8 +88,6 @@ class Router
         return $this;
     }
 
-    // ─── Dispatching ─────────────────────────────────────────────────────────
-
     public function dispatch(): void
     {
         $requestMethod = $this->request->getMethod();
@@ -112,7 +101,6 @@ class Router
             if (preg_match($route['regex'], $requestPath, $matches)) {
                 if ($route['method'] === $requestMethod) {
                     $matchedRoute = $route;
-                    // Extract named parameters only
                     foreach ($matches as $k => $v) {
                         if (is_string($k)) {
                             $params[$k] = $v;
@@ -134,7 +122,6 @@ class Router
             return;
         }
 
-        // Execute middleware pipeline
         $this->runMiddlewarePipeline($matchedRoute['middleware'], function () use ($matchedRoute, $params) {
             $this->executeHandler($matchedRoute['handler'], $params);
         });
@@ -160,7 +147,6 @@ class Router
                     $param = $parts[1] ?? null;
 
                     if (!isset($middlewareMap[$alias])) {
-                        // Pass through if not registered
                         return $next();
                     }
 

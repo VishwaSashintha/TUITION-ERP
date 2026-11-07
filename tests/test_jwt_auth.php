@@ -2,10 +2,6 @@
 
 declare(strict_types=1);
 
-/**
- * TuitionPro ERP — Automated JWT Authentication & Security Test Suite
- */
-
 require_once __DIR__ . '/../public/index.php';
 
 use App\Core\Database;
@@ -35,7 +31,7 @@ echo "======================================================\n\n";
 
 $jwt = new JwtService();
 
-// 1. Generate & validate valid access token
+//Validation
 echo "1. Testing JWT Token Issuance & Signature Verification...\n";
 $user = [
     'id'           => 1,
@@ -55,7 +51,7 @@ $payload = $jwt->validateToken($accessToken);
 assertTest($payload !== null && $payload['sub'] === 1, "JWT access token verified with correct subject claim");
 assertTest($payload['role'] === 'institute_admin', "JWT payload carries correct user role");
 
-// 2. Tampered token rejection
+//Authentication
 echo "\n2. Testing Tampered Token Rejection...\n";
 $parts = explode('.', $accessToken);
 $tamperedPayload = base64_encode(json_encode(['sub' => 999, 'role' => 'super_admin']));
@@ -67,13 +63,12 @@ assertTest($tamperedResult === null, "Tampered JWT with modified payload is stri
 $tamperedSigToken = "{$parts[0]}.{$parts[1]}.invalidsignature123";
 assertTest($jwt->validateToken($tamperedSigToken) === null, "JWT with counterfeit signature is strictly rejected");
 
-// 3. Algorithm 'none' attack rejection
 echo "\n3. Testing Algorithm Manipulation Defense (alg: none)...\n";
 $noneHeader = base64_encode(json_encode(['typ' => 'JWT', 'alg' => 'none']));
 $noneToken  = "{$noneHeader}.{$parts[1]}.";
 assertTest($jwt->validateToken($noneToken) === null, "Unsigned token (alg: none) is strictly rejected");
 
-// 4. Refresh token rotation & DB persistence
+//Authentication
 echo "\n4. Testing Refresh Token Rotation & Database Persistence...\n";
 $refreshToken = $jwt->generateRefreshToken($user);
 assertTest(!empty($refreshToken), "Refresh token successfully generated");
@@ -82,21 +77,21 @@ $tokenHash = hash('sha256', $refreshToken);
 $record = $db->queryOne("SELECT * FROM `refresh_tokens` WHERE `token_hash` = :thash", ['thash' => $tokenHash]);
 assertTest($record !== null && (int)$record['user_id'] === 1, "Refresh token persisted in `refresh_tokens` table");
 
-// Rotate refresh token
+//Authentication
 $rotated = $jwt->rotateRefreshToken($refreshToken);
 assertTest($rotated !== null && !empty($rotated['access_token']), "Refresh token rotation succeeded, issued new access token");
 assertTest(!empty($rotated['refresh_token']), "New refresh token issued during rotation");
 
-// Verify old refresh token is now revoked
+//Authentication
 $oldRecord = $db->queryOne("SELECT * FROM `refresh_tokens` WHERE `token_hash` = :thash", ['thash' => $tokenHash]);
 assertTest($oldRecord['revoked_at'] !== null, "Previous refresh token marked as revoked in database");
 
-// 5. Replay attack prevention: reusing revoked refresh token must be rejected
+//Authentication
 echo "\n5. Testing Replay Attack Detection & Defense...\n";
 $replayResult = $jwt->rotateRefreshToken($refreshToken);
 assertTest($replayResult === null, "Replaying already-revoked refresh token is strictly rejected");
 
-// 6. Token revocation on logout
+//Authentication
 echo "\n6. Testing Explicit Token Revocation (Logout)...\n";
 $newRefreshToken = $rotated['refresh_token'];
 $jwt->revokeRefreshToken($newRefreshToken);
@@ -107,7 +102,7 @@ $revokedRecord = $db->queryOne(
 );
 assertTest($revokedRecord['revoked_at'] !== null, "Refresh token successfully revoked upon logout");
 
-// 7. Login rate limiting
+//Authentication
 echo "\n7. Testing Login Rate Limiting (Brute-Force Protection)...\n";
 $limiter = new RateLimiter(5, 300);
 $testIp  = '192.168.100.99';
@@ -116,7 +111,6 @@ $testUid = 'victim@iskole.lk';
 $limiter->clear($testIp, $testUid);
 assertTest(!$limiter->isRateLimited($testIp, $testUid), "Initial login attempt is not rate-limited");
 
-// Record 5 failed attempts
 for ($i = 1; $i <= 5; $i++) {
     $limiter->recordAttempt($testIp, $testUid, false);
 }

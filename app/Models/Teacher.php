@@ -12,9 +12,6 @@ class Teacher extends Model
     protected bool $tenantScoped = true;
     protected bool $supportsSoftDeletes = true;
 
-    /**
-     * Get batches assigned to a teacher.
-     */
     public function getAssignedBatches(int $teacherId): array
     {
         $tenantId = $this->getActiveTenantId();

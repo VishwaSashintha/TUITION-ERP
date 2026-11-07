@@ -7,11 +7,6 @@ namespace App\Middleware;
 use App\Core\Request;
 use App\Core\Response;
 
-/**
- * TuitionPro ERP — Guest Middleware
- *
- * Prevents authenticated users from accessing login/registration pages.
- */
 class GuestMiddleware implements MiddlewareInterface
 {
     public function handle(Request $request, Response $response, callable $next, ?string $param = null): mixed

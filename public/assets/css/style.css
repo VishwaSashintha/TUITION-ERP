@@ -1,21 +1,4 @@
-/**
- * TuitionPro ERP — Master SaaS Design System
- * 
- * Exact 6-Color Palette:
- * - Black:    #0C0C0C
- * - Green:    #4BA95F
- * - Sky Blue: #77DDFA
- * - Orange:   #FEA339
- * - Purple:   #9985FB
- * - Coral:    #FF908D
- *
- * Typography:
- * - Application font: Roboto
- * - Numbers / KPIs:   Poppins SemiBold 700
- */
-
 :root {
-    /* Exact 6-Color Palette */
     --tp-black: #0C0C0C;
     --tp-green: #4BA95F;
     --tp-sky-blue: #77DDFA;
@@ -23,7 +6,6 @@
     --tp-purple: #9985FB;
     --tp-coral: #FF908D;
 
-    /* Semantic Theme Mappings */
     --primary: #9985FB;
     --primary-dark: #7E6AE8;
     --primary-light: #F2EFFF;
@@ -59,13 +41,13 @@ button, input, select, textarea, .nav, .table, h1, h2, h3, h4, h5, h6 {
     font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
 }
 
-/* ─── Numbers / Statistics Typography ────────────────────────────────────── */
+/* Numbers */
 .stat-value, .kpi-number, .currency-amount, .number-font, .stat-num, .fw-number {
     font-family: 'Poppins', sans-serif !important;
     font-weight: 700 !important;
 }
 
-/* ─── Typography & Links ─────────────────────────────────────────────────── */
+/* Typography */
 h1, h2, h3, h4, h5, h6 {
     color: var(--text-main);
     font-weight: 700;
@@ -82,7 +64,7 @@ a:hover {
     color: var(--primary-dark);
 }
 
-/* ─── Layout Structure ───────────────────────────────────────────────────── */
+/* Layout */
 #app-wrapper {
     display: flex;
     min-height: 100vh;
@@ -129,7 +111,7 @@ a:hover {
     flex: 1;
 }
 
-/* ─── Sidebar Navigation ─────────────────────────────────────────────────── */
+/* Sidebar */
 .sidebar-brand {
     height: var(--topbar-height);
     display: flex;
@@ -211,7 +193,7 @@ a:hover {
     color: var(--primary);
 }
 
-/* ─── Cards & KPI Widgets ────────────────────────────────────────────────── */
+/* Cards */
 .card-custom {
     background: #FFFFFF;
     border: 1px solid var(--border-color);
@@ -264,7 +246,6 @@ a:hover {
 .stat-icon.danger,  .stat-icon.tp-coral    { background: var(--danger-light); color: var(--tp-coral); }
 .stat-icon.dark,    .stat-icon.tp-black    { background: #F1F5F9; color: var(--tp-black); }
 
-/* Exact 6-Color Badges */
 .badge-tp-purple   { background-color: var(--primary-light); color: #6D56E2; }
 .badge-tp-green    { background-color: var(--success-light); color: #2E7D32; }
 .badge-tp-sky-blue { background-color: var(--info-light); color: #0369A1; }
@@ -272,7 +253,6 @@ a:hover {
 .badge-tp-coral    { background-color: var(--danger-light); color: #D32F2F; }
 .badge-tp-black    { background-color: #F1F5F9; color: var(--tp-black); }
 
-/* Exact 6-Color Backgrounds & Text */
 .bg-tp-purple   { background-color: var(--tp-purple) !important; color: #FFFFFF !important; }
 .bg-tp-green    { background-color: var(--tp-green) !important; color: #FFFFFF !important; }
 .bg-tp-sky-blue { background-color: var(--tp-sky-blue) !important; color: var(--tp-black) !important; }
@@ -287,7 +267,6 @@ a:hover {
 .text-tp-coral    { color: var(--tp-coral) !important; }
 .text-tp-black    { color: var(--tp-black) !important; }
 
-/* Quick Action Cards */
 .quick-action-card {
     background: #FFFFFF;
     border: 1px solid var(--border-color);
@@ -335,7 +314,7 @@ a:hover {
     letter-spacing: 0.02em;
 }
 
-/* ─── Buttons ────────────────────────────────────────────────────────────── */
+/* Buttons */
 .btn-primary-custom {
     background-color: var(--primary);
     border-color: var(--primary);
@@ -375,7 +354,7 @@ a:hover {
     color: #FFFFFF;
 }
 
-/* ─── Tables ─────────────────────────────────────────────────────────────── */
+/* Tables */
 .table-custom {
     width: 100%;
     margin-bottom: 0;
@@ -403,7 +382,7 @@ a:hover {
     background-color: #F8FAFC;
 }
 
-/* ─── Badges ─────────────────────────────────────────────────────────────── */
+/* Badges */
 .badge-custom {
     font-size: 0.75rem;
     font-weight: 600;
@@ -420,7 +399,7 @@ a:hover {
 .badge-info    { background-color: #E1EFFE; color: #1E429F; }
 .badge-purple  { background-color: var(--primary-light); color: var(--primary); }
 
-/* ─── Forms ──────────────────────────────────────────────────────────────── */
+/* Forms */
 .form-label-custom {
     font-size: 0.85rem;
     font-weight: 600;
@@ -442,7 +421,7 @@ a:hover {
     outline: none;
 }
 
-/* ─── Responsive Media Queries ───────────────────────────────────────────── */
+/* Responsive */
 @media (max-width: 991px) {
     #sidebar {
         transform: translateX(-100%);
@@ -455,4 +434,3 @@ a:hover {
         width: 100%;
     }
 }
-

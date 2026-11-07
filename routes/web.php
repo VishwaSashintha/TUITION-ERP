@@ -2,10 +2,8 @@
 
 declare(strict_types=1);
 
-/** @var \App\Core\Router $router */
 $router = $router ?? ($this->router ?? \App\Core\Application::getInstance()->getRouter());
 
-// ─── Root & Redirect ─────────────────────────────────────────────────────────
 $router->get('/', function ($request, $response) {
     if (auth_check()) {
         $role = auth_role();
@@ -22,23 +20,18 @@ $router->get('/', function ($request, $response) {
     redirect(url('login'));
 });
 
-// ─── Guest Authentication Routes ─────────────────────────────────────────────
 $router->get('/login', [\App\Controllers\Auth\AuthController::class, 'showLogin'], ['guest']);
 $router->post('/login', [\App\Controllers\Auth\AuthController::class, 'login'], ['guest', 'csrf']);
 
 
-// ─── Authenticated System Routes ─────────────────────────────────────────────
 $router->group(['middleware' => ['auth']], function ($router) {
 
-    // Auth actions
     $router->post('/logout', [\App\Controllers\Auth\AuthController::class, 'logout'], ['csrf']);
 
-    // Institute Dashboard
     $router->get('/dashboard', [\App\Controllers\Institute\DashboardController::class, 'index']);
 
-    // ─── Student Management (Admin, Receptionist, Admissions Officer) ───────────────────────────
+    //Students
     $router->group(['middleware' => ['role:institute_owner,institute_admin,branch_manager,receptionist,admissions_officer']], function ($router) {
-        // Enquiries & Lead Tracking
         $router->get('/students/enquiries', [\App\Controllers\Students\EnquiryController::class, 'index']);
         $router->get('/students/enquiries/create', [\App\Controllers\Students\EnquiryController::class, 'create']);
         $router->post('/students/enquiries/store', [\App\Controllers\Students\EnquiryController::class, 'store'], ['csrf']);
@@ -46,7 +39,6 @@ $router->group(['middleware' => ['auth']], function ($router) {
         $router->post('/students/enquiries/followup', [\App\Controllers\Students\EnquiryController::class, 'storeFollowup'], ['csrf']);
         $router->post('/students/enquiries/convert', [\App\Controllers\Students\EnquiryController::class, 'convert'], ['csrf']);
 
-        // Student Directory & Registration
         $router->get('/students', [\App\Controllers\Students\StudentController::class, 'index']);
         $router->get('/students/create', [\App\Controllers\Students\StudentController::class, 'create']);
         $router->post('/students', [\App\Controllers\Students\StudentController::class, 'store'], ['csrf']);
@@ -58,7 +50,7 @@ $router->group(['middleware' => ['auth']], function ($router) {
         $router->get('/students/id-card', [\App\Controllers\Students\StudentController::class, 'idCard']);
     });
 
-    // ─── Teacher Management (Admin, HR Manager) ──────────────────────────────────────
+    //Teachers
     $router->group(['middleware' => ['role:institute_owner,institute_admin,hr_manager']], function ($router) {
         $router->get('/teachers', [\App\Controllers\Teachers\TeacherController::class, 'index']);
         $router->get('/teachers/create', [\App\Controllers\Teachers\TeacherController::class, 'create']);
@@ -68,7 +60,7 @@ $router->group(['middleware' => ['auth']], function ($router) {
         $router->get('/teachers/{id}', [\App\Controllers\Teachers\TeacherController::class, 'show']);
     });
 
-    // ─── Academic Structure & Batches ─────────────────────────────────────────
+    //Academic
     $router->group(['middleware' => ['role:institute_owner,institute_admin,branch_manager,receptionist,teacher,academic_coordinator']], function ($router) {
         $router->get('/academic/subjects', [\App\Controllers\Academic\AcademicController::class, 'subjects']);
         $router->post('/academic/subjects', [\App\Controllers\Academic\AcademicController::class, 'storeSubject'], ['csrf']);
@@ -80,14 +72,12 @@ $router->group(['middleware' => ['auth']], function ($router) {
         $router->get('/academic/batches/{id}', [\App\Controllers\Academic\AcademicController::class, 'showBatch']);
         $router->post('/academic/batches/enroll', [\App\Controllers\Academic\AcademicController::class, 'enrollStudent'], ['csrf']);
 
-        // Learning Materials & Resources
         $router->get('/academic/materials', [\App\Controllers\Academic\MaterialController::class, 'index']);
         $router->get('/academic/materials/create', [\App\Controllers\Academic\MaterialController::class, 'create']);
         $router->post('/academic/materials/store', [\App\Controllers\Academic\MaterialController::class, 'store'], ['csrf']);
         $router->get('/academic/materials/download', [\App\Controllers\Academic\MaterialController::class, 'download']);
         $router->get('/academic/materials/download/{id}', [\App\Controllers\Academic\MaterialController::class, 'download']);
 
-        // Assignments & Coursework
         $router->get('/academic/assignments', [\App\Controllers\Academic\AssignmentController::class, 'index']);
         $router->get('/academic/assignments/create', [\App\Controllers\Academic\AssignmentController::class, 'create']);
         $router->post('/academic/assignments/store', [\App\Controllers\Academic\AssignmentController::class, 'store'], ['csrf']);
@@ -98,13 +88,12 @@ $router->group(['middleware' => ['auth']], function ($router) {
         $router->post('/academic/assignments/submit', [\App\Controllers\Academic\AssignmentController::class, 'submit'], ['csrf']);
         $router->post('/academic/assignments/grade', [\App\Controllers\Academic\AssignmentController::class, 'grade'], ['csrf']);
 
-        // Timetable & Scheduling
         $router->get('/timetable', [\App\Controllers\Timetable\TimetableController::class, 'index']);
         $router->post('/timetable/schedule', [\App\Controllers\Timetable\TimetableController::class, 'storeSchedule'], ['csrf']);
         $router->get('/timetable/sessions', [\App\Controllers\Timetable\TimetableController::class, 'sessions']);
         $router->post('/timetable/generate-sessions', [\App\Controllers\Timetable\TimetableController::class, 'generateSessions'], ['csrf']);
 
-        // Attendance Module
+        //Attendance
         $router->get('/attendance', [\App\Controllers\Attendance\AttendanceController::class, 'take']);
         $router->get('/attendance/take', [\App\Controllers\Attendance\AttendanceController::class, 'take']);
         $router->post('/attendance/save', [\App\Controllers\Attendance\AttendanceController::class, 'save'], ['csrf']);
@@ -113,7 +102,7 @@ $router->group(['middleware' => ['auth']], function ($router) {
         $router->get('/attendance/history', [\App\Controllers\Attendance\AttendanceController::class, 'history']);
         $router->post('/attendance/correct', [\App\Controllers\Attendance\AttendanceController::class, 'correct'], ['csrf']);
 
-        // Examinations & Performance
+        //Exams
         $router->get('/examinations', [\App\Controllers\Examinations\ExamController::class, 'index']);
         $router->post('/examinations/store', [\App\Controllers\Examinations\ExamController::class, 'store'], ['csrf']);
         $router->get('/examinations/marks-entry', [\App\Controllers\Examinations\ExamController::class, 'marksEntry']);
@@ -124,7 +113,7 @@ $router->group(['middleware' => ['auth']], function ($router) {
         $router->post('/examinations/publish', [\App\Controllers\Examinations\ExamController::class, 'publish'], ['csrf']);
     });
 
-    // ─── Fee Invoicing & Receipts (Admin, Accountant, Receptionist, Cashier) ───────────
+    //Fees
     $router->group(['middleware' => ['role:institute_owner,institute_admin,accountant,receptionist,cashier']], function ($router) {
         $router->get('/fees', [\App\Controllers\Fees\FeeController::class, 'invoices']);
         $router->get('/fees/invoices', [\App\Controllers\Fees\FeeController::class, 'invoices']);
@@ -140,7 +129,7 @@ $router->group(['middleware' => ['auth']], function ($router) {
         $router->post('/fees/refund', [\App\Controllers\Fees\FeeController::class, 'refund'], ['csrf']);
     });
 
-    // ─── Teacher Payments & Payroll (Owner, Accountant, HR Manager) ─────────────────
+    //Expenses
     $router->group(['middleware' => ['role:institute_owner,accountant,hr_manager']], function ($router) {
         $router->get('/teacher-payments', [\App\Controllers\TeacherPayments\TeacherPaymentController::class, 'index']);
         $router->get('/teacher-payments/calculate', [\App\Controllers\TeacherPayments\TeacherPaymentController::class, 'calculate']);
@@ -149,14 +138,13 @@ $router->group(['middleware' => ['auth']], function ($router) {
         $router->post('/teacher-payments/disburse', [\App\Controllers\TeacherPayments\TeacherPaymentController::class, 'disburse'], ['csrf']);
     });
 
-    // ─── Operational Expenses (Owner, Admin, Accountant) ─────────────────────
     $router->group(['middleware' => ['role:institute_owner,institute_admin,accountant']], function ($router) {
         $router->get('/expenses', [\App\Controllers\Expenses\ExpenseController::class, 'index']);
         $router->get('/expenses/create', [\App\Controllers\Expenses\ExpenseController::class, 'create']);
         $router->post('/expenses/store', [\App\Controllers\Expenses\ExpenseController::class, 'store'], ['csrf']);
     });
 
-    // ─── Double-Entry General Ledger & Bank (Owner & Accountant ONLY) ─────────
+    //Accounting
     $router->group(['middleware' => ['role:institute_owner,accountant']], function ($router) {
         $router->get('/expenses/trial-balance', [\App\Controllers\Expenses\ExpenseController::class, 'trialBalance']);
         $router->get('/accounting/trial-balance', [\App\Controllers\Expenses\ExpenseController::class, 'trialBalance']);
@@ -166,13 +154,13 @@ $router->group(['middleware' => ['auth']], function ($router) {
         $router->get('/accounting/cash-bank', [\App\Controllers\Expenses\ExpenseController::class, 'cashBank']);
     });
 
-    // ─── Communication & Notices ─────────────────────────────────────────────
+    //Communication
     $router->get('/communication/announcements', [\App\Controllers\Communication\CommunicationController::class, 'announcements']);
     $router->post('/communication/announcements', [\App\Controllers\Communication\CommunicationController::class, 'storeAnnouncement'], ['csrf']);
     $router->get('/notifications', [\App\Controllers\Communication\CommunicationController::class, 'notifications']);
     $router->post('/notifications/mark-read', [\App\Controllers\Communication\CommunicationController::class, 'markNotificationRead'], ['csrf']);
 
-    // ─── Student & Parent Portals ────────────────────────────────────────────
+    //Portals
     $router->group(['middleware' => ['role:student']], function ($router) {
         $router->get('/portal/student', [\App\Controllers\Portals\StudentPortalController::class, 'dashboard']);
         $router->get('/portal/student/dashboard', [\App\Controllers\Portals\StudentPortalController::class, 'dashboard']);
@@ -183,7 +171,7 @@ $router->group(['middleware' => ['auth']], function ($router) {
         $router->get('/portal/parent/dashboard', [\App\Controllers\Portals\ParentPortalController::class, 'dashboard']);
     });
 
-    // ─── Institute Settings & Branches (Owner & Admin ONLY) ───────────────────
+    //Settings
     $router->group(['middleware' => ['role:institute_owner,institute_admin']], function ($router) {
         $router->get('/settings', [\App\Controllers\Settings\SettingsController::class, 'index']);
         $router->post('/settings', [\App\Controllers\Settings\SettingsController::class, 'updateSettings'], ['csrf']);
@@ -197,14 +185,14 @@ $router->group(['middleware' => ['auth']], function ($router) {
         $router->post('/settings/backups/restore', [\App\Controllers\Settings\SettingsController::class, 'restoreBackup'], ['csrf']);
     });
 
-    // ─── Developer / System Super Admin (Installation & Admin Management) ───
+    //Platform
     $router->get('/platform/dashboard', [\App\Controllers\Platform\PlatformController::class, 'dashboard'], ['platform']);
     $router->get('/platform/tenants', [\App\Controllers\Platform\PlatformController::class, 'tenants'], ['platform']);
     $router->post('/platform/tenants', [\App\Controllers\Platform\PlatformController::class, 'storeTenant'], ['platform', 'csrf']);
     $router->post('/platform/institute/update', [\App\Controllers\Platform\PlatformController::class, 'updateInstitute'], ['platform', 'csrf']);
     $router->post('/platform/institute-admin/reset', [\App\Controllers\Platform\PlatformController::class, 'resetAdminPassword'], ['platform', 'csrf']);
 
-    // ─── Reports & Analytics (Owner, Admin, Accountant) ──────────────────────
+    //Reports
     $router->group(['middleware' => ['role:institute_owner,institute_admin,accountant']], function ($router) {
         $router->get('/reports', [\App\Controllers\Reports\ReportController::class, 'index']);
         $router->get('/reports/attendance', [\App\Controllers\Reports\ReportController::class, 'attendance']);
@@ -215,4 +203,3 @@ $router->group(['middleware' => ['auth']], function ($router) {
         $router->get('/reports/student-performance', [\App\Controllers\Reports\ReportController::class, 'studentPerformance']);
     });
 });
-

@@ -12,9 +12,6 @@ class Invoice extends Model
     protected bool $tenantScoped = true;
     protected bool $supportsSoftDeletes = true;
 
-    /**
-     * Find invoice with joined student, branch, and line items.
-     */
     public function findWithDetails(int $id): ?array
     {
         $tenantId = $this->getActiveTenantId();
@@ -44,10 +41,6 @@ class Invoice extends Model
         return $invoice;
     }
 
-    /**
-     * Generate the next sequential invoice number.
-     * Format: {TENANT_CODE}-INV-{YYYYMM}-{XXXX}
-     */
     public function generateNextNumber(): string
     {
         $tenantId = $this->getActiveTenantId();

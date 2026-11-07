@@ -7,16 +7,11 @@ namespace App\Middleware;
 use App\Core\Request;
 use App\Core\Response;
 
-/**
- * TuitionPro ERP — CSRF Protection Middleware
- *
- * Validates CSRF tokens on all state-changing HTTP requests (POST, PUT, DELETE, PATCH).
- */
 class CsrfMiddleware implements MiddlewareInterface
 {
     public function handle(Request $request, Response $response, callable $next, ?string $param = null): mixed
     {
-        // Safe read-only HTTP methods do not require CSRF token
+        //Authentication
         if (in_array($request->getMethod(), ['GET', 'HEAD', 'OPTIONS'], true)) {
             return $next();
         }

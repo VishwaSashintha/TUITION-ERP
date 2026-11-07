@@ -10,17 +10,10 @@ class JournalEntry extends Model
 {
     protected string $table = 'journal_entries';
     protected bool $tenantScoped = true;
-    protected bool $supportsSoftDeletes = false; // Financial journals are immutable
+    protected bool $supportsSoftDeletes = false;
     protected bool $hasUpdatedAt = false;
 
-    /**
-     * Post a balanced double-entry journal entry.
-     * Enforces mathematical balance: Total Debits == Total Credits.
-     *
-     * @param array $entryData
-     * @param array $lines Array of ['account_id' => int, 'line_description' => string, 'debit' => float, 'credit' => float]
-     * @return int Inserted journal entry ID
-     */
+    //Validation
     public function postBalancedEntry(array $entryData, array $lines): int
     {
         $totalDebit  = 0.00;
@@ -31,7 +24,6 @@ class JournalEntry extends Model
             $totalCredit += (float) ($line['credit'] ?? 0);
         }
 
-        // Check journal balance with minor-unit precision
         if (round($totalDebit, 2) !== round($totalCredit, 2)) {
             throw new \RuntimeException(
                 sprintf('Accounting imbalance: Total Debits (Rs. %.2f) must equal Total Credits (Rs. %.2f).', $totalDebit, $totalCredit)
@@ -76,9 +68,6 @@ class JournalEntry extends Model
         });
     }
 
-    /**
-     * Find journal entry with all line items and accounts.
-     */
     public function findWithLines(int $id): ?array
     {
         $tenantId = $this->getActiveTenantId();

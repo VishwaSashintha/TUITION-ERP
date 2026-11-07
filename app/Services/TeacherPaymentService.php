@@ -8,16 +8,6 @@ use App\Core\Database;
 use App\Models\TeacherPaymentCalculation;
 use App\Models\TeacherPayment;
 
-/**
- * TuitionPro ERP — Teacher Compensation & Payroll Engine
- *
- * Implements 5 teacher compensation models:
- * 1. Fixed monthly salary
- * 2. Per-session rate
- * 3. Per-student rate
- * 4. Revenue-share percentage of collected fees
- * 5. Custom payment arrangement
- */
 class TeacherPaymentService
 {
     private Database $db;
@@ -33,14 +23,11 @@ class TeacherPaymentService
         $this->paymentModel = new TeacherPayment();
     }
 
-    /**
-     * Calculate teacher compensation for a specific period and batch.
-     */
     public function calculateCompensation(int $teacherId, int $periodId, ?int $batchId = null): array
     {
         $tenantId = current_tenant_id();
 
-        // 1. Fetch teacher details & rule
+        //Teachers
         $teacher = $this->db->queryOne(
             "SELECT * FROM `teachers` WHERE `id` = :id AND `tenant_id` = :tid AND `deleted_at` IS NULL",
             ['id' => $teacherId, 'tid' => $tenantId]
@@ -57,7 +44,7 @@ class TeacherPaymentService
             throw new \RuntimeException('Payment period not found.');
         }
 
-        // Find applicable rule (batch specific rule takes precedence over default teacher rule)
+        //Teachers
         $rule = null;
         if ($batchId) {
             $rule = $this->db->queryOne(
@@ -73,13 +60,11 @@ class TeacherPaymentService
             );
         }
 
-        // Fallback to teacher profile defaults
+        //Teachers
         $model      = $rule['model'] ?? $teacher['compensation_model'] ?? 'revenue_share';
         $rate       = (float) ($rule['rate'] ?? $teacher['default_rate'] ?? 0.00);
         $percentage = (float) ($rule['percentage'] ?? $teacher['default_percentage'] ?? 0.00);
 
-        // 2. Aggregate operational metrics
-        // Completed class sessions
         $sessionQuery = "SELECT COUNT(*) AS total_sessions FROM `class_sessions` WHERE `tenant_id` = :tid AND `teacher_id` = :teacher_id AND `status` = 'completed' AND `session_date` BETWEEN :start_date AND :end_date";
         $sessionParams = ['tid' => $tenantId, 'teacher_id' => $teacherId, 'start_date' => $period['start_date'], 'end_date' => $period['end_date']];
         if ($batchId) {
@@ -88,7 +73,7 @@ class TeacherPaymentService
         }
         $totalSessions = (int) $this->db->queryOne($sessionQuery, $sessionParams)['total_sessions'];
 
-        // Enrolled students
+        //Students
         $studentQuery = "SELECT COUNT(DISTINCT e.student_id) AS total_students FROM `enrollments` e JOIN `batches` b ON e.batch_id = b.id WHERE e.`tenant_id` = :tid AND b.`teacher_id` = :teacher_id AND e.`status` = 'active' AND e.`deleted_at` IS NULL";
         $studentParams = ['tid' => $tenantId, 'teacher_id' => $teacherId];
         if ($batchId) {
@@ -97,7 +82,7 @@ class TeacherPaymentService
         }
         $totalStudents = (int) $this->db->queryOne($studentQuery, $studentParams)['total_students'];
 
-        // Eligible collected revenue (sum of payments allocated to invoices of this teacher's batches during this period)
+        //Teachers
         $revenueQuery = "SELECT COALESCE(SUM(pa.amount), 0) AS total_revenue 
                          FROM `payment_allocations` pa 
                          JOIN `payments` p ON pa.payment_id = p.id 
@@ -115,7 +100,7 @@ class TeacherPaymentService
         }
         $eligibleRevenue = (float) $this->db->queryOne($revenueQuery, $revenueParams)['total_revenue'];
 
-        // 3. Compute Calculated Amount by Model
+        //Calculation
         $calculatedAmount = 0.00;
         switch ($model) {
             case 'fixed_salary':
@@ -153,9 +138,6 @@ class TeacherPaymentService
         ];
     }
 
-    /**
-     * Save draft calculation, approve, and disburse payment voucher.
-     */
     public function saveAndApproveCalculation(array $calcData, bool $autoApprove = true): int
     {
         return $this->db->transaction(function () use ($calcData, $autoApprove) {
@@ -174,9 +156,6 @@ class TeacherPaymentService
         });
     }
 
-    /**
-     * Record actual teacher payment disbursement.
-     */
     public function disbursePayment(
         int $teacherId,
         int $calculationId,
@@ -206,13 +185,12 @@ class TeacherPaymentService
                 'notes'            => $notes,
             ]);
 
-            // Mark calculation as paid
+            //Calculation
             $this->db->execute(
                 "UPDATE `teacher_payment_calculations` SET `status` = 'paid' WHERE `id` = :id AND `tenant_id` = :tid",
                 ['id' => $calculationId, 'tid' => $tenantId]
             );
 
-            // Deduct from Main Bank or Cash account
             $account = $this->db->queryOne(
                 "SELECT id, current_balance FROM `financial_accounts` WHERE `tenant_id` = :tid AND `account_type` = 'bank' AND `is_active` = 1 LIMIT 1",
                 ['tid' => $tenantId]

@@ -7,11 +7,6 @@ namespace App\Middleware;
 use App\Core\Request;
 use App\Core\Response;
 
-/**
- * TuitionPro ERP — Role-Based Access Control Middleware
- *
- * Verifies that the authenticated user possesses one of the allowed roles.
- */
 class RoleMiddleware implements MiddlewareInterface
 {
     public function handle(Request $request, Response $response, callable $next, ?string $param = null): mixed
@@ -27,7 +22,6 @@ class RoleMiddleware implements MiddlewareInterface
             return null;
         }
 
-        // Super Admin has universal access
         if (($user['role_name'] ?? '') === 'super_admin') {
             return $next();
         }

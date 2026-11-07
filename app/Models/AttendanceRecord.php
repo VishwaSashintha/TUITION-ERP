@@ -12,9 +12,6 @@ class AttendanceRecord extends Model
     protected bool $tenantScoped = true;
     protected bool $supportsSoftDeletes = false;
 
-    /**
-     * Get attendance summary for a student.
-     */
     public function getStudentSummary(int $studentId): array
     {
         $tenantId = $this->getActiveTenantId();

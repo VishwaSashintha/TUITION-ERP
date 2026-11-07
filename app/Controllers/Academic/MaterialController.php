@@ -10,9 +10,6 @@ use App\Core\Request;
 use App\Models\LearningMaterial;
 use App\Services\AuditService;
 
-/**
- * TuitionPro ERP — Learning Materials & Resources Controller
- */
 class MaterialController extends Controller
 {
     private LearningMaterial $materialModel;
@@ -26,9 +23,6 @@ class MaterialController extends Controller
         $this->audit         = new AuditService();
     }
 
-    /**
-     * List all learning materials with batch and subject filters.
-     */
     public function index(Request $request): void
     {
         $tenantId  = current_tenant_id();
@@ -80,9 +74,6 @@ class MaterialController extends Controller
         ]);
     }
 
-    /**
-     * Show upload material form.
-     */
     public function create(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -99,9 +90,6 @@ class MaterialController extends Controller
         ]);
     }
 
-    /**
-     * Store new learning material.
-     */
     public function store(Request $request): void
     {
         $rules = [
@@ -123,7 +111,7 @@ class MaterialController extends Controller
         $description  = trim((string) $request->input('description', ''));
         $externalLink = trim((string) $request->input('external_link', ''));
 
-        // Resolve subject and teacher from batch
+        //Lookup
         $batch = $this->db->queryOne("SELECT subject_id, teacher_id FROM `batches` WHERE `id` = :id AND `tenant_id` = :tid", ['id' => $batchId, 'tid' => $tenantId]);
         if (!$batch) {
             $this->back('error', 'Selected class batch not found.');
@@ -136,7 +124,7 @@ class MaterialController extends Controller
         $filePath = null;
         $fileSize = null;
 
-        // Handle file upload if provided
+        //Upload
         if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
             $file = $_FILES['file'];
             $maxBytes = (int) env('UPLOAD_MAX_SIZE_MB', 10) * 1024 * 1024;
@@ -180,9 +168,6 @@ class MaterialController extends Controller
         $this->redirect(url('academic/materials'), 'success', 'Learning material uploaded successfully.');
     }
 
-    /**
-     * Download material attachment safely.
-     */
     public function download(Request $request, string $id = ''): void
     {
         $materialId = (int) ($id !== '' ? $id : $request->query('id', 0));
@@ -211,4 +196,3 @@ class MaterialController extends Controller
         exit;
     }
 }
-

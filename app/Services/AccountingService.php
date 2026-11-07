@@ -7,13 +7,6 @@ namespace App\Services;
 use App\Core\Database;
 use App\Models\JournalEntry;
 
-/**
- * TuitionPro ERP — Double-Entry Accounting & Ledger Engine
- *
- * Implements strict double-entry bookkeeping:
- * - Every transaction posts balanced debits and credits.
- * - Generates Trial Balance, General Ledger, and P&L Statements.
- */
 class AccountingService
 {
     private Database $db;
@@ -27,11 +20,6 @@ class AccountingService
         $this->journalModel = new JournalEntry();
     }
 
-    /**
-     * Post journal entry for an issued fee invoice.
-     * Debit: Accounts Receivable (1100)
-     * Credit: Tuition Fee Revenue (4010)
-     */
     public function recordInvoiceJournal(int $invoiceId): int
     {
         $tenantId = current_tenant_id();
@@ -77,11 +65,6 @@ class AccountingService
         return $this->journalModel->postBalancedEntry($entryData, $lines);
     }
 
-    /**
-     * Post journal entry for a collected student payment.
-     * Debit: Cash in Hand (1010) or Main Bank Account (1020)
-     * Credit: Accounts Receivable (1100)
-     */
     public function recordPaymentJournal(int $paymentId): int
     {
         $tenantId = current_tenant_id();
@@ -128,11 +111,6 @@ class AccountingService
         return $this->journalModel->postBalancedEntry($entryData, $lines);
     }
 
-    /**
-     * Post journal entry for an operational expense.
-     * Debit: Specific Expense Account (e.g. 5020 Classroom Rent)
-     * Credit: Cash in Hand (1010) or Operating Bank (1020)
-     */
     public function recordExpenseJournal(int $expenseId): int
     {
         $tenantId = current_tenant_id();
@@ -144,7 +122,6 @@ class AccountingService
             throw new \RuntimeException('Expense not found.');
         }
 
-        // Map expense category to expense account
         $expenseAccount = $this->getAccountByCode('5020'); // Default rent / operational expense
         $cashAccount    = $this->getAccountByCode('1010');
 
@@ -182,9 +159,6 @@ class AccountingService
         return $this->journalModel->postBalancedEntry($entryData, $lines);
     }
 
-    /**
-     * Generate Trial Balance to mathematically verify that Debits == Credits.
-     */
     public function getTrialBalance(): array
     {
         $tenantId = current_tenant_id();
@@ -218,9 +192,6 @@ class AccountingService
         ];
     }
 
-    /**
-     * Generate Profit and Loss (Income Statement) Summary.
-     */
     public function getProfitAndLossStatement(?string $startDate = null, ?string $endDate = null): array
     {
         $tenantId = current_tenant_id();
@@ -233,7 +204,7 @@ class AccountingService
             $params['end']   = $endDate;
         }
 
-        // Revenues
+        //Revenues
         $revenues = $this->db->query(
             "SELECT coa.account_name, COALESCE(SUM(jl.credit - jl.debit), 0) AS balance 
              FROM `chart_of_accounts` coa 
@@ -244,7 +215,7 @@ class AccountingService
             $params
         );
 
-        // Expenses
+        //Expenses
         $expenses = $this->db->query(
             "SELECT coa.account_name, COALESCE(SUM(jl.debit - jl.credit), 0) AS balance 
              FROM `chart_of_accounts` coa 
@@ -274,10 +245,6 @@ class AccountingService
         ];
     }
 
-    /**
-     * Generate Balance Sheet (Statement of Financial Position).
-     * Verifies Assets = Liabilities + Equity (including current period retained earnings).
-     */
     public function getBalanceSheet(?string $asOfDate = null): array
     {
         $tenantId = current_tenant_id();
@@ -289,7 +256,7 @@ class AccountingService
             $params['as_of'] = $asOfDate;
         }
 
-        // 1. Assets (Normal Balance = Debit)
+        //Assets
         $assets = $this->db->query(
             "SELECT coa.account_code, coa.account_name, COALESCE(SUM(jl.debit - jl.credit), 0) AS balance 
              FROM `chart_of_accounts` coa 
@@ -301,7 +268,7 @@ class AccountingService
             $params
         );
 
-        // 2. Liabilities (Normal Balance = Credit)
+        //Liabilities
         $liabilities = $this->db->query(
             "SELECT coa.account_code, coa.account_name, COALESCE(SUM(jl.credit - jl.debit), 0) AS balance 
              FROM `chart_of_accounts` coa 
@@ -313,7 +280,7 @@ class AccountingService
             $params
         );
 
-        // 3. Equity (Normal Balance = Credit)
+        //Equity
         $equity = $this->db->query(
             "SELECT coa.account_code, coa.account_name, COALESCE(SUM(jl.credit - jl.debit), 0) AS balance 
              FROM `chart_of_accounts` coa 
@@ -325,7 +292,6 @@ class AccountingService
             $params
         );
 
-        // 4. Current Period Net Income (Revenues - Expenses)
         $pnl = $this->getProfitAndLossStatement(null, $asOfDate);
         $netIncome = (float) $pnl['net_profit'];
 

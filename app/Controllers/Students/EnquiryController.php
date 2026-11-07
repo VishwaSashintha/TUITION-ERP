@@ -9,9 +9,6 @@ use App\Core\Database;
 use App\Core\Request;
 use App\Services\AuditService;
 
-/**
- * TuitionPro ERP — Student Enquiries & Admission Lifecycle Controller
- */
 class EnquiryController extends Controller
 {
     private Database $db;
@@ -23,9 +20,6 @@ class EnquiryController extends Controller
         $this->audit = new AuditService();
     }
 
-    /**
-     * List all student enquiries with search, filters, and metrics.
-     */
     public function index(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -67,7 +61,6 @@ class EnquiryController extends Controller
             $params
         );
 
-        // Summary KPI counts
         $counts = $this->db->queryOne(
             "SELECT 
                 COUNT(*) AS total,
@@ -96,9 +89,6 @@ class EnquiryController extends Controller
         ]);
     }
 
-    /**
-     * Show enquiry creation form.
-     */
     public function create(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -113,9 +103,6 @@ class EnquiryController extends Controller
         ]);
     }
 
-    /**
-     * Store new enquiry.
-     */
     public function store(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -161,9 +148,6 @@ class EnquiryController extends Controller
         $this->redirect(url('students/enquiries'), 'success', 'Student enquiry registered successfully.');
     }
 
-    /**
-     * View enquiry details and follow-up interaction history.
-     */
     public function show(Request $request, string $id = ''): void
     {
         $tenantId  = current_tenant_id();
@@ -201,9 +185,6 @@ class EnquiryController extends Controller
         ]);
     }
 
-    /**
-     * Log a follow-up interaction on an enquiry.
-     */
     public function storeFollowup(Request $request): void
     {
         $tenantId  = current_tenant_id();
@@ -252,9 +233,6 @@ class EnquiryController extends Controller
         $this->redirect(url("students/enquiries/{$enquiryId}"), 'success', 'Follow-up interaction recorded successfully.');
     }
 
-    /**
-     * Convert an enquiry directly into a registered student record.
-     */
     public function convert(Request $request): void
     {
         $tenantId  = current_tenant_id();
@@ -275,7 +253,6 @@ class EnquiryController extends Controller
             return;
         }
 
-        // Generate unique admission number: APX-YYYY-XXXX
         $year   = date('Y');
         $random = mt_rand(1000, 9999);
         $admNo  = "APX-{$year}-{$random}";
@@ -297,7 +274,6 @@ class EnquiryController extends Controller
             'created_at'       => date('Y-m-d H:i:s'),
         ]);
 
-        // Link back to enquiry
         $this->db->execute(
             "UPDATE `student_enquiries` SET `status` = 'admitted', `converted_student_id` = :sid, `updated_at` = NOW() WHERE `id` = :eid AND `tenant_id` = :tid",
             ['sid' => $studentId, 'eid' => $enquiryId, 'tid' => $tenantId]

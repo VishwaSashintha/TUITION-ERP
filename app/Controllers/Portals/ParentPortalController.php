@@ -17,22 +17,17 @@ class ParentPortalController extends Controller
         $this->db = Database::getInstance();
     }
 
-    /**
-     * Parent Portal Dashboard.
-     */
     public function dashboard(Request $request): void
     {
         $tenantId = current_tenant_id();
         $user     = auth_user();
 
-        // Find linked guardian record
         $guardian = $this->db->queryOne(
             "SELECT * FROM `guardians` WHERE `tenant_id` = :tid AND (`user_id` = :uid OR `email` = :email) AND `deleted_at` IS NULL",
             ['tid' => $tenantId, 'uid' => $user['id'], 'email' => $user['email']]
         );
 
         if (!$guardian) {
-            // Fallback for demo/testing
             $guardian = $this->db->queryOne(
                 "SELECT * FROM `guardians` WHERE `tenant_id` = :tid AND `deleted_at` IS NULL LIMIT 1",
                 ['tid' => $tenantId]
@@ -53,7 +48,7 @@ class ParentPortalController extends Controller
             );
         }
 
-        // Validate child access: strictly prevent IDOR
+        //Validation
         $activeChild = null;
         if (!empty($children)) {
             if ($selectedChildId > 0) {
@@ -72,7 +67,7 @@ class ParentPortalController extends Controller
             $selectedChildId = 0;
         }
 
-        // Attendance stats for selected child
+        //Attendance
         $attSummary = $this->db->queryOne(
             "SELECT 
                 COUNT(*) AS total_sessions,
@@ -86,7 +81,6 @@ class ParentPortalController extends Controller
         $attSessions = (int)($attSummary['attended_sessions'] ?? 0);
         $attRate = $totSessions > 0 ? round(($attSessions / $totSessions) * 100, 1) : 100.0;
 
-        // Invoices and pending fees
         $invoices = $this->db->query(
             "SELECT * FROM `invoices` WHERE `student_id` = :stuid AND `tenant_id` = :tid AND `deleted_at` IS NULL ORDER BY `id` DESC LIMIT 10",
             ['stuid' => $selectedChildId, 'tid' => $tenantId]
@@ -94,7 +88,6 @@ class ParentPortalController extends Controller
 
         $totalBalance = array_reduce($invoices, fn($carry, $i) => $carry + (float)$i['balance_amount'], 0.00);
 
-        // Recent examination results
         $results = $this->db->query(
             "SELECT em.*, ex.name AS exam_name, ex.exam_date, ex.max_marks, s.name AS subject_name
              FROM `exam_marks` em
@@ -105,13 +98,11 @@ class ParentPortalController extends Controller
             ['stuid' => $selectedChildId, 'tid' => $tenantId]
         );
 
-        // Parent Announcements
         $announcements = $this->db->query(
             "SELECT * FROM `announcements` WHERE `tenant_id` = :tid AND `target_audience` IN ('all', 'parents') AND `is_published` = 1 ORDER BY `published_at` DESC LIMIT 5",
             ['tid' => $tenantId]
         );
 
-        // Enrolled batches and materials/assignments for selected child
         $batches = $this->db->query(
             "SELECT b.*, s.name AS subject_name, t.full_name AS teacher_name
              FROM `enrollments` e

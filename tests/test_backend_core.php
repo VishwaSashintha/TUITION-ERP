@@ -2,17 +2,6 @@
 
 declare(strict_types=1);
 
-/**
- * TuitionPro ERP — Backend Foundation & Financial Integrity Test Suite
- *
- * Runs automated tests verifying:
- * - Multi-tenant isolation (Tenant A vs Tenant B)
- * - Authentication & RBAC security
- * - Invoice creation, partial payments, and balance tracking
- * - Teacher compensation calculations across models
- * - Double-entry balanced journal entries and Trial Balance
- */
-
 require_once dirname(__DIR__) . '/public/index.php';
 
 use App\Core\Database;
@@ -74,65 +63,56 @@ class BackendTestSuite
             echo " [FAIL] {$testName}\n";
         }
     }
-
-    // ─── 1. Authentication Tests ─────────────────────────────────────────────
     private function testAuthentication(): void
     {
         echo "1. Testing Authentication & RBAC...\n";
         $auth = new AuthService();
 
-        // Valid platform login
+        //Authentication
         $platformUser = $auth->attempt('superadmin@tuitionpro.lk', 'Password@123');
         $this->assert($platformUser !== null && $platformUser['role'] === 'super_admin', "Super Admin login succeeds with valid credentials");
 
-        // Invalid password
         $badLogin = $auth->attempt('superadmin@tuitionpro.lk', 'WrongPassword!');
         $this->assert($badLogin === null, "Login fails with invalid password");
 
-        // Valid tenant owner login
+        //Authentication
         $apexOwner = $auth->attempt('apex.owner@tuitionpro.lk', 'Password@123', 'apex');
         $this->assert($apexOwner !== null && $apexOwner['role_name'] === 'institute_owner', "Apex Institute Owner login succeeds");
 
-        // Tenant code mismatch check
         $crossTenantLogin = $auth->attempt('apex.owner@tuitionpro.lk', 'Password@123', 'excel');
         $this->assert($crossTenantLogin === null, "Login rejected when tenant code does not match user institute");
     }
-
-    // ─── 2. Tenant Isolation Tests ───────────────────────────────────────────
     private function testTenantIsolation(): void
     {
         echo "\n2. Testing Multi-Tenant Data Isolation...\n";
         $session = app()->getSession();
 
-        // Resolve Apex Tenant ID (Tenant 1)
         $apexTenant = $this->db->queryOne("SELECT id FROM `tenants` WHERE `code` = 'apex'");
         $apexId = (int)$apexTenant['id'];
 
-        // Resolve Excel Tenant ID (Tenant 2)
         $excelTenant = $this->db->queryOne("SELECT id FROM `tenants` WHERE `code` = 'excel'");
         $excelId = (int)$excelTenant['id'];
 
-        // Set active session context to APEX
         $session->set('tenant_id', $apexId);
         $studentModel = new Student();
 
-        // Get student belonging to Excel
+        //Students
         $excelStudent = $this->db->queryOne("SELECT id, full_name FROM `students` WHERE `tenant_id` = :tid LIMIT 1", ['tid' => $excelId]);
         $excelStudentId = (int)$excelStudent['id'];
 
-        // Querying Excel student while in Apex context must return null
+        //Students
         $isolatedFind = $studentModel->find($excelStudentId);
         $this->assert($isolatedFind === null, "Tenant A cannot read Tenant B student by ID (returns null)");
 
-        // Attempting to update Excel student while in Apex context affects 0 rows
+        //Students
         $affectedRows = $studentModel->update($excelStudentId, ['first_name' => 'HackedName']);
         $this->assert($affectedRows === 0, "Tenant A cannot modify Tenant B student (0 rows affected)");
 
-        // Verify Excel student's original name was preserved
+        //Students
         $recheck = $this->db->queryOne("SELECT first_name FROM `students` WHERE `id` = :id", ['id' => $excelStudentId]);
         $this->assert($recheck['first_name'] !== 'HackedName', "Tenant B record remained untouched after cross-tenant attack attempt");
 
-        // List all students under Apex context — must only contain Apex students
+        //Students
         $apexStudents = $studentModel->all();
         $onlyApex = true;
         foreach ($apexStudents as $s) {
@@ -143,8 +123,6 @@ class BackendTestSuite
         }
         $this->assert($onlyApex && count($apexStudents) > 0, "Tenant A query strictly scopes results to Tenant A data only");
     }
-
-    // ─── 3. Invoicing, Partial Payments & Allocations ─────────────────────────
     private function testBillingAndPartialPayments(): void
     {
         echo "\n3. Testing Invoicing, Partial Payments & Balance Recalculation...\n";
@@ -156,7 +134,6 @@ class BackendTestSuite
         $student = $this->db->queryOne("SELECT id FROM `students` WHERE `tenant_id` = :tid LIMIT 1", ['tid' => (int)$apexTenant['id']]);
         $studentId = (int)$student['id'];
 
-        // Create Invoice for Rs. 5,000.00
         $invoiceId = $billing->createInvoice(
             $studentId,
             '2026-12',
@@ -174,7 +151,6 @@ class BackendTestSuite
             "Invoice created with Rs. 5,000.00 total and issued status"
         );
 
-        // Record Partial Payment 1: Rs. 2,000.00
         $payId1 = $billing->recordPayment(
             $studentId,
             2000.00,
@@ -192,7 +168,6 @@ class BackendTestSuite
             "Partial payment of Rs. 2,000 updates balance to Rs. 3,000 and status to partially_paid"
         );
 
-        // Record Partial Payment 2: Rs. 3,000.00 (Settles remaining balance)
         $payId2 = $billing->recordPayment(
             $studentId,
             3000.00,
@@ -210,7 +185,6 @@ class BackendTestSuite
             "Final payment of Rs. 3,000 settles invoice to Rs. 0 balance and status to paid"
         );
 
-        // Attempting to over-allocate beyond balance throws an exception
         $overpayBlocked = false;
         try {
             $billing->recordPayment(
@@ -224,8 +198,6 @@ class BackendTestSuite
         }
         $this->assert($overpayBlocked, "Over-allocating payment beyond invoice balance is strictly rejected with exception");
     }
-
-    // ─── 4. Teacher Payment Calculations ─────────────────────────────────────
     private function testTeacherPaymentCalculation(): void
     {
         echo "\n4. Testing Teacher Payment Calculation Models...\n";
@@ -246,8 +218,6 @@ class BackendTestSuite
             "Teacher compensation calculation executes successfully with accurate revenue formula"
         );
     }
-
-    // ─── 5. Double-Entry Accounting Balance & Integrity ──────────────────────
     private function testDoubleEntryAccountingBalance(): void
     {
         echo "\n5. Testing Double-Entry Accounting Balances (Debits == Credits)...\n";
@@ -259,7 +229,7 @@ class BackendTestSuite
         $accService = new AccountingService();
         $journalModel = new JournalEntry();
 
-        // 1. Post a balanced journal entry (Rs. 10,000 Rent Payment: DR Rent Expense, CR Cash in Hand)
+        //Ledger
         $cashAcc = $this->db->queryOne("SELECT id FROM `chart_of_accounts` WHERE `tenant_id` = :tid AND `account_code` = '1010'", ['tid' => $tenantId]);
         $rentAcc = $this->db->queryOne("SELECT id FROM `chart_of_accounts` WHERE `tenant_id` = :tid AND `account_code` = '5020'", ['tid' => $tenantId]);
 
@@ -280,7 +250,7 @@ class BackendTestSuite
         $entryId = $journalModel->postBalancedEntry($entryData, $lines);
         $this->assert($entryId > 0, "Balanced double-entry journal (Debits: Rs. 10,000 == Credits: Rs. 10,000) posted successfully");
 
-        // 2. Attempting to post an unbalanced journal entry must be rejected
+        //Ledger
         $unbalancedBlocked = false;
         try {
             $unbalancedLines = [
@@ -293,7 +263,6 @@ class BackendTestSuite
         }
         $this->assert($unbalancedBlocked, "Unbalanced journal entry (Debits: 10,000 != Credits: 8,000) is rejected with accounting exception");
 
-        // 3. Verify Trial Balance
         $tb = $accService->getTrialBalance();
         $this->assert(
             $tb['is_balanced'] === true && $tb['total_debit'] === $tb['total_credit'],

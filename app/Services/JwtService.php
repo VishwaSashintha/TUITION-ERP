@@ -6,7 +6,7 @@ namespace App\Services;
 
 use App\Core\Database;
 
-// JWT
+//JWT
 class JwtService
 {
     private string $secret;
@@ -26,7 +26,7 @@ class JwtService
         $this->db         = Database::getInstance();
     }
 
-    // JWT
+    //JWT
     public function generateAccessToken(array $user): string
     {
         $now = time();
@@ -57,7 +57,7 @@ class JwtService
         return $this->encode($header, $payload);
     }
 
-    // JWT
+    //JWT
     public function generateRefreshToken(array $user): string
     {
         $now = time();
@@ -84,7 +84,7 @@ class JwtService
         $tokenString = $this->encode($header, $payload);
         $tokenHash   = hash('sha256', $tokenString);
 
-        // Database
+        //Database
         $this->db->execute(
             "INSERT INTO `refresh_tokens` (`user_id`, `user_type`, `token_id`, `token_hash`, `expires_at`, `created_at`)
              VALUES (:uid, :utype, :tid, :thash, :exp, NOW())",
@@ -100,7 +100,7 @@ class JwtService
         return $tokenString;
     }
 
-    // JWT
+    //JWT
     public function validateToken(string $token): ?array
     {
         $parts = explode('.', $token);
@@ -144,7 +144,7 @@ class JwtService
         return $payload;
     }
 
-    // JWT
+    //JWT
     public function rotateRefreshToken(string $tokenString): ?array
     {
         $payload = $this->validateToken($tokenString);
@@ -162,7 +162,7 @@ class JwtService
             return null;
         }
 
-        // Replay attack prevention: if token already revoked, invalidate all user tokens
+        //Validation
         if ($record['revoked_at'] !== null) {
             $this->db->execute(
                 "UPDATE `refresh_tokens` SET `revoked_at` = NOW() WHERE `user_id` = :uid AND `user_type` = :utype",
@@ -175,13 +175,12 @@ class JwtService
             return null;
         }
 
-        // Revoke current token
+        //Authentication
         $this->db->execute(
             "UPDATE `refresh_tokens` SET `revoked_at` = NOW() WHERE `id` = :id",
             ['id' => $record['id']]
         );
 
-        // Fetch fresh user
         $user = null;
         if ($record['user_type'] === 'platform') {
             $user = $this->db->queryOne(
@@ -222,7 +221,7 @@ class JwtService
         ];
     }
 
-    // JWT
+    //JWT
     public function revokeRefreshToken(string $tokenString): void
     {
         $tokenHash = hash('sha256', $tokenString);
@@ -232,7 +231,7 @@ class JwtService
         );
     }
 
-    // JWT
+    //JWT
     private function encode(array $header, array $payload): string
     {
         $headerB64  = $this->base64UrlEncode(json_encode($header, JSON_UNESCAPED_SLASHES));
@@ -243,19 +242,19 @@ class JwtService
         return "$headerB64.$payloadB64.$sigB64";
     }
 
-    // JWT
+    //JWT
     private function sign(string $data): string
     {
         return hash_hmac('sha256', $data, $this->secret, true);
     }
 
-    // JWT
+    //JWT
     private function base64UrlEncode(string $data): string
     {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 
-    // JWT
+    //JWT
     private function base64UrlDecode(string $data): string
     {
         return base64_decode(strtr($data, '-_', '+/'));

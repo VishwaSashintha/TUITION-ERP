@@ -26,9 +26,6 @@ class ExpenseController extends Controller
         $this->db                 = Database::getInstance();
     }
 
-    /**
-     * List expenses.
-     */
     public function index(Request $request): void
     {
         $tenantId   = current_tenant_id();
@@ -58,7 +55,7 @@ class ExpenseController extends Controller
 
         $categories = $this->db->query("SELECT id, name FROM `expense_categories` WHERE `tenant_id` = :tid AND `is_active` = 1", ['tid' => $tenantId]);
 
-        // Summaries
+        //Summaries
         $summary = $this->db->queryOne(
             "SELECT 
                 COALESCE(SUM(amount), 0.00) AS total_expense,
@@ -82,9 +79,6 @@ class ExpenseController extends Controller
         ]);
     }
 
-    /**
-     * Show expense creation form.
-     */
     public function create(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -102,9 +96,6 @@ class ExpenseController extends Controller
         ]);
     }
 
-    /**
-     * Store new expense and post balanced double-entry accounting journal.
-     */
     public function store(Request $request): void
     {
         $rules = [
@@ -152,7 +143,6 @@ class ExpenseController extends Controller
                     'created_by'     => auth_id() ?? 1,
                 ]);
 
-                // Update financial account balance
                 if ($accountId > 0) {
                     $acc = $this->db->queryOne("SELECT current_balance FROM `financial_accounts` WHERE `id` = :id AND `tenant_id` = :tid", ['id' => $accountId, 'tid' => $tenantId]);
                     if ($acc) {
@@ -161,7 +151,7 @@ class ExpenseController extends Controller
                     }
                 }
 
-                // Post double-entry journal entry
+                //Ledger
                 $this->accountingService->recordExpenseJournal($id);
 
                 $this->audit->log('expense_recorded', 'expenses', $id, "Expense {$expenseNumber} for Rs. {$amount} recorded and posted to general ledger");
@@ -175,9 +165,6 @@ class ExpenseController extends Controller
         }
     }
 
-    /**
-     * Trial Balance view.
-     */
     public function trialBalance(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -190,9 +177,6 @@ class ExpenseController extends Controller
         ]);
     }
 
-    /**
-     * Profit and Loss / Income Statement.
-     */
     public function profitLoss(Request $request): void
     {
         $startDate = $request->query('start_date', date('Y-m-01'));
@@ -209,9 +193,6 @@ class ExpenseController extends Controller
         ]);
     }
 
-    /**
-     * Cash & Bank Account Balances and Reconciliation.
-     */
     public function cashBank(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -254,9 +235,6 @@ class ExpenseController extends Controller
         ]);
     }
 
-    /**
-     * Balance Sheet (Statement of Financial Position).
-     */
     public function balanceSheet(Request $request): void
     {
         $asOfDate = $request->query('as_of', date('Y-m-d'));

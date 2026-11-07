@@ -7,11 +7,6 @@ namespace App\Middleware;
 use App\Core\Request;
 use App\Core\Response;
 
-/**
- * TuitionPro ERP — Platform Administration Middleware
- *
- * Strictly confines /platform routes to Super Admins and Support Admins.
- */
 class PlatformAdminMiddleware implements MiddlewareInterface
 {
     public function handle(Request $request, Response $response, callable $next, ?string $param = null): mixed

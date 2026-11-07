@@ -10,11 +10,8 @@ class Payment extends Model
 {
     protected string $table = 'payments';
     protected bool $tenantScoped = true;
-    protected bool $supportsSoftDeletes = false; // Financial payments are immutable (never deleted)
+    protected bool $supportsSoftDeletes = false;
 
-    /**
-     * Find payment with joined student, receipt, and allocations.
-     */
     public function findWithDetails(int $id): ?array
     {
         $tenantId = $this->getActiveTenantId();
@@ -44,9 +41,6 @@ class Payment extends Model
         return $payment;
     }
 
-    /**
-     * Generate next sequential payment number and receipt number.
-     */
     public function generateNextNumbers(): array
     {
         $tenantId = $this->getActiveTenantId();

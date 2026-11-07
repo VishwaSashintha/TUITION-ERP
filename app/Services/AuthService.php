@@ -6,7 +6,7 @@ namespace App\Services;
 
 use App\Core\Database;
 
-// Auth
+//Auth
 class AuthService
 {
     private Database $db;
@@ -22,18 +22,16 @@ class AuthService
         $this->limiter = new RateLimiter();
     }
 
-    // Auth
+    //Auth
     public function attempt(string $login, string $password, ?string $tenantCode = null): ?array
     {
         $login = trim($login);
         $ip    = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
 
-        // Rate limiting
         if ($this->limiter->isRateLimited($ip, $login)) {
             throw new \RuntimeException('Too many failed login attempts. Please wait 5 minutes before trying again.');
         }
 
-        // 1. Platform Super Admin
         $platformUser = $this->db->queryOne(
             "SELECT * FROM `platform_users` WHERE (`email` = :login) AND `status` = 'active' LIMIT 1",
             ['login' => $login]
@@ -45,7 +43,6 @@ class AuthService
             return $platformUser;
         }
 
-        // 2. Institute Users
         $sql = "SELECT u.*, r.name AS role_name, r.display_name AS role_display, t.name AS tenant_name, t.code AS tenant_code, t.status AS tenant_status, b.name AS branch_name 
                 FROM `users` u 
                 JOIN `roles` r ON u.role_id = r.id 
@@ -75,7 +72,6 @@ class AuthService
             return null;
         }
 
-        // Check account status
         if ($user['status'] !== 'active') {
             throw new \RuntimeException('Your account has been deactivated. Please contact your institute administrator.');
         }
@@ -89,7 +85,7 @@ class AuthService
         return $user;
     }
 
-    // Auth
+    //Auth
     private function loginPlatformUser(array &$user): void
     {
         $userData = [
@@ -103,7 +99,7 @@ class AuthService
             'branch_id'   => null,
         ];
 
-        // JWT
+        //JWT
         $accessToken  = $this->jwt->generateAccessToken($userData);
         $refreshToken = $this->jwt->generateRefreshToken($userData);
 
@@ -129,7 +125,7 @@ class AuthService
         $this->audit->log('platform_login', 'platform_users', (int)$user['id'], "Platform administrator {$user['name']} signed in via JWT.");
     }
 
-    // Auth
+    //Auth
     private function loginInstituteUser(array &$user): void
     {
         $userData = [
@@ -148,7 +144,7 @@ class AuthService
             'is_platform'  => false,
         ];
 
-        // JWT
+        //JWT
         $accessToken  = $this->jwt->generateAccessToken($userData);
         $refreshToken = $this->jwt->generateRefreshToken($userData);
 
@@ -176,7 +172,7 @@ class AuthService
         $this->audit->log('user_login', 'users', (int)$user['id'], "User {$user['name']} ({$user['role_display']}) signed in via JWT.");
     }
 
-    // Auth
+    //Auth
     public function logout(): void
     {
         $user = auth_user();
@@ -184,7 +180,7 @@ class AuthService
             $this->audit->log('user_logout', 'users', (int)$user['id'], "User {$user['name']} signed out.");
         }
 
-        // Revoke refresh token
+        //Authentication
         $refreshToken = $_COOKIE['tuitionpro_refresh'] ?? null;
         if ($refreshToken) {
             $this->jwt->revokeRefreshToken($refreshToken);
@@ -194,7 +190,7 @@ class AuthService
         app()->getSession()->destroy();
     }
 
-    // JWT
+    //JWT
     private function setAuthCookies(string $accessToken, string $refreshToken): void
     {
         if (headers_sent()) {
@@ -222,7 +218,7 @@ class AuthService
         ]);
     }
 
-    // JWT
+    //JWT
     private function clearAuthCookies(): void
     {
         if (headers_sent()) {
@@ -248,7 +244,7 @@ class AuthService
         ]);
     }
 
-    // JWT
+    //JWT
     public function getJwtService(): JwtService
     {
         return $this->jwt;

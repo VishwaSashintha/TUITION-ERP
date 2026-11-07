@@ -12,9 +12,6 @@ class Enrollment extends Model
     protected bool $tenantScoped = true;
     protected bool $supportsSoftDeletes = true;
 
-    /**
-     * Get students enrolled in a specific batch.
-     */
     public function getBatchStudents(int $batchId): array
     {
         $tenantId = $this->getActiveTenantId();

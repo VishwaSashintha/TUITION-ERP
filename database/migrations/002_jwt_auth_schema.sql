@@ -1,9 +1,7 @@
--- TuitionPro ERP — JWT Authentication & Security Schema
--- Migration: 002_jwt_auth_schema.sql
 
 USE `tuitionpro`;
 
--- 1. Refresh Tokens Table (Rotation, Revocation & Replay Prevention)
+--Authentication
 CREATE TABLE IF NOT EXISTS `refresh_tokens` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `user_id` INT UNSIGNED NOT NULL,
@@ -18,7 +16,6 @@ CREATE TABLE IF NOT EXISTS `refresh_tokens` (
     INDEX `idx_token_hash` (`token_hash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 2. Login Rate Limiting Table (Brute-Force Attack Prevention)
 CREATE TABLE IF NOT EXISTS `login_attempts` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `ip_address` VARCHAR(45) NOT NULL,

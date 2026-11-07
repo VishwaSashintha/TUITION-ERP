@@ -2,14 +2,6 @@
 
 declare(strict_types=1);
 
-/**
- * TuitionPro ERP — End-to-End User Journey & Workflow Verification Suite
- *
- * Tests real data flows across all major application modules:
- * Authentication → Student Lifecycle → Timetable → Attendance → Fees →
- * Teacher Payments → Accounting → Examinations → Communication → Backups → Multi-Tenancy
- */
-
 require_once __DIR__ . '/../public/index.php';
 
 use App\Core\Application;
@@ -39,20 +31,14 @@ function assertCondition(bool $condition, string $description): void
 echo "======================================================\n";
 echo "TUITIONPRO ERP — COMPREHENSIVE E2E WORKFLOW TEST SUITE\n";
 echo "======================================================\n\n";
-
-// ─────────────────────────────────────────────────────────────
-// 1. Authentication & Session Initialization
-// ─────────────────────────────────────────────────────────────
+//Authentication
 echo "1. Simulating Institute Owner Authentication & Session Initialization...\n";
 
 $authService = new AuthService();
 $user = $authService->attempt('apex.owner@tuitionpro.lk', 'Password@123', 'apex');
 assertCondition($user !== null, "Institute owner successfully authenticated for tenant 'apex'");
 assertCondition(current_tenant_id() === 1, "Active tenant context initialized to Tenant 1 (Apex)");
-
-// ─────────────────────────────────────────────────────────────
-// 2. Student Lifecycle — Create & Enroll
-// ─────────────────────────────────────────────────────────────
+//Students
 echo "\n2. Testing Student Onboarding & Enrollment Lifecycle...\n";
 
 $studentModel = new \App\Models\Student();
@@ -72,7 +58,6 @@ $studentId = $studentModel->create([
 ]);
 assertCondition($studentId > 0, "Student 'Nimali Senanayake' created with admission number {$newAdmNo}");
 
-// Enroll into Batch 1 — field is 'enrollment_date' (not 'enrolled_at')
 $enrollmentModel = new \App\Models\Enrollment();
 $enrollId = $enrollmentModel->create([
     'tenant_id'       => 1,
@@ -83,7 +68,6 @@ $enrollId = $enrollmentModel->create([
 ]);
 assertCondition($enrollId > 0, "Student successfully enrolled into Batch 1");
 
-// Verify enrollment record exists in DB
 $storedEnroll = $db->queryOne(
     "SELECT * FROM `enrollments` WHERE `id` = :id AND `tenant_id` = 1",
     ['id' => $enrollId]
@@ -92,10 +76,6 @@ assertCondition(
     $storedEnroll !== null && (int)$storedEnroll['student_id'] === $studentId,
     "Enrollment record persisted with correct student reference"
 );
-
-// ─────────────────────────────────────────────────────────────
-// 3. Timetable & Session Generation
-// ─────────────────────────────────────────────────────────────
 echo "\n3. Testing Class Scheduling & Session Generation...\n";
 
 $schedModel = new \App\Models\ClassSchedule();
@@ -126,10 +106,7 @@ $sessId       = $sessionModel->create([
     'status'       => 'scheduled',
 ]);
 assertCondition($sessId > 0, "Actual date session generated for today");
-
-// ─────────────────────────────────────────────────────────────
-// 4. Attendance — QR Scan Simulation
-// ─────────────────────────────────────────────────────────────
+//Attendance
 echo "\n4. Testing QR Attendance Scanner & Validation...\n";
 
 $db->execute(
@@ -150,10 +127,6 @@ assertCondition(
     $attRecord !== null && $attRecord['status'] === 'present',
     "Student instantly checked in as PRESENT for active session"
 );
-
-// ─────────────────────────────────────────────────────────────
-// 5. Billing, Invoicing & Receipts
-// ─────────────────────────────────────────────────────────────
 echo "\n5. Testing Invoicing, Payments, Allocation & Receipt Printing...\n";
 
 $billingService = new BillingService();
@@ -174,14 +147,12 @@ $invoiceId      = $billingService->createInvoice(
 );
 assertCondition($invoiceId > 0, "Invoice created for student #{$studentId} — Rs. 9,000.00 total");
 
-// Verify invoice total
 $invoice = $db->queryOne("SELECT * FROM `invoices` WHERE `id` = :id", ['id' => $invoiceId]);
 assertCondition(
     $invoice !== null && (float)$invoice['total_amount'] === 9000.00,
     "Invoice total correctly computed as Rs. 9,000.00"
 );
 
-// Record first partial payment (Rs. 4,000) — allocate to invoice
 $payment1Id = $billingService->recordPayment(
     $studentId,
     4000.00,
@@ -192,14 +163,12 @@ $payment1Id = $billingService->recordPayment(
 );
 assertCondition($payment1Id > 0, "First partial payment of Rs. 4,000 recorded");
 
-// Verify invoice status is partially_paid
 $invoice = $db->queryOne("SELECT * FROM `invoices` WHERE `id` = :id", ['id' => $invoiceId]);
 assertCondition(
     $invoice['status'] === 'partially_paid' && (float)$invoice['balance_amount'] === 5000.00,
     "Invoice status = partially_paid, outstanding balance = Rs. 5,000.00"
 );
 
-// Settle remaining Rs. 5,000
 $payment2Id = $billingService->recordPayment(
     $studentId,
     5000.00,
@@ -216,7 +185,6 @@ assertCondition(
     "Invoice status = paid, balance = Rs. 0.00"
 );
 
-// Attempt over-allocation — must throw an exception (invoice already paid, allocating Rs. 1 more)
 $overPaymentRejected = false;
 try {
     $billingService->recordPayment(
@@ -231,13 +199,10 @@ try {
     $overPaymentRejected = true;
 }
 assertCondition($overPaymentRejected, "Over-payment allocation beyond settled invoice correctly rejected");
-
-// ─────────────────────────────────────────────────────────────
-// 6. Teacher Payments — Compensation Calculation
-// ─────────────────────────────────────────────────────────────
+//Calculation
 echo "\n6. Testing Teacher Compensation Calculation Models...\n";
 
-// Create a payment rule for Teacher ID 1 (revenue_share model)
+//Teachers
 $ruleModel = new \App\Models\TeacherPaymentRule();
 $ruleId    = $ruleModel->create([
     'tenant_id'      => 1,
@@ -256,13 +221,8 @@ assertCondition(
     $calc !== null && isset($calc['calculated_amount']),
     "Teacher compensation calculation executed successfully (Revenue Share Model — Rs. " . number_format($calc['calculated_amount'], 2) . ")"
 );
-
-// ─────────────────────────────────────────────────────────────
-// 7. Expense Recording & Double-Entry Accounting
-// ─────────────────────────────────────────────────────────────
 echo "\n7. Testing Expense Recording & Double-Entry Accounting Verification...\n";
 
-// Record an expense
 $expenseModel = new \App\Models\Expense();
 $expNo        = 'EXP-E2E-' . rand(1000, 9999);
 $expenseId    = $expenseModel->create([
@@ -281,12 +241,11 @@ $expenseId    = $expenseModel->create([
 ]);
 assertCondition($expenseId > 0, "Expense record (Rs. 2,500) created with number {$expNo}");
 
-// Use AccountingService to record the expense journal (recordExpenseJournal)
+//Ledger
 $accountingService = new AccountingService();
 $journalId = $accountingService->recordExpenseJournal($expenseId);
 assertCondition($journalId > 0, "Balanced double-entry journal (Debit=Credit=Rs. 2,500) posted for expense");
 
-// Verify trial balance
 $tb = $accountingService->getTrialBalance();
 assertCondition(
     isset($tb['total_debit']) && $tb['total_debit'] === $tb['total_credit'],
@@ -294,16 +253,11 @@ assertCondition(
     ") strictly equal Total Credits (Rs. " . number_format($tb['total_credit'], 2) . ")"
 );
 
-// Profit & Loss statement
 $pnl = $accountingService->getProfitAndLossStatement();
 assertCondition(
     isset($pnl['total_revenue']) && isset($pnl['net_profit']),
     "Profit & Loss Statement computed (Net: Rs. " . number_format($pnl['net_profit'], 2) . ")"
 );
-
-// ─────────────────────────────────────────────────────────────
-// 8. Examinations & Merit Rankings
-// ─────────────────────────────────────────────────────────────
 echo "\n8. Testing Examinations Scheduling, Grading & Merit Rankings...\n";
 
 $examModel = new \App\Models\Examination();
@@ -322,7 +276,6 @@ $examId    = $examModel->create([
 ]);
 assertCondition($examId > 0, "Examination 'November Combined Maths Evaluation' scheduled and marked completed");
 
-// Insert two marks records separately (PDO does not allow duplicate named params in one statement)
 $db->execute(
     "INSERT INTO `exam_marks`
         (`tenant_id`, `examination_id`, `student_id`, `marks_obtained`, `percentage`,
@@ -346,10 +299,6 @@ assertCondition(
     $topMark !== null && $topMark['grade'] === 'A' && (int)$topMark['rank_in_batch'] === 1,
     "Merit ranking verified: Student awarded Grade A and Rank #1"
 );
-
-// ─────────────────────────────────────────────────────────────
-// 9. Announcements & Notice Board
-// ─────────────────────────────────────────────────────────────
 echo "\n9. Testing Communication & Notice Board Broadcasting...\n";
 
 $annModel = new \App\Models\Announcement();
@@ -364,7 +313,6 @@ $annId    = $annModel->create([
 ]);
 assertCondition($annId > 0, "Notice board announcement broadcasted to all students and guardians");
 
-// Verify announcement is retrievable
 $storedAnn = $db->queryOne(
     "SELECT * FROM `announcements` WHERE `id` = :id AND `tenant_id` = 1",
     ['id' => $annId]
@@ -373,10 +321,6 @@ assertCondition(
     $storedAnn !== null && $storedAnn['is_published'] == 1,
     "Announcement persisted and marked as published"
 );
-
-// ─────────────────────────────────────────────────────────────
-// 10. Database Backup Generation
-// ─────────────────────────────────────────────────────────────
 echo "\n10. Testing Database Backup Generation...\n";
 
 $backupDir     = dirname(__DIR__) . '/storage/backups';
@@ -404,10 +348,6 @@ assertCondition(
     file_exists($sqlBackupFile) && filesize($sqlBackupFile) > 1024,
     "Full SQL database archive successfully generated (" . round(filesize($sqlBackupFile) / 1024, 1) . " KB)"
 );
-
-// ─────────────────────────────────────────────────────────────
-// 11. Platform Super Admin — Multi-Tenant Provisioning
-// ─────────────────────────────────────────────────────────────
 echo "\n11. Testing Platform Super Admin & Multi-Tenant Provisioning...\n";
 
 $newTenantCode = 'vidura' . rand(100, 999);
@@ -428,7 +368,6 @@ assertCondition(
     "Super Admin provisioned new institute tenant '{$newTenantCode}' (ID #{$newTenantId})"
 );
 
-// Verify strict tenant isolation — Tenant 1 must NOT see new tenant's data
 $crossQuery = $db->query(
     "SELECT * FROM `students` WHERE `tenant_id` = :tid",
     ['tid' => $newTenantId]
@@ -437,10 +376,6 @@ assertCondition(
     count($crossQuery) === 0,
     "Multi-tenant boundary strictly maintained: zero cross-tenant student data leakage"
 );
-
-// ─────────────────────────────────────────────────────────────
-// RESULTS SUMMARY
-// ─────────────────────────────────────────────────────────────
 echo "\n------------------------------------------------------\n";
 echo "END-TO-END WORKFLOW RESULTS:\n";
 echo "Passed: {$passed}\n";

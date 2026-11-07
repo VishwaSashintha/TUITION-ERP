@@ -4,23 +4,12 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/**
- * TuitionPro ERP — View Renderer
- *
- * Renders PHP view templates with layout support and variable data passing.
- */
 class View
 {
     private static ?string $layout = null;
     private static array $sections = [];
     private static ?string $currentSection = null;
 
-    /**
-     * Render a view file with optional data and layout.
-     *
-     * @param string $viewPath Relative to resources/views/, without .php (e.g. 'auth/login')
-     * @param array<string,mixed> $data
-     */
     public static function render(string $viewPath, array $data = [], ?string $layout = 'layouts/app'): string
     {
         $file = VIEW_PATH . '/' . str_replace('.', '/', $viewPath) . '.php';
@@ -29,16 +18,12 @@ class View
         }
 
         self::$layout = $layout;
-
-        // Extract variables into local scope
         extract($data, EXTR_SKIP);
 
-        // Start output buffering for view content
         ob_start();
         require $file;
         $content = ob_get_clean();
 
-        // If a layout is specified, render the layout with $content
         if (self::$layout !== null) {
             $layoutFile = VIEW_PATH . '/' . str_replace('.', '/', self::$layout) . '.php';
             if (file_exists($layoutFile)) {

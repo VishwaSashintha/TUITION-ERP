@@ -26,9 +26,6 @@ class TimetableController extends Controller
         $this->db            = Database::getInstance();
     }
 
-    /**
-     * Weekly timetable view.
-     */
     public function index(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -45,7 +42,6 @@ class TimetableController extends Controller
             ['tid' => $tenantId]
         );
 
-        // Group by day of week (0=Sunday ... 6=Saturday)
         $byDay = array_fill(0, 7, []);
         foreach ($schedules as $s) {
             $byDay[(int)$s['day_of_week']][] = $s;
@@ -65,9 +61,6 @@ class TimetableController extends Controller
         ]);
     }
 
-    /**
-     * Store new recurring class schedule with conflict detection.
-     */
     public function storeSchedule(Request $request): void
     {
         $rules = [
@@ -99,7 +92,6 @@ class TimetableController extends Controller
         $teacherId = (int) $batch['teacher_id'];
         $branchId  = (int) $batch['branch_id'];
 
-        // Run schedule conflict detection
         $conflicts = $this->scheduleModel->detectConflicts($teacherId, $dayOfWeek, $startTime, $endTime, $classroom);
         if (!empty($conflicts)) {
             $this->back('error', 'Schedule conflict: ' . implode(' ', $conflicts), $request->all());
@@ -126,9 +118,6 @@ class TimetableController extends Controller
         }
     }
 
-    /**
-     * List date-specific class sessions.
-     */
     public function sessions(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -154,9 +143,6 @@ class TimetableController extends Controller
         ]);
     }
 
-    /**
-     * Generate class sessions for the current month from active schedules.
-     */
     public function generateSessions(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -187,7 +173,6 @@ class TimetableController extends Controller
 
             foreach ($schedules as $sched) {
                 if ((int)$sched['day_of_week'] === $dow) {
-                    // Check if already generated
                     $exists = $this->db->queryOne(
                         "SELECT id FROM `class_sessions` WHERE `tenant_id` = :tid AND `batch_id` = :bid AND `session_date` = :sdate AND `start_time` = :stime",
                         ['tid' => $tenantId, 'bid' => $sched['batch_id'], 'sdate' => $currentDateStr, 'stime' => $sched['start_time']]

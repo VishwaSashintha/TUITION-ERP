@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/**
- * TuitionPro ERP — Application Singleton
- *
- * Bootstraps all core services and acts as the service container.
- */
 class Application
 {
     private static ?self $instance = null;
@@ -36,7 +31,6 @@ class Application
             return;
         }
 
-        // Order matters — dependencies must be initialised first.
         $this->initErrorHandling();
         $this->initLogger();
         $this->initDatabase();
@@ -45,8 +39,6 @@ class Application
 
         $this->booted = true;
     }
-
-    // ─── Initialisation Helpers ──────────────────────────────────────────────
 
     private function initErrorHandling(): void
     {
@@ -91,8 +83,6 @@ class Application
         }
     }
 
-    // ─── Error / Exception Handlers ──────────────────────────────────────────
-
     public function handleException(\Throwable $e): void
     {
         $this->logger?->error('Unhandled exception', [
@@ -119,7 +109,6 @@ class Application
         }
     }
 
-    /** @param int $errno */
     public function handleError(int $errno, string $errstr, string $errfile, int $errline): bool
     {
         if (!(error_reporting() & $errno)) {
@@ -127,8 +116,6 @@ class Application
         }
         throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
     }
-
-    // ─── Accessors ───────────────────────────────────────────────────────────
 
     public function getRouter(): Router
     {
@@ -150,4 +137,3 @@ class Application
         return $this->logger;
     }
 }
-

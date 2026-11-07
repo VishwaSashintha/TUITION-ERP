@@ -7,12 +7,6 @@ namespace App\Services;
 use App\Core\Database;
 use App\Core\Session;
 
-/**
- * TuitionPro ERP — Multi-Tenant Manager Service
- *
- * Enforces tenant resolution, subscription limit verification,
- * and transactional tenant onboarding.
- */
 class TenantManager
 {
     private Database $db;
@@ -24,9 +18,6 @@ class TenantManager
         $this->audit = new AuditService();
     }
 
-    /**
-     * Get the active tenant record.
-     */
     public function getActiveTenant(): ?array
     {
         $tenantId = current_tenant_id();
@@ -43,17 +34,11 @@ class TenantManager
         );
     }
 
-    /**
-     * Set the active tenant in session context.
-     */
     public function setActiveTenant(int $tenantId): void
     {
         session(['tenant_id' => $tenantId]);
     }
 
-    /**
-     * Check if the tenant is active or in trial.
-     */
     public function isTenantActive(): bool
     {
         $tenant = $this->getActiveTenant();
@@ -68,9 +53,6 @@ class TenantManager
         return false;
     }
 
-    /**
-     * Verify if the active tenant can add more students based on plan limits.
-     */
     public function canAddStudent(): bool
     {
         $tenant = $this->getActiveTenant();
@@ -111,11 +93,6 @@ class TenantManager
         return $currentCount < $limit;
     }
 
-    /**
-     * Register a new tuition institute (tenant) with its initial branch,
-     * academic year, owner account, and default chart of accounts.
-     * Fully atomic inside a database transaction.
-     */
     public function registerInstitute(array $data): int
     {
         return $this->db->transaction(function () use ($data) {
@@ -123,7 +100,6 @@ class TenantManager
             $plan = $this->db->queryOne("SELECT id, student_limit, branch_limit FROM `subscription_plans` WHERE `code` = :code", ['code' => $planCode]);
             $planId = $plan ? (int)$plan['id'] : null;
 
-            // 1. Create Tenant
             $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
                 mt_rand(0, 0xffff), mt_rand(0, 0xffff),
                 mt_rand(0, 0xffff),
@@ -147,7 +123,6 @@ class TenantManager
                 ]
             );
 
-            // 2. Default Branch
             $branchId = $this->db->insert(
                 "INSERT INTO `branches` (`tenant_id`, `name`, `code`, `address`, `phone`, `email`, `status`, `created_at`) 
                  VALUES (:tid, :name, 'MAIN', :address, :phone, :email, 'active', NOW())",
@@ -160,7 +135,6 @@ class TenantManager
                 ]
             );
 
-            // 3. Current Academic Year
             $currentYear = date('Y');
             $this->db->insert(
                 "INSERT INTO `academic_years` (`tenant_id`, `name`, `start_date`, `end_date`, `is_active`, `created_at`) 
@@ -173,7 +147,6 @@ class TenantManager
                 ]
             );
 
-            // 4. Default Owner User
             $roleOwner = $this->db->queryOne("SELECT id FROM `roles` WHERE `name` = 'institute_owner'");
             $roleOwnerId = $roleOwner ? (int)$roleOwner['id'] : 3;
 
@@ -193,7 +166,6 @@ class TenantManager
                 ]
             );
 
-            // 5. Default Chart of Accounts
             $defaultCoa = [
                 ['1010', 'Cash in Hand', 'asset', 'debit'],
                 ['1020', 'Main Operating Bank Account', 'asset', 'debit'],
@@ -223,21 +195,18 @@ class TenantManager
                 );
             }
 
-            // 6. Default Cash Account
             $this->db->insert(
                 "INSERT INTO `financial_accounts` (`tenant_id`, `branch_id`, `account_name`, `account_type`, `account_number`, `current_balance`, `is_active`, `created_at`) 
                  VALUES (:tid, :bid, 'Cash in Hand (Reception)', 'cash', 'CASH-01', 0.00, 1, NOW())",
                 ['tid' => $tenantId, 'bid' => $branchId]
             );
 
-            // 7. Default Fee Types
             $this->db->insert(
                 "INSERT INTO `fee_types` (`tenant_id`, `code`, `name`, `is_recurring`, `default_amount`, `description`, `created_at`) 
                  VALUES (:tid, 'TUIT_MONTHLY', 'Monthly Tuition Fee', 1, 3500.00, 'Standard monthly class fee', NOW())",
                 ['tid' => $tenantId]
             );
 
-            // Audit Log
             $this->audit->log('institute_registered', 'tenants', $tenantId, "New tuition institute registered: {$data['institute_name']}");
 
             return $tenantId;

@@ -1,5 +1,3 @@
--- TuitionPro ERP: Seed Additional Operational Roles
--- Inserts Cashier, Admissions Officer, Academic Coordinator, and HR Manager roles and their default permissions
 
 INSERT INTO `roles` (`id`, `name`, `display_name`, `description`, `is_system`, `created_at`, `updated_at`)
 VALUES
@@ -9,13 +7,13 @@ VALUES
     (14, 'hr_manager', 'HR Manager', 'Teacher Profiles & Compensation Management', 1, NOW(), NOW())
 ON DUPLICATE KEY UPDATE `display_name` = VALUES(`display_name`), `description` = VALUES(`description`);
 
--- 1. cashier (Role 11): Fee view, collect payments, create invoice
+--Roles
 INSERT IGNORE INTO `role_permissions` (`role_id`, `permission_id`)
 SELECT 11, id FROM `permissions` WHERE `name` IN (
     'fees.view', 'fees.collect_payment', 'fees.create_invoice'
 );
 
--- 2. admissions_officer (Role 12): Student directory, registration, editing, academic view
+--Roles
 INSERT IGNORE INTO `role_permissions` (`role_id`, `permission_id`)
 SELECT 12, id FROM `permissions` WHERE `name` IN (
     'students.view', 'students.create', 'students.edit',
@@ -23,7 +21,7 @@ SELECT 12, id FROM `permissions` WHERE `name` IN (
     'reports.academic'
 );
 
--- 3. academic_coordinator (Role 13): Timetable, batches, sessions, examinations, attendance
+--Roles
 INSERT IGNORE INTO `role_permissions` (`role_id`, `permission_id`)
 SELECT 13, id FROM `permissions` WHERE `name` IN (
     'students.view',
@@ -32,7 +30,7 @@ SELECT 13, id FROM `permissions` WHERE `name` IN (
     'reports.academic'
 );
 
--- 4. hr_manager (Role 14): Teachers, teacher payments
+--Roles
 INSERT IGNORE INTO `role_permissions` (`role_id`, `permission_id`)
 SELECT 14, id FROM `permissions` WHERE `name` IN (
     'teachers.manage',

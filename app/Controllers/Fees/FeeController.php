@@ -25,9 +25,6 @@ class FeeController extends Controller
         $this->db             = Database::getInstance();
     }
 
-    /**
-     * List all invoices with status and period filters.
-     */
     public function invoices(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -62,7 +59,7 @@ class FeeController extends Controller
         $sql .= " ORDER BY inv.`id` DESC LIMIT 100";
         $invoices = $this->db->query($sql, $params);
 
-        // Calculate KPI summary
+        //Calculation
         $summary = $this->db->queryOne(
             "SELECT 
                 COALESCE(SUM(total_amount), 0.00) AS total_invoiced,
@@ -90,9 +87,6 @@ class FeeController extends Controller
         ]);
     }
 
-    /**
-     * Show single invoice details.
-     */
     public function showInvoice(Request $request, string $id = ''): void
     {
         $id = (int) ($id !== '' ? $id : $request->query('id', 0));
@@ -138,9 +132,6 @@ class FeeController extends Controller
         ]);
     }
 
-    /**
-     * Display form to create new invoice.
-     */
     public function createInvoice(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -165,9 +156,6 @@ class FeeController extends Controller
         ]);
     }
 
-    /**
-     * Store generated invoice.
-     */
     public function storeInvoice(Request $request): void
     {
         $rules = [
@@ -217,9 +205,6 @@ class FeeController extends Controller
         }
     }
 
-    /**
-     * Collect payment modal/action.
-     */
     public function collectPayment(Request $request): void
     {
         $rules = [
@@ -248,7 +233,7 @@ class FeeController extends Controller
                 'amount'     => $amount,
             ];
         } else {
-            // Distribute automatically across student's oldest unpaid invoices
+            //Students
             $unpaidInvoices = $this->db->query(
                 "SELECT id, balance_amount FROM `invoices` 
                  WHERE `student_id` = :stuid AND `tenant_id` = :tid AND `status` IN ('issued', 'partially_paid', 'overdue') AND `deleted_at` IS NULL 
@@ -286,9 +271,6 @@ class FeeController extends Controller
         }
     }
 
-    /**
-     * Display printable receipt.
-     */
     public function receipt(Request $request, string $id = ''): void
     {
         $id = (int) ($id !== '' ? $id : $request->query('id', 0));
@@ -328,9 +310,6 @@ class FeeController extends Controller
         ]);
     }
 
-    /**
-     * Fee defaulters & outstanding dues report.
-     */
     public function outstanding(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -359,9 +338,6 @@ class FeeController extends Controller
         ]);
     }
 
-    /**
-     * Process refund against payment.
-     */
     public function refund(Request $request): void
     {
         $paymentId = (int) $request->input('payment_id');

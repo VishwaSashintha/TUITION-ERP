@@ -26,9 +26,6 @@ class ExamController extends Controller
         $this->db        = Database::getInstance();
     }
 
-    /**
-     * List examinations.
-     */
     public function index(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -59,9 +56,6 @@ class ExamController extends Controller
         ]);
     }
 
-    /**
-     * Store new examination.
-     */
     public function store(Request $request): void
     {
         $rules = [
@@ -114,9 +108,6 @@ class ExamController extends Controller
         }
     }
 
-    /**
-     * Marks entry sheet.
-     */
     public function marksEntry(Request $request, string $id = ''): void
     {
         $examId   = (int) ($id !== '' ? $id : $request->query('id', 0));
@@ -144,7 +135,7 @@ class ExamController extends Controller
             return;
         }
 
-        // Fetch enrolled students with their existing marks
+        //Students
         $students = $this->db->query(
             "SELECT st.id AS student_id, st.admission_number, st.full_name,
                     em.id AS mark_id, em.marks_obtained, em.percentage, em.grade, em.rank_in_batch, em.is_absent, em.remarks
@@ -169,9 +160,6 @@ class ExamController extends Controller
         ]);
     }
 
-    /**
-     * Save student marks and compute grades & batch rankings.
-     */
     public function saveMarks(Request $request): void
     {
         $examId   = (int) $request->input('examination_id');
@@ -198,7 +186,7 @@ class ExamController extends Controller
         $this->db->transaction(function () use ($examId, $tenantId, $userId, $marksInput, $absentsInput, $remarksInput, $maxMarks, $passMark) {
             $scores = [];
 
-            // 1. Process and save each student's score
+            //Students
             foreach ($marksInput as $studentId => $markVal) {
                 $studentId = (int) $studentId;
                 $isAbsent  = isset($absentsInput[$studentId]) && $absentsInput[$studentId] == '1';
@@ -213,8 +201,6 @@ class ExamController extends Controller
                     $marksObtained = round((float)$markVal, 2);
                     $percentage    = $maxMarks > 0 ? round(($marksObtained / $maxMarks) * 100, 2) : 0.00;
 
-                    // Sri Lankan standard grade scale:
-                    // A: 75+, B: 65-74, C: 55-64, S: 40-54, F: 0-39
                     $grade = match(true) {
                         $percentage >= 75.0 => 'A',
                         $percentage >= 65.0 => 'B',
@@ -247,7 +233,7 @@ class ExamController extends Controller
                 ]);
             }
 
-            // 2. Rank calculation: sort present students by score descending
+            //Calculation
             arsort($scores);
             $currentRank = 1;
             $prevScore   = null;
@@ -269,7 +255,6 @@ class ExamController extends Controller
                 }
             }
 
-            // Update exam status to completed
             $this->db->execute(
                 "UPDATE `examinations` SET `status` = 'completed' WHERE `id` = :id AND `tenant_id` = :tid",
                 ['id' => $examId, 'tid' => $tenantId]
@@ -281,9 +266,6 @@ class ExamController extends Controller
         $this->redirect(url("examinations/results?id={$examId}"), 'success', 'Marks saved and student rankings computed successfully.');
     }
 
-    /**
-     * Examination results & ranking sheet.
-     */
     public function results(Request $request, string $id = ''): void
     {
         $examId   = (int) ($id !== '' ? $id : $request->query('id', 0));
@@ -320,7 +302,6 @@ class ExamController extends Controller
             ['eid' => $examId, 'tid' => $tenantId]
         );
 
-        // Compute performance summary
         $summary = $this->db->queryOne(
             "SELECT 
                 COUNT(*) AS total_candidates,
@@ -350,9 +331,6 @@ class ExamController extends Controller
         ]);
     }
 
-    /**
-     * Publish results to student and parent portals.
-     */
     public function publish(Request $request): void
     {
         $examId   = (int) $request->input('id');

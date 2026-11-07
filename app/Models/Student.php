@@ -12,9 +12,6 @@ class Student extends Model
     protected bool $tenantScoped = true;
     protected bool $supportsSoftDeletes = true;
 
-    /**
-     * Search students across multiple criteria with pagination.
-     */
     public function search(
         ?string $term = null,
         ?int $branchId = null,

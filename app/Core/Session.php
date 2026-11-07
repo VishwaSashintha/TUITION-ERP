@@ -4,15 +4,6 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/**
- * TuitionPro ERP — Secure Session Manager
- *
- * Implements session security best practices:
- * - Strict cookie parameters (HttpOnly, SameSite=Lax, Secure over HTTPS)
- * - Anti-session fixation (regeneration on login)
- * - Flash message lifecycle (accessible for one request)
- * - CSRF token lifecycle
- */
 class Session
 {
     private bool $started = false;
@@ -49,15 +40,13 @@ class Session
         if (!headers_sent()) {
             session_start();
         } elseif (session_status() !== PHP_SESSION_ACTIVE) {
-            // CLI context — use array-based pseudo-session
+            //CLI
             if (!isset($_SESSION)) {
                 $_SESSION = [];
             }
         }
 
         $this->started = true;
-
-        // Age out flash data from previous request
         $this->ageFlash();
     }
 
@@ -81,9 +70,6 @@ class Session
         unset($_SESSION[$key]);
     }
 
-    /**
-     * Regenerate session ID to prevent session fixation attacks.
-     */
     public function regenerate(bool $deleteOldSession = true): void
     {
         if (session_status() === PHP_SESSION_ACTIVE && !headers_sent()) {
@@ -91,10 +77,6 @@ class Session
         }
     }
 
-
-    /**
-     * Destroy session completely.
-     */
     public function destroy(): void
     {
         if (session_status() === PHP_SESSION_ACTIVE) {
@@ -116,8 +98,6 @@ class Session
         }
     }
 
-    // ─── Flash Messages ──────────────────────────────────────────────────────
-
     public function setFlash(string $key, mixed $value): void
     {
         $_SESSION['__flash']['new'][$key] = $value;
@@ -130,12 +110,9 @@ class Session
 
     private function ageFlash(): void
     {
-        // Move new flash to old, discard previous old
         $_SESSION['__flash']['old'] = $_SESSION['__flash']['new'] ?? [];
         $_SESSION['__flash']['new'] = [];
     }
-
-    // ─── CSRF Token ──────────────────────────────────────────────────────────
 
     public function getCsrfToken(): string
     {

@@ -26,9 +26,6 @@ class TeacherController extends Controller
         $this->db            = Database::getInstance();
     }
 
-    /**
-     * List all teachers.
-     */
     public function index(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -50,9 +47,6 @@ class TeacherController extends Controller
         ]);
     }
 
-    /**
-     * Create teacher form.
-     */
     public function create(Request $request): void
     {
         $tenantId = current_tenant_id();
@@ -65,9 +59,6 @@ class TeacherController extends Controller
         ]);
     }
 
-    /**
-     * Store new teacher.
-     */
     public function store(Request $request): void
     {
         $rules = [
@@ -100,7 +91,7 @@ class TeacherController extends Controller
 
                 $fullName = trim($request->input('first_name') . ' ' . $request->input('last_name'));
 
-                // 1. Create User account for Teacher portal
+                //Teachers
                 $roleTeacher = $this->db->queryOne("SELECT id FROM `roles` WHERE `name` = 'teacher'");
                 $roleTeacherId = $roleTeacher ? (int)$roleTeacher['id'] : 8;
 
@@ -117,7 +108,7 @@ class TeacherController extends Controller
                     'status'        => 'active',
                 ]);
 
-                // 2. Create Teacher Record
+                //Teachers
                 $teacherId = $this->teacherModel->create([
                     'tenant_id'            => $tenantId,
                     'user_id'              => $userId,
@@ -149,9 +140,6 @@ class TeacherController extends Controller
         }
     }
 
-    /**
-     * Show teacher profile.
-     */
     public function show(Request $request, string $id = ''): void
     {
         $teacherId = (int) ($id !== '' ? $id : $request->query('id', 0));
@@ -163,16 +151,13 @@ class TeacherController extends Controller
 
         $tenantId = current_tenant_id();
 
-        // Assigned batches
         $batches = $this->teacherModel->getAssignedBatches($teacherId);
 
-        // Payment rules
         $rules = $this->db->query(
             "SELECT * FROM `teacher_payment_rules` WHERE `teacher_id` = :tid AND `tenant_id` = :tenant_id ORDER BY `id` DESC",
             ['tid' => $teacherId, 'tenant_id' => $tenantId]
         );
 
-        // Payment vouchers
         $vouchers = $this->db->query(
             "SELECT * FROM `teacher_payments` WHERE `teacher_id` = :tid AND `tenant_id` = :tenant_id ORDER BY `id` DESC",
             ['tid' => $id, 'tenant_id' => $tenantId]

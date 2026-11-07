@@ -79,3 +79,4 @@ The `AuditService` logs all critical security and financial actions into the `au
 - Attendance overrides and grade publications
 
 Each audit entry captures: `tenant_id`, `user_id`, `event_type`, `resource_type`, `resource_id`, `ip_address`, `user_agent`, and `timestamp`. Audit records cannot be altered or deleted by application users.
+

@@ -297,7 +297,18 @@ class DashboardController extends Controller
             ['tid' => $tenantId]
         );
 
-        // 10. Important Notices
+        // 10. Prospective Student Enquiries & Follow-Ups
+        $enquiryStats = $this->db->queryOne(
+            "SELECT 
+                COUNT(*) AS total_enquiries,
+                SUM(CASE WHEN `status` = 'new' THEN 1 ELSE 0 END) AS new_enquiries,
+                SUM(CASE WHEN `next_followup_date` = :today AND `status` NOT IN ('admitted', 'closed', 'lost') THEN 1 ELSE 0 END) AS followups_due_today
+             FROM `student_enquiries` 
+             WHERE `tenant_id` = :tid",
+            ['tid' => $tenantId, 'today' => $today]
+        );
+
+        // 11. Important Notices
         $announcements = $this->db->query(
             "SELECT * FROM `announcements` 
              WHERE `tenant_id` = :tid AND `is_published` = 1 
@@ -318,6 +329,7 @@ class DashboardController extends Controller
             'recentAdmissions'     => $recentAdmissions,
             'recentPayments'       => $recentPayments,
             'followUpStudents'     => $followUpStudents,
+            'enquiryStats'         => $enquiryStats,
             'announcements'        => $announcements,
         ]);
     }

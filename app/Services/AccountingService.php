@@ -274,6 +274,93 @@ class AccountingService
         ];
     }
 
+    /**
+     * Generate Balance Sheet (Statement of Financial Position).
+     * Verifies Assets = Liabilities + Equity (including current period retained earnings).
+     */
+    public function getBalanceSheet(?string $asOfDate = null): array
+    {
+        $tenantId = current_tenant_id();
+        $params   = ['tid' => $tenantId];
+
+        $dateFilter = "";
+        if ($asOfDate) {
+            $dateFilter = "AND je.entry_date <= :as_of";
+            $params['as_of'] = $asOfDate;
+        }
+
+        // 1. Assets (Normal Balance = Debit)
+        $assets = $this->db->query(
+            "SELECT coa.account_code, coa.account_name, COALESCE(SUM(jl.debit - jl.credit), 0) AS balance 
+             FROM `chart_of_accounts` coa 
+             LEFT JOIN `journal_lines` jl ON coa.id = jl.account_id 
+             LEFT JOIN `journal_entries` je ON jl.journal_entry_id = je.id AND je.`status` = 'posted' {$dateFilter}
+             WHERE coa.`tenant_id` = :tid AND coa.`account_type` = 'asset' AND coa.`is_active` = 1
+             GROUP BY coa.id, coa.account_code, coa.account_name
+             ORDER BY coa.account_code ASC",
+            $params
+        );
+
+        // 2. Liabilities (Normal Balance = Credit)
+        $liabilities = $this->db->query(
+            "SELECT coa.account_code, coa.account_name, COALESCE(SUM(jl.credit - jl.debit), 0) AS balance 
+             FROM `chart_of_accounts` coa 
+             LEFT JOIN `journal_lines` jl ON coa.id = jl.account_id 
+             LEFT JOIN `journal_entries` je ON jl.journal_entry_id = je.id AND je.`status` = 'posted' {$dateFilter}
+             WHERE coa.`tenant_id` = :tid AND coa.`account_type` = 'liability' AND coa.`is_active` = 1
+             GROUP BY coa.id, coa.account_code, coa.account_name
+             ORDER BY coa.account_code ASC",
+            $params
+        );
+
+        // 3. Equity (Normal Balance = Credit)
+        $equity = $this->db->query(
+            "SELECT coa.account_code, coa.account_name, COALESCE(SUM(jl.credit - jl.debit), 0) AS balance 
+             FROM `chart_of_accounts` coa 
+             LEFT JOIN `journal_lines` jl ON coa.id = jl.account_id 
+             LEFT JOIN `journal_entries` je ON jl.journal_entry_id = je.id AND je.`status` = 'posted' {$dateFilter}
+             WHERE coa.`tenant_id` = :tid AND coa.`account_type` = 'equity' AND coa.`is_active` = 1
+             GROUP BY coa.id, coa.account_code, coa.account_name
+             ORDER BY coa.account_code ASC",
+            $params
+        );
+
+        // 4. Current Period Net Income (Revenues - Expenses)
+        $pnl = $this->getProfitAndLossStatement(null, $asOfDate);
+        $netIncome = (float) $pnl['net_profit'];
+
+        $totalAssets = 0.00;
+        foreach ($assets as $a) {
+            $totalAssets += (float) $a['balance'];
+        }
+
+        $totalLiabilities = 0.00;
+        foreach ($liabilities as $l) {
+            $totalLiabilities += (float) $l['balance'];
+        }
+
+        $totalEquity = 0.00;
+        foreach ($equity as $eq) {
+            $totalEquity += (float) $eq['balance'];
+        }
+
+        $totalLiabilitiesAndEquity = round($totalLiabilities + $totalEquity + $netIncome, 2);
+        $totalAssets = round($totalAssets, 2);
+
+        return [
+            'as_of_date'                   => $asOfDate ?: date('Y-m-d'),
+            'assets'                       => $assets,
+            'total_assets'                 => $totalAssets,
+            'liabilities'                  => $liabilities,
+            'total_liabilities'            => round($totalLiabilities, 2),
+            'equity'                       => $equity,
+            'total_equity'                 => round($totalEquity, 2),
+            'net_income'                   => round($netIncome, 2),
+            'total_liabilities_and_equity' => $totalLiabilitiesAndEquity,
+            'is_balanced'                  => (abs($totalAssets - $totalLiabilitiesAndEquity) < 0.01),
+        ];
+    }
+
     private function getAccountByCode(string $code): array
     {
         $tenantId = current_tenant_id();

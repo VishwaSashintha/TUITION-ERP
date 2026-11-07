@@ -68,3 +68,4 @@ php tests/test_jwt_auth.php && php tests/test_backend_core.php && php tests/test
 - Confirms Teachers receive academic view and receive `HTTP 403` on `/fees` and `/accounting/*`.
 - Tests parent child switcher with invalid and cross-family IDs to verify Anti-IDOR defense.
 - Verifies exact 6-color palette variables and Roboto / Poppins typography in CSS and views.
+

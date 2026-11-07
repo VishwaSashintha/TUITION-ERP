@@ -38,6 +38,15 @@ $router->group(['middleware' => ['auth']], function ($router) {
 
     // ─── Student Management (Admin, Receptionist, Admissions Officer) ───────────────────────────
     $router->group(['middleware' => ['role:institute_owner,institute_admin,branch_manager,receptionist,admissions_officer']], function ($router) {
+        // Enquiries & Lead Tracking
+        $router->get('/students/enquiries', [\App\Controllers\Students\EnquiryController::class, 'index']);
+        $router->get('/students/enquiries/create', [\App\Controllers\Students\EnquiryController::class, 'create']);
+        $router->post('/students/enquiries/store', [\App\Controllers\Students\EnquiryController::class, 'store'], ['csrf']);
+        $router->get('/students/enquiries/{id}', [\App\Controllers\Students\EnquiryController::class, 'show']);
+        $router->post('/students/enquiries/followup', [\App\Controllers\Students\EnquiryController::class, 'storeFollowup'], ['csrf']);
+        $router->post('/students/enquiries/convert', [\App\Controllers\Students\EnquiryController::class, 'convert'], ['csrf']);
+
+        // Student Directory & Registration
         $router->get('/students', [\App\Controllers\Students\StudentController::class, 'index']);
         $router->get('/students/create', [\App\Controllers\Students\StudentController::class, 'create']);
         $router->post('/students', [\App\Controllers\Students\StudentController::class, 'store'], ['csrf']);
@@ -86,6 +95,8 @@ $router->group(['middleware' => ['auth']], function ($router) {
         $router->get('/academic/assignments/{id}', [\App\Controllers\Academic\AssignmentController::class, 'show']);
         $router->get('/academic/assignments/download', [\App\Controllers\Academic\AssignmentController::class, 'download']);
         $router->get('/academic/assignments/download/{id}', [\App\Controllers\Academic\AssignmentController::class, 'download']);
+        $router->post('/academic/assignments/submit', [\App\Controllers\Academic\AssignmentController::class, 'submit'], ['csrf']);
+        $router->post('/academic/assignments/grade', [\App\Controllers\Academic\AssignmentController::class, 'grade'], ['csrf']);
 
         // Timetable & Scheduling
         $router->get('/timetable', [\App\Controllers\Timetable\TimetableController::class, 'index']);
@@ -150,6 +161,8 @@ $router->group(['middleware' => ['auth']], function ($router) {
         $router->get('/expenses/trial-balance', [\App\Controllers\Expenses\ExpenseController::class, 'trialBalance']);
         $router->get('/accounting/trial-balance', [\App\Controllers\Expenses\ExpenseController::class, 'trialBalance']);
         $router->get('/accounting/profit-loss', [\App\Controllers\Expenses\ExpenseController::class, 'profitLoss']);
+        $router->get('/accounting/balance-sheet', [\App\Controllers\Expenses\ExpenseController::class, 'balanceSheet']);
+        $router->get('/expenses/balance-sheet', [\App\Controllers\Expenses\ExpenseController::class, 'balanceSheet']);
         $router->get('/accounting/cash-bank', [\App\Controllers\Expenses\ExpenseController::class, 'cashBank']);
     });
 

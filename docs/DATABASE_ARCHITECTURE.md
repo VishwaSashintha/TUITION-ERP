@@ -164,3 +164,4 @@ All foreign keys carry explicit B-tree indexes:
 - `idx_refresh_tokens_hash`: `(token_hash)` UNIQUE
 
 ACID compliance is guaranteed across billing, invoice allocation, and journal posting using `PDO::beginTransaction()` and `PDO::commit()`.
+

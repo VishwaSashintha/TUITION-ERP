@@ -217,6 +217,8 @@ runTest("POST /login with Institute Owner credentials succeeds", function () use
 
 $instituteRoutes = [
     '/dashboard'                      => 'Executive Dashboard',
+    '/students/enquiries'             => 'Student Enquiries',
+    '/students/enquiries/create'      => 'Register Student Enquiry',
     '/students'                       => 'Student Directory',
     '/students/create'                => 'New Student Admission',
     '/students/1'                     => 'Kasun Chamara Perera',
@@ -248,6 +250,7 @@ $instituteRoutes = [
     '/expenses/create'                => 'Record Institute Expense',
     '/expenses/trial-balance'         => 'Trial Balance',
     '/accounting/profit-loss'         => 'Profit & Loss Statement',
+    '/accounting/balance-sheet'       => 'Balance Sheet',
     '/accounting/cash-bank'           => 'Cash & Bank',
     '/examinations'                   => 'Examinations & Student Performance',
     '/examinations/marks-entry'       => 'Marks',

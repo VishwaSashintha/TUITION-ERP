@@ -181,3 +181,4 @@ Standard HTTP status codes utilized:
 - `404 Not Found`: Resource does not exist within active tenant.
 - `429 Too Many Requests`: Rate-limiting triggered (e.g. brute-force defense).
 - `500 Internal Server Error`: Unhandled server exception.
+

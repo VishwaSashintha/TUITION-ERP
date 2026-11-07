@@ -4,7 +4,7 @@
 [![Database](https://img.shields.io/badge/Database-MySQL%208.0%20%7C%20MariaDB-4479A1?style=flat&logo=mysql&logoColor=white)](https://mysql.com)
 [![Architecture](https://img.shields.io/badge/Architecture-Modular%20Monolith-orange)](https://github.com/VishwaSashintha/TUITION-ERP)
 [![Security](https://img.shields.io/badge/Security-HS256%20JWT%20%2B%20RBAC-green)](https://github.com/VishwaSashintha/TUITION-ERP)
-[![Tests Passing](https://img.shields.io/badge/Tests-146%2F146%20Passing%20(100%25)-success)](https://github.com/VishwaSashintha/TUITION-ERP)
+[![Tests Passing](https://img.shields.io/badge/Tests-149%2F149%20Passing%20(100%25)-success)](https://github.com/VishwaSashintha/TUITION-ERP)
 [![License](https://img.shields.io/badge/License-Commercial%20%2F%20Proprietary-blue)](https://github.com/VishwaSashintha/TUITION-ERP)
 
 TuitionPro ERP is a commercial-grade, multi-tenant and standalone Education Management and Enterprise Resource Planning platform engineered for tuition institutes, private schools, tuition centres, and large multi-branch educational organizations.
@@ -53,6 +53,7 @@ TuitionPro adheres to a visual design language engineered for readability and fa
 ## 3. Comprehensive Feature Matrix
 
 ### 3.1 Student Lifecycle & Admissions
+- **Prospective Student Enquiries:** Lead capture, contact interaction logs, follow-up scheduling, and direct conversion to student admissions (`/students/enquiries`).
 - **Onboarding Workflow:** Full student registration with automatic unique admission number generation (`APX-YYYY-XXXX`).
 - **Student Directory:** Searchable directory with real-time filters by branch, grade, and active/inactive status (`/students`).
 - **Guardian Association:** Multi-guardian relationship management with primary contacts, emergency phones, and occupations.
@@ -83,6 +84,7 @@ TuitionPro adheres to a visual design language engineered for readability and fa
 - **Balanced Journal Posting:** Strict server-side invariant requiring $\sum \text{Debits} = \sum \text{Credits}$ on every transaction.
 - **Trial Balance:** Live ledger verification confirming exact equilibrium across all ledger accounts (`/accounting/trial-balance`).
 - **Profit & Loss Statement:** Real-time income statement calculating net operating surplus (`/accounting/profit-loss`).
+- **Balance Sheet:** Real-time Statement of Financial Position verifying $\text{Assets} = \text{Liabilities} + \text{Equity}$ (`/accounting/balance-sheet`).
 - **Cash & Bank Accounts:** Multi-account tracking of physical cash counters and institutional bank balances (`/accounting/cash-bank`).
 - **Expense Categorization:** Direct recording of operational overheads with receipt attachments (`/expenses`).
 
@@ -99,6 +101,7 @@ TuitionPro adheres to a visual design language engineered for readability and fa
 ### 3.8 Coursework & Learning Materials (LMS)
 - **Document Handouts:** Teacher upload and distribution of lesson notes and PDF study packs (`/academic/materials`).
 - **Homework Assignments:** Coursework creation with submission deadlines and download briefs (`/academic/assignments`).
+- **Student Submissions & Grading:** Online solution submission with teacher grading and feedback workflow (`/academic/assignments/submit`, `/academic/assignments/grade`).
 
 ### 3.9 Portals & Stakeholder Experience
 - **Student Portal (`/portal/student`):** Personal dashboard displaying timetable schedules, attendance %, exam results, fee balances, and study materials.
@@ -194,7 +197,7 @@ php -S localhost:8080 -t public
 
 ## 8. Automated Test Suite Verification
 
-TuitionPro ERP features an automated test harness with **146 out of 146 tests passing (100% pass rate)**:
+TuitionPro ERP features an automated test harness with **149 out of 149 tests passing (100% pass rate)**:
 
 ```bash
 # Run all test suites
@@ -210,9 +213,9 @@ php tests/test_role_dashboards.php
 | `test_jwt_auth.php` | JWT signing, tamper rejection, token rotation, replay defense, lockout | **16 / 16 PASS** |
 | `test_backend_core.php` | Multi-tenant isolation, fee invoicing, double-entry balance, trial balance | **16 / 16 PASS** |
 | `test_e2e_workflows.php` | Student admission, batch enrollment, session, QR attendance, payments | **28 / 28 PASS** |
-| `test_http_routes.php` | 59 public & authenticated routes return HTTP 200/302 | **59 / 59 PASS** |
+| `test_http_routes.php` | 62 public & authenticated routes return HTTP 200/302 | **62 / 62 PASS** |
 | `test_role_dashboards.php` | Role dashboard dispatch, front-desk/teacher 403 blocks, Anti-IDOR | **27 / 27 PASS** |
-| **Total** | **Comprehensive System Verification** | **146 / 146 PASS (100%)** |
+| **Total** | **Comprehensive System Verification** | **149 / 149 PASS (100%)** |
 
 ---
 

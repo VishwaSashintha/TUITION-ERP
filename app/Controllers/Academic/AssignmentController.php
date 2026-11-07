@@ -194,12 +194,102 @@ class AssignmentController extends Controller
             ['bid' => $assignment['batch_id'], 'tid' => $tenantId]
         );
 
+        // Fetch submissions
+        $submissions = $this->db->query(
+            "SELECT sub.*, st.full_name AS student_name, st.admission_number, u.name AS graded_by_name
+             FROM `student_submissions` sub
+             JOIN `students` st ON sub.student_id = st.id
+             LEFT JOIN `users` u ON sub.graded_by = u.id
+             WHERE sub.`assignment_id` = :aid AND sub.`tenant_id` = :tid
+             ORDER BY sub.`submitted_at` DESC",
+            ['aid' => $assignmentId, 'tid' => $tenantId]
+        );
+
         $this->render('academic/assignments/show', [
-            'title'      => $assignment['title'],
-            'activeMenu' => 'assignments',
-            'assignment' => $assignment,
-            'students'   => $students,
+            'title'       => $assignment['title'],
+            'activeMenu'  => 'assignments',
+            'assignment'  => $assignment,
+            'students'    => $students,
+            'submissions' => $submissions,
         ]);
+    }
+
+    /**
+     * Submit coursework solution (Student action).
+     */
+    public function submit(Request $request): void
+    {
+        $tenantId     = current_tenant_id();
+        $assignmentId = (int) $request->input('assignment_id');
+        $studentId    = (int) $request->input('student_id');
+        $solutionText = trim((string) $request->input('submission_text'));
+
+        $user = auth_user();
+        if ($user && ($user['role_name'] ?? '') === 'student') {
+            // Find student linked to this user email or id
+            $stu = $this->db->queryOne("SELECT id FROM `students` WHERE `email` = :em AND `tenant_id` = :tid", [
+                'em'  => $user['email'] ?? '',
+                'tid' => $tenantId,
+            ]);
+            if ($stu) {
+                $studentId = (int) $stu['id'];
+            }
+        }
+
+        if ($studentId <= 0 || $assignmentId <= 0) {
+            $this->back('error', 'Valid student and assignment are required for submission.');
+            return;
+        }
+
+        $existing = $this->db->queryOne(
+            "SELECT id FROM `student_submissions` WHERE `assignment_id` = :aid AND `student_id` = :sid AND `tenant_id` = :tid",
+            ['aid' => $assignmentId, 'sid' => $studentId, 'tid' => $tenantId]
+        );
+
+        if ($existing) {
+            $this->db->execute(
+                "UPDATE `student_submissions` SET `submission_text` = :txt, `submitted_at` = NOW() WHERE `id` = :id AND `tenant_id` = :tid",
+                ['txt' => $solutionText, 'id' => $existing['id'], 'tid' => $tenantId]
+            );
+        } else {
+            $this->db->insert('student_submissions', [
+                'tenant_id'       => $tenantId,
+                'assignment_id'   => $assignmentId,
+                'student_id'      => $studentId,
+                'submission_text' => $solutionText,
+                'submitted_at'    => date('Y-m-d H:i:s'),
+            ]);
+        }
+
+        $this->redirect(url("academic/assignments/{$assignmentId}"), 'success', 'Coursework solution submitted successfully!');
+    }
+
+    /**
+     * Grade student submission and provide feedback (Teacher action).
+     */
+    public function grade(Request $request): void
+    {
+        $tenantId     = current_tenant_id();
+        $submissionId = (int) $request->input('submission_id');
+        $assignmentId = (int) $request->input('assignment_id');
+        $marks        = (float) $request->input('marks_awarded', 0.0);
+        $feedback     = trim((string) $request->input('feedback'));
+
+        $user = auth_user();
+        $userId = $user['id'] ?? 1;
+
+        $this->db->execute(
+            "UPDATE `student_submissions` SET `marks_awarded` = :m, `feedback` = :fb, `graded_by` = :uid, `graded_at` = NOW() WHERE `id` = :id AND `tenant_id` = :tid",
+            [
+                'm'   => $marks,
+                'fb'  => $feedback,
+                'uid' => $userId,
+                'id'  => $submissionId,
+                'tid' => $tenantId,
+            ]
+        );
+
+        $this->redirect(url("academic/assignments/{$assignmentId}"), 'success', 'Submission graded successfully with feedback saved.');
     }
 
     /**

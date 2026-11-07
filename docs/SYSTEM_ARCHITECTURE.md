@@ -132,3 +132,4 @@ TuitionPro ERP/
 3. **Double-Entry Equilibrium:** All journal entries must verify $\sum \text{Debits} = \sum \text{Credits}$. Unbalanced transactions trigger an immediate rollback and exception.
 4. **Tenant Scoping:** All database queries implicitly include `WHERE tenant_id = :tenant_id` to guarantee absolute data isolation.
 5. **Session & JWT Dual-Stack:** Standard web browser access uses secure HTTP-only cookies; mobile apps and external API clients utilize stateless JWT tokens with refresh rotation.
+

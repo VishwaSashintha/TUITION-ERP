@@ -97,3 +97,4 @@ settings.manage         Configure institute branches, users, and backups
 1. **Defense in Depth:** Even if a menu item is made visible on the client, `RoleMiddleware` intercepts the HTTP route and aborts execution with `HTTP 403 Forbidden` if the user's role is not authorized.
 2. **Dashboard Query Segregation:** `DashboardController` branches into dedicated methods (`adminDashboard`, `receptionistDashboard`, `teacherDashboard`) so that unpermitted queries (e.g. `financial_accounts` current balance, profit/loss totals) are **never executed** for front-desk and academic roles.
 3. **Anti-IDOR Policy:** Resource controllers verify that the requested model belongs to the active `tenant_id` and that parents are explicitly linked to the requested student in `student_guardians`.
+

@@ -70,6 +70,7 @@ Strict adherence to the approved 6-color palette and typography:
 - [x] **2.6 User Management:** Staff invitation, user account creation, password management (`/settings/users`).
 
 ### PHASE 3 — STUDENT LIFECYCLE AND ADMISSIONS
+- [x] **3.0 Prospective Student Enquiries & Lead Tracking:** Lead capture, follow-up history, and direct conversion to student admissions (`/students/enquiries`).
 - [x] **3.1 Student Registration & Onboarding:** Complete registration workflow with admission number generation (`/students/create`).
 - [x] **3.2 Student Profile Directory:** Search, branch filter, grade filter, and status pagination (`/students`).
 - [x] **3.3 Guardian Relationship Management:** Primary and secondary guardian associations, contact information.
@@ -108,6 +109,7 @@ Strict adherence to the approved 6-color palette and typography:
 - [x] **7.5 Profit & Loss Statement:** Revenue minus expenses calculation over specified financial periods (`/accounting/profit-loss`).
 - [x] **7.6 Cash & Bank Account Management:** Tracking petty cash and bank balances (`financial_accounts` table).
 - [x] **7.7 Expense Management & Categorization:** Direct expense tracking with receipt attachment (`/expenses`).
+- [x] **7.8 Balance Sheet (Statement of Financial Position):** Real-time statement verifying Assets = Liabilities + Equity (`/accounting/balance-sheet`).
 
 ### PHASE 8 — HR AND TEACHER COMPENSATION
 - [x] **8.1 Teacher Profiles & Directory:** Teacher records with subject qualifications and contact info (`/teachers`).
@@ -122,6 +124,7 @@ Strict adherence to the approved 6-color palette and typography:
 - [x] **9.3 Result Publication & Ranking:** Exam results compilation with pass/fail indicators (`/examinations/results`).
 - [x] **9.4 Learning Materials Repository:** Teacher document and lesson note distribution (`/academic/materials`).
 - [x] **9.5 Assignment Management:** Assignment creation, due dates, and student submissions (`/academic/assignments`).
+- [x] **9.6 Online Student Assignment Submissions & Grading:** Student solution submission and teacher grading workflow (`/academic/assignments/submit`, `/academic/assignments/grade`).
 
 ### PHASE 10 — STUDENT AND PARENT PORTALS
 - [x] **10.1 Student Academic Dashboard:** Student portal showing enrolled batches, attendance %, fees, and exams (`/portal/student`).
@@ -151,11 +154,11 @@ Strict adherence to the approved 6-color palette and typography:
 - [x] **13.4 QR Attendance Integration:** Interactive client-side QR scanner and validation.
 
 ### PHASE 14 — DEPLOYMENT, TESTING & DOCUMENTATION
-- [x] **14.1 Full Automated Test Suite Passing (146/146 tests, 100%):**
+- [x] **14.1 Full Automated Test Suite Passing (149/149 tests, 100%):**
   - `tests/test_jwt_auth.php` (16/16)
   - `tests/test_backend_core.php` (16/16)
   - `tests/test_e2e_workflows.php` (28/28)
-  - `tests/test_http_routes.php` (59/59)
+  - `tests/test_http_routes.php` (62/62)
   - `tests/test_role_dashboards.php` (27/27)
 - [x] **14.2 Master Documentation Pack (`docs/`):**
   - `docs/PRODUCT_AUDIT.md`

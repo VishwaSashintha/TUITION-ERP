@@ -61,6 +61,9 @@ $branchName = $user['branch_name'] ?? 'Main Branch';
                 </a>
 
                 <div class="nav-section-title">Academic & Students</div>
+                <a href="<?= url('students/enquiries') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'enquiries' ? 'active' : '' ?>">
+                    <i class="bi bi-chat-left-dots-fill"></i> Inquiries & Admissions
+                </a>
                 <a href="<?= url('students') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'students' ? 'active' : '' ?>">
                     <i class="bi bi-people-fill"></i> Students Directory
                 </a>
@@ -180,6 +183,9 @@ $branchName = $user['branch_name'] ?? 'Main Branch';
                 </a>
 
                 <div class="nav-section-title">Front Desk Operations</div>
+                <a href="<?= url('students/enquiries') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'enquiries' ? 'active' : '' ?>">
+                    <i class="bi bi-chat-left-dots-fill"></i> Inquiries & Leads
+                </a>
                 <a href="<?= url('students') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'students' ? 'active' : '' ?>">
                     <i class="bi bi-people-fill"></i> Student Directory
                 </a>

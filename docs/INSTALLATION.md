@@ -106,3 +106,4 @@ Upon database initialization, the following administrative account is active:
 
 > [!IMPORTANT]
 > Immediately log in and navigate to **Settings -> Users** to change default passwords and update institute contact details before processing live student data.
+

@@ -108,3 +108,4 @@ server {
 2. **MySQL Connection Pool:** Configure `max_connections = 250` and `innodb_buffer_pool_size` to 70% of available server RAM.
 3. **Environment Isolation:** Set `APP_ENV=production` and `APP_DEBUG=false` in `.env`.
 4. **Log Rotation:** Ensure `storage/logs/app.log` is rotated weekly via `logrotate`.
+

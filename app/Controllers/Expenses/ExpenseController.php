@@ -253,5 +253,21 @@ class ExpenseController extends Controller
             'recentTransactions' => $recentTransactions,
         ]);
     }
+
+    /**
+     * Balance Sheet (Statement of Financial Position).
+     */
+    public function balanceSheet(Request $request): void
+    {
+        $asOfDate = $request->query('as_of', date('Y-m-d'));
+        $statement = $this->accountingService->getBalanceSheet($asOfDate);
+
+        $this->render('expenses/balance_sheet', [
+            'title'      => 'Balance Sheet (Statement of Financial Position)',
+            'activeMenu' => 'accounting',
+            'sheet'      => $statement,
+            'asOfDate'   => $asOfDate,
+        ]);
+    }
 }
 

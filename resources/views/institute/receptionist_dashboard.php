@@ -21,7 +21,18 @@
 
 <!-- ─── QUICK ACTION BAR ─────────────────────────────────────────────────── -->
 <div class="row g-3 mb-4">
-    <div class="col-md-3 col-6">
+    <div class="col-lg-2 col-md-4 col-6">
+        <a href="<?= url('students/enquiries') ?>" class="quick-action-card">
+            <div class="quick-action-icon tp-sky-blue">
+                <i class="bi bi-chat-left-dots-fill text-tp-sky-blue"></i>
+            </div>
+            <div>
+                <div class="fw-bold" style="font-size: 0.9rem;">Enquiries</div>
+                <small class="text-muted" style="font-size: 0.75rem;"><?= number_format((int)($enquiryStats['followups_due_today'] ?? 0)) ?> due today</small>
+            </div>
+        </a>
+    </div>
+    <div class="col-lg-2 col-md-4 col-6">
         <a href="<?= url('students/create') ?>" class="quick-action-card">
             <div class="quick-action-icon tp-purple">
                 <i class="bi bi-person-plus-fill text-tp-purple"></i>
@@ -32,7 +43,7 @@
             </div>
         </a>
     </div>
-    <div class="col-md-3 col-6">
+    <div class="col-lg-2 col-md-4 col-6">
         <a href="<?= url('attendance/take') ?>" class="quick-action-card">
             <div class="quick-action-icon tp-green">
                 <i class="bi bi-calendar-check-fill text-tp-green"></i>
@@ -43,7 +54,7 @@
             </div>
         </a>
     </div>
-    <div class="col-md-3 col-6">
+    <div class="col-lg-3 col-md-6 col-6">
         <a href="<?= url('fees/invoices') ?>" class="quick-action-card">
             <div class="quick-action-icon tp-orange">
                 <i class="bi bi-cash-stack text-tp-orange"></i>
@@ -54,10 +65,10 @@
             </div>
         </a>
     </div>
-    <div class="col-md-3 col-6">
+    <div class="col-lg-3 col-md-6 col-12">
         <a href="<?= url('timetable') ?>" class="quick-action-card">
-            <div class="quick-action-icon tp-sky-blue">
-                <i class="bi bi-clock-history text-tp-sky-blue"></i>
+            <div class="quick-action-icon tp-coral">
+                <i class="bi bi-clock-history text-tp-coral"></i>
             </div>
             <div>
                 <div class="fw-bold" style="font-size: 0.9rem;">Class Timetable</div>

@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS `student_enquiries` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `tenant_id` INT UNSIGNED NOT NULL,
@@ -42,11 +41,8 @@ CREATE TABLE IF NOT EXISTS `enquiry_followups` (
     CONSTRAINT `fk_followups_enquiry` FOREIGN KEY (`enquiry_id`) REFERENCES `student_enquiries` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_followups_contacted` FOREIGN KEY (`contacted_by`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---Seeds
 INSERT IGNORE INTO `student_enquiries` (`id`, `tenant_id`, `branch_id`, `first_name`, `last_name`, `phone`, `email`, `grade`, `course_interest`, `source`, `status`, `notes`, `next_followup_date`, `created_at`)
 VALUES
     (1, 1, 1, 'Roshan', 'Jayasinghe', '0779911223', 'roshan.j@gmail.com', '12', 'A/L Combined Mathematics', 'walk_in', 'follow_up', 'Interested in weekday revision batch. Requested timetable.', CURDATE() + INTERVAL 1 DAY, NOW()),
     (2, 1, 1, 'Sanduni', 'Tharaka', '0714455667', 'sanduni.t@yahoo.com', '13', 'A/L Physics & Chemistry', 'social_media', 'new', 'Inquired via Facebook page regarding physics theory sessions.', CURDATE(), NOW()),
     (3, 1, 1, 'Kavindu', 'Perera', '0761122334', 'kavindu.p@gmail.com', '11', 'O/L Mathematics English Medium', 'referral', 'contacted', 'Spoke to mother. Arranged campus visit.', CURDATE() + INTERVAL 3 DAY, NOW());
-

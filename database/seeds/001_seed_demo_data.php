@@ -23,12 +23,15 @@ $tables = [
     'student_submissions', 'assignments', 'learning_materials', 'notifications', 'announcements',
     'exam_marks', 'examinations', 'grading_rules',
     'enrollments', 'batches', 'courses', 'subjects', 'teacher_availability', 'teachers',
-    'student_documents', 'student_guardians', 'guardians', 'students',
+    'student_guardians', 'guardians', 'students',
     'academic_years', 'branches', 'users', 'audit_logs', 'system_settings', 'tenants'
 ];
 
 foreach ($tables as $tbl) {
-    $pdo->exec("TRUNCATE TABLE `{$tbl}`");
+    $exists = $pdo->query("SHOW TABLES LIKE '{$tbl}'")->fetch();
+    if ($exists) {
+        $pdo->exec("TRUNCATE TABLE `{$tbl}`");
+    }
 }
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
 

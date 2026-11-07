@@ -1,7 +1,4 @@
-
 SET FOREIGN_KEY_CHECKS = 0;
-
---Platform
 
 CREATE TABLE IF NOT EXISTS `subscription_plans` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -72,8 +69,6 @@ CREATE TABLE IF NOT EXISTS `platform_users` (
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---Academics
-
 CREATE TABLE IF NOT EXISTS `branches` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `tenant_id` INT UNSIGNED NOT NULL,
@@ -104,8 +99,6 @@ CREATE TABLE IF NOT EXISTS `academic_years` (
     INDEX `idx_acad_tenant` (`tenant_id`),
     CONSTRAINT `fk_acad_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---Authentication
 
 CREATE TABLE IF NOT EXISTS `roles` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -161,8 +154,6 @@ CREATE TABLE IF NOT EXISTS `users` (
     CONSTRAINT `fk_users_branch` FOREIGN KEY (`branch_id`) REFERENCES `branches`(`id`) ON DELETE SET NULL,
     CONSTRAINT `fk_users_role` FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---Students
 
 CREATE TABLE IF NOT EXISTS `students` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -235,8 +226,6 @@ CREATE TABLE IF NOT EXISTS `student_guardians` (
     CONSTRAINT `fk_sg_guardian` FOREIGN KEY (`guardian_id`) REFERENCES `guardians`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---Teachers
-
 CREATE TABLE IF NOT EXISTS `teachers` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `tenant_id` INT UNSIGNED NOT NULL,
@@ -281,8 +270,6 @@ CREATE TABLE IF NOT EXISTS `teacher_availability` (
     CONSTRAINT `fk_ta_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants`(`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_ta_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teachers`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---Academics
 
 CREATE TABLE IF NOT EXISTS `subjects` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -375,8 +362,6 @@ CREATE TABLE IF NOT EXISTS `enrollments` (
     CONSTRAINT `fk_enr_acad` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---Academics
-
 CREATE TABLE IF NOT EXISTS `class_schedules` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `tenant_id` INT UNSIGNED NOT NULL,
@@ -424,8 +409,6 @@ CREATE TABLE IF NOT EXISTS `class_sessions` (
     CONSTRAINT `fk_sess_sched` FOREIGN KEY (`schedule_id`) REFERENCES `class_schedules`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---Attendance
-
 CREATE TABLE IF NOT EXISTS `attendance_records` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `tenant_id` INT UNSIGNED NOT NULL,
@@ -462,8 +445,6 @@ CREATE TABLE IF NOT EXISTS `attendance_corrections` (
     CONSTRAINT `fk_ac_att` FOREIGN KEY (`attendance_record_id`) REFERENCES `attendance_records`(`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_ac_user` FOREIGN KEY (`corrected_by`) REFERENCES `users`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---Billing
 
 CREATE TABLE IF NOT EXISTS `fee_types` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -590,8 +571,6 @@ CREATE TABLE IF NOT EXISTS `refunds` (
     CONSTRAINT `fk_ref_authorizer` FOREIGN KEY (`authorized_by`) REFERENCES `users`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---Teachers
-
 CREATE TABLE IF NOT EXISTS `teacher_payment_rules` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `tenant_id` INT UNSIGNED NOT NULL,
@@ -672,8 +651,6 @@ CREATE TABLE IF NOT EXISTS `teacher_payments` (
     CONSTRAINT `fk_tp_calc` FOREIGN KEY (`calculation_id`) REFERENCES `teacher_payment_calculations`(`id`) ON DELETE SET NULL,
     CONSTRAINT `fk_tp_payer` FOREIGN KEY (`paid_by`) REFERENCES `users`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---Accounting
 
 CREATE TABLE IF NOT EXISTS `expense_categories` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -837,8 +814,6 @@ CREATE TABLE IF NOT EXISTS `journal_lines` (
     CONSTRAINT `fk_jl_account` FOREIGN KEY (`account_id`) REFERENCES `chart_of_accounts`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---Students
-
 CREATE TABLE IF NOT EXISTS `grading_rules` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `tenant_id` INT UNSIGNED NOT NULL,
@@ -903,8 +878,6 @@ CREATE TABLE IF NOT EXISTS `exam_marks` (
     CONSTRAINT `fk_em_student` FOREIGN KEY (`student_id`) REFERENCES `students`(`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_em_user` FOREIGN KEY (`entered_by`) REFERENCES `users`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---Communication
 
 CREATE TABLE IF NOT EXISTS `announcements` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -1007,8 +980,6 @@ CREATE TABLE IF NOT EXISTS `student_submissions` (
     CONSTRAINT `fk_subm_grader` FOREIGN KEY (`graded_by`) REFERENCES `users`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---Backups
-
 CREATE TABLE IF NOT EXISTS `audit_logs` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `tenant_id` INT UNSIGNED NULL,
@@ -1053,4 +1024,3 @@ CREATE TABLE IF NOT EXISTS `backup_records` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;
-

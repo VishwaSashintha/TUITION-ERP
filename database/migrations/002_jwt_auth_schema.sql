@@ -1,7 +1,4 @@
-
 USE `tuitionpro`;
-
---Authentication
 CREATE TABLE IF NOT EXISTS `refresh_tokens` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `user_id` INT UNSIGNED NOT NULL,
@@ -25,4 +22,3 @@ CREATE TABLE IF NOT EXISTS `login_attempts` (
     INDEX `idx_rate_limit` (`ip_address`, `attempted_at`),
     INDEX `idx_identifier` (`login_identifier`, `attempted_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-

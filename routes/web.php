@@ -2,22 +2,24 @@
 
 declare(strict_types=1);
 
+use App\Core\Response;
+
 $router = $router ?? ($this->router ?? \App\Core\Application::getInstance()->getRouter());
 
 $router->get('/', function ($request, $response) {
     if (auth_check()) {
         $role = auth_role();
         if ($role === 'super_admin') {
-            redirect(url('platform/dashboard'));
+            Response::redirect(url('platform/dashboard'));
         } elseif ($role === 'student') {
-            redirect(url('portal/student'));
+            Response::redirect(url('portal/student'));
         } elseif ($role === 'parent') {
-            redirect(url('portal/parent'));
+            Response::redirect(url('portal/parent'));
         } else {
-            redirect(url('dashboard'));
+            Response::redirect(url('dashboard'));
         }
     }
-    redirect(url('login'));
+    Response::redirect(url('login'));
 });
 
 $router->get('/login', [\App\Controllers\Auth\AuthController::class, 'showLogin'], ['guest']);

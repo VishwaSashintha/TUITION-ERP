@@ -107,6 +107,16 @@ if (!function_exists('url')) {
     }
 }
 
+if (!function_exists('redirect')) {
+    function redirect(string $url, ?string $flashKey = null, ?string $flashMessage = null): void
+    {
+        if ($flashKey !== null && $flashMessage !== null) {
+            flash($flashKey, $flashMessage);
+        }
+        \App\Core\Response::redirect($url);
+    }
+}
+
 if (!function_exists('asset')) {
     function asset(string $path): string
     {

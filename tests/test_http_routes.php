@@ -93,6 +93,17 @@ echo "Server Target: {$baseUrl}\n";
 echo "======================================================\n\n";
 echo "1. Testing Guest Protection & Redirects...\n";
 
+runTest("GET / without auth redirects to /login (302)", function () use ($baseUrl) {
+    $client = new HttpClient();
+    $res = $client->get("{$baseUrl}/");
+    if ($res['code'] !== 302) {
+        throw new \RuntimeException("Expected 302, got {$res['code']}");
+    }
+    if (!str_contains($res['headers'], 'Location:')) {
+        throw new \RuntimeException("Missing Location redirect header");
+    }
+});
+
 runTest("GET /login returns 200 OK", function () use ($baseUrl) {
     $client = new HttpClient();
     $res = $client->get("{$baseUrl}/login");

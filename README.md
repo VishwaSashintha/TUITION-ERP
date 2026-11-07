@@ -1,326 +1,320 @@
-# TuitionPro ERP — Education Management & Enterprise Resource Planning System
+<div align="center">
 
-[![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=flat&logo=php&logoColor=white)](https://php.net)
-[![Database](https://img.shields.io/badge/Database-MySQL%208.0%20%7C%20MariaDB-4479A1?style=flat&logo=mysql&logoColor=white)](https://mysql.com)
-[![Architecture](https://img.shields.io/badge/Architecture-Modular%20Monolith-orange)](https://github.com/VishwaSashintha/TUITION-ERP)
-[![Security](https://img.shields.io/badge/Security-HS256%20JWT%20%2B%20RBAC-green)](https://github.com/VishwaSashintha/TUITION-ERP)
-[![Tests Passing](https://img.shields.io/badge/Tests-149%2F149%20Passing%20(100%25)-success)](https://github.com/VishwaSashintha/TUITION-ERP)
-[![License](https://img.shields.io/badge/License-Commercial%20%2F%20Proprietary-blue)](https://github.com/VishwaSashintha/TUITION-ERP)
+<img src="public/assets/images/logo.svg" alt="TuitionPro ERP" height="80" />
 
-TuitionPro ERP is a commercial-grade, multi-tenant and standalone Education Management and Enterprise Resource Planning platform engineered for tuition institutes, private schools, tuition centres, and large multi-branch educational organizations.
+# TuitionPro ERP
 
-Built in pure PHP 8.2+ and MySQL/MariaDB with zero framework bloat, TuitionPro delivers enterprise-scale performance, strict double-entry financial integrity, comprehensive 14-role role-based access control (RBAC), fine-grained server-side data isolation, and user-specific dashboard experiences.
+**A Comprehensive Education Management & Enterprise Resource Planning System**
+
+[![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=flat-square&logo=php&logoColor=white)](https://php.net)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://mysql.com)
+[![Tests](https://img.shields.io/badge/Tests-149%2F149%20Passing-brightgreen?style=flat-square&logo=checkmarx&logoColor=white)](https://github.com/VishwaSashintha/TUITION-ERP)
+[![License](https://img.shields.io/badge/License-Proprietary-red?style=flat-square)](https://github.com/VishwaSashintha/TUITION-ERP)
+
+A production-grade, multi-tenant education ERP built for tuition institutes, private centres, and multi-branch educational organizations. Built on pure PHP 8.2+ with zero framework dependency.
+
+[📋 Features](#-features) · [👥 User Roles](#-user-roles) · [🛠 Tech Stack](#-tech-stack) · [🚀 Installation](#-installation) · [🧪 Tests](#-automated-tests) · [🔐 Security](#-security)
+
+</div>
 
 ---
 
-## 1. Core Architecture & Dual Deployment Modes
+## 📌 Overview
 
-TuitionPro is **ONE unified, reusable software product** that seamlessly supports two deployment models on the exact same codebase:
+**TuitionPro ERP** centralizes every operational aspect of an educational institute — from student admissions and batch scheduling to fee collection, double-entry accounting, teacher compensation, and parent portals — into a single cohesive platform.
 
-### 1.1 Mode A: Standalone Installation (Single Institute)
-- One dedicated installation serving one customer institute (e.g. Apex Higher Education Institute, Iskole, Pasala).
-- Dedicated local database and `.env` institute profile (`INSTITUTE_NAME`, `INSTITUTE_CODE`, `INSTITUTE_CURRENCY`, `INSTITUTE_LOGO`).
-- Local branch campuses managed under a unified single-institute tenancy.
+**Designed for:**
+- 🏫 Private tuition centres and tuition classes
+- 📚 Multi-subject educational institutes
+- 🏢 Multi-branch education groups
+- 👨‍🏫 Individual tutors managing organized class operations
 
-### 1.2 Mode B: Multi-Institute Platform (Education Groups & SaaS)
-- One centrally managed installation serving multiple independent institutes, regional branches, and education groups.
-- Centrally administered via the Platform Super Admin Dashboard (`/platform/dashboard`).
-- Dynamic tenant provisioning, subscription tier limits (student and staff caps), and automated institute onboarding.
-- Strict database-level tenant scoping (`tenant_id`) ensuring 100% multi-tenant data isolation.
+**Key strengths:**
+- 14-role RBAC with strict server-side access enforcement
+- Double-entry general ledger with real-time Balance Sheet and P&L
+- Multi-tenant architecture supporting both standalone and SaaS deployment
+- Role-specific dashboards — every user sees only what they need
+- 149/149 automated tests passing
 
-```mermaid
-flowchart TD
-    Client["Client Browsers & Mobile Devices\n(Admin, Receptionist, Teacher, Student, Parent)"]
-    FrontController["public/index.php\n(Front Controller)"]
-    Router["App\\Core\\Router\n(Reflection DI & Route Matching)"]
-    Middleware["Middleware Pipeline\n(AuthMiddleware, RoleMiddleware, TenantMiddleware, CsrfMiddleware)"]
-    
-    subgraph Controllers["Domain Controllers"]
-        InstCtrl["Institute Dashboards\n(Executive, Front-Desk, Academic)"]
-        StudCtrl["Students & Enquiries"]
-        FeesCtrl["Billing & Invoicing"]
-        AcctCtrl["General Ledger & Expenses"]
-        AcadCtrl["Batches & Timetable"]
-        PortalCtrl["Student & Parent Portals"]
-    end
-    
-    subgraph Services["Core Business Services"]
-        Billing["BillingService"]
-        Accounting["AccountingService"]
-        TenantMgr["TenantManager"]
-        Audit["AuditService"]
-        JWT["JwtService"]
-    end
-    
-    Database[("MySQL 8.0+ / MariaDB\nInnoDB • 61 Tables • ACID Transactions\nTenant Isolation (tenant_id)")]
+---
 
-    Client -->|HTTP / JSON| FrontController
-    FrontController --> Router
-    Router --> Middleware
-    Middleware --> Controllers
-    Controllers --> Services
-    Services --> Database
+## 🚀 Deployment Modes
+
+TuitionPro ERP runs on a single codebase across two deployment configurations:
+
+| Mode | Description |
+|---|---|
+| **Standalone** | One installation per institute. Dedicated database, local branch campus management. Ideal for independent tuition centres. |
+| **Multi-Institute Platform** | One centrally hosted installation serving multiple independent institutes. Managed via Platform Super Admin Dashboard. Strict `tenant_id` database-level isolation. |
+
+---
+
+## ✨ Features
+
+### 🎓 Student Management
+- Prospective student enquiry tracking with lead source capture (Walk-in, Phone, Social Media, Website, Referral)
+- Follow-up interaction timeline with channel logging (Call, WhatsApp, Email, In-Person)
+- One-click enquiry-to-admission conversion with auto-generated admission numbers (`APX-YYYY-XXXX`)
+- Student profiles with multi-guardian linking, emergency contacts, and document storage
+- Printable digital student ID cards with embedded QR codes
+- Student CSV export and advanced directory filtering
+
+### 📅 Academic Management
+- Subject and course catalogue management
+- Batch cohort creation with teacher assignment, monthly fee structures, and capacity limits
+- Weekly timetable scheduling with conflict prevention
+- Date-specific session planning with room and lecturer assignment
+- Student batch enrolment management
+
+### ✅ Attendance
+- Session-level roll-call register (Present / Absent / Late / Excused)
+- **Real-time HTML5 camera QR scanner** with instant audio-visual confirmation
+- Attendance history with controlled correction audit trail
+- Attendance reports by student, batch, and date range
+
+### 💰 Fee Management & Invoicing
+- Flexible invoice generation (batch-based and ad-hoc)
+- Partial payment recording with real-time outstanding balance tracking
+- Server-side overpayment prevention
+- Printable A4/thermal-formatted payment receipts with institute branding
+- Aged defaulters report with direct guardian contact access
+- Formal refund workflow with general ledger adjustment entries
+
+### 📒 Double-Entry General Ledger Accounting
+- Standard 5-tier Chart of Accounts (1000 Assets · 2000 Liabilities · 3000 Equity · 4000 Income · 5000 Expenses)
+- Strict debit = credit invariant enforced on every journal posting
+- **Trial Balance** — real-time ledger equilibrium verification
+- **Profit & Loss Statement** — gross revenue, expenses, net surplus
+- **Balance Sheet** — Assets = Liabilities + Equity + Net Surplus
+- Multi-account cash and bank balance tracking
+- Expense recording with receipt attachment support
+
+### 👨‍🏫 Teacher & HR Management
+- Teacher profile directory with availability tracking
+- Compensation formula engine: percentage of fee collection, hourly rate, or flat monthly stipend
+- Payment disbursement vouchers with settlement tracking
+- Printable individual teacher compensation statements
+
+### 📝 Examinations & LMS
+- Exam creation by batch, subject, max marks, and date
+- Batch-wide marks entry with automatic percentage calculation
+- Results publishing with auto-graded rankings (A / B / C / S / F)
+- Lesson material uploads and distribution (PDF study packs)
+- Homework assignment creation with submission deadlines
+- Online student submission portal with teacher grading and feedback workflow
+
+### 👨‍👩‍👧 Student & Parent Portals
+- **Student Portal** — personal timetable, attendance %, exam results, fee balance, study materials
+- **Parent Portal** — multi-child switcher, attendance summary, fee dues, exam report cards
+- Server-side anti-IDOR protection — parents cannot access unauthorized student records
+
+### 📊 Reports Centre
+- Attendance Reports
+- Fee Collection Reports
+- Outstanding Balance Reports
+- Teacher Payment Reports
+- Operational Expense Reports
+- Student Performance Reports
+- Consolidated navigation hub at `/reports`
+
+### ⚙️ System & Administration
+- Role and permission management
+- Branch campus management
+- User account management
+- In-browser database backup creation, download, and restoration
+- Announcement and notification management
+- Platform Super Admin dashboard for multi-tenant operations
+
+---
+
+## 👥 User Roles
+
+TuitionPro ERP enforces a **14-role access hierarchy** with dedicated dashboard experiences per role:
+
+| Role | Access Scope |
+|---|---|
+| **Platform Super Admin** | Full platform administration, tenant lifecycle, subscription management |
+| **Platform Support Admin** | Monitored tenant diagnostics and support |
+| **Institute Owner / Director** | Executive dashboard — full financials, GL, staff management |
+| **Institute Admin** | Operational dashboard — academics, admissions, daily billing |
+| **Branch Manager** | Operations scoped strictly to assigned branch campus |
+| **Accountant** | Financial dashboard — GL, Trial Balance, P&L, Balance Sheet, payroll |
+| **Receptionist** | Front-desk dashboard — enquiries, admissions, attendance (zero GL/payroll exposure) |
+| **Cashier** | Counter fee collection, receipt generation, daily cash settlement |
+| **Admissions Officer** | Enquiry management, student registrations, enrolment, document verification |
+| **Academic Coordinator** | Timetable, sessions, teacher assignments, examination coordination |
+| **HR Manager** | Teacher profiles, workload monitoring, compensation processing |
+| **Teacher** | Academic dashboard — assigned classes and students only |
+| **Student** | Personal academic portal — own records only |
+| **Parent / Guardian** | Multi-child portal — own children's records only |
+
+---
+
+## 🔐 Security
+
+| Control | Implementation |
+|---|---|
+| **Authentication** | RFC 7519 HS256 JSON Web Tokens · single-use rotating refresh tokens · database persistence |
+| **Brute-Force Protection** | Automatic lockout after 5 failed login attempts (IP + account) |
+| **Route Authorization** | Server-side `RoleMiddleware` returning `HTTP 403` on unauthorized access |
+| **CSRF Protection** | Synchronizer token on all `POST`, `PUT`, `DELETE` requests |
+| **XSS Prevention** | 100% output escaping via global `e()` helper |
+| **SQL Injection Defense** | 100% parameterized PDO prepared statements |
+| **IDOR Prevention** | Server-side resource ownership validation on all student, parent, and invoice endpoints |
+| **File Upload Security** | Whitelisted MIME types · randomized filenames · executable extension blocking |
+| **Audit Trail** | Immutable event log for all sensitive security and financial actions via `AuditService` |
+| **Multi-Tenant Isolation** | All queries scoped by `tenant_id` at the database level |
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Backend** | PHP 8.2+ · Custom MVC (no framework) · PDO · PSR-4 Autoloading |
+| **Database** | MySQL 8.0+ / MariaDB 10.4+ · InnoDB · 61 tables · ACID transactions |
+| **Authentication** | HS256 JWT · Refresh token rotation · Session management |
+| **Frontend** | PHP view templates · Custom CSS (6-colour design system) · Vanilla JS |
+| **QR Scanning** | HTML5 Camera API · `endroid/qr-code` |
+| **PDF & Export** | `dompdf/dompdf` · `phpoffice/phpspreadsheet` |
+| **Email** | `phpmailer/phpmailer` · SMTP |
+| **Environment** | `vlucas/phpdotenv` |
+| **Testing** | Native PHP test harness · PHPUnit 11 |
+| **Dev Environment** | XAMPP · Apache 2.4+ · PHP built-in server |
+
+---
+
+## 🏗 Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│          Client Browsers & Devices          │
+│   Admin · Teacher · Student · Parent        │
+└───────────────────┬─────────────────────────┘
+                    │ HTTP
+┌───────────────────▼─────────────────────────┐
+│          public/index.php (Front Controller) │
+└───────────────────┬─────────────────────────┘
+                    │
+┌───────────────────▼─────────────────────────┐
+│   Middleware Pipeline                        │
+│   AuthMiddleware · RoleMiddleware            │
+│   TenantMiddleware · CsrfMiddleware          │
+└───────────────────┬─────────────────────────┘
+                    │
+┌───────────────────▼─────────────────────────┐
+│   Domain Controllers (20 controllers)        │
+│   Students · Fees · Academic · Attendance    │
+│   Exams · Teachers · Reports · Portals · GL  │
+└───────────────────┬─────────────────────────┘
+                    │
+┌───────────────────▼─────────────────────────┐
+│   Business Services                          │
+│   BillingService · AccountingService         │
+│   JwtService · AuditService · TenantManager  │
+└───────────────────┬─────────────────────────┘
+                    │
+┌───────────────────▼─────────────────────────┐
+│   MySQL 8.0+ / MariaDB                       │
+│   InnoDB · 61 Tables · tenant_id isolation   │
+└─────────────────────────────────────────────┘
 ```
 
 ---
 
-## 2. Official Visual Identity & Design System
+## 📁 Project Structure
 
-TuitionPro ERP adheres to a visual design language engineered for readability, fast operations, and visual clarity:
-
-### 2.1 The Approved 6-Color Palette
-| Purpose | Color Name | Hex Code | Visual Application |
-|---|---|:---:|---|
-| **Primary Dark** | Black | `#0C0C0C` | High-contrast typography, headings, dark navigation accents |
-| **Primary Brand** | Green | `#4BA95F` | Primary action buttons, positive states, payment collections, receipts |
-| **Secondary** | Light Blue | `#77DDFA` | Informational cards, timetable sessions, student metric indicators |
-| **Accent** | Orange | `#FEA339` | Warnings, pending fee notices, upcoming session indicators |
-| **Accent** | Purple | `#9985FB` | Batch cohorts, academic subjects, secondary action accents |
-| **Accent** | Coral | `#FF908D` | Urgent alerts, overdue balances, expense tags, error badges |
-
-### 2.2 Typography Hierarchy
-- **Roboto:** Used for all base interface text, navigation links, form controls, table rows, and descriptions.
-- **Poppins SemiBold 700:** Used exclusively for high-impact numeric values, KPI statistic counters, financial balances, and currency figures.
-
----
-
-## 3. Comprehensive Feature Matrix
-
-### 3.1 Prospective Student Enquiries & Admissions Lifecycle
-- **Lead Capture:** Record prospective student inquiries with contact details, grade, course interest, and lead source (Walk-in, Phone, Social Media, Website, Referral) (`/students/enquiries`).
-- **Interaction Timeline:** Log follow-up interactions with contact channel (Call, WhatsApp, In-Person Visit, Email), outcome notes, and next follow-up dates.
-- **One-Click Admission Conversion:** Instantly convert an enquiry into an active student record with automated admission number generation.
-- **Receptionist Follow-up Alerts:** Live counter of follow-ups due today rendered on the Front-Desk Dashboard.
-
-### 3.2 Student Profiles, Guardians & Digital QR ID Cards
-- **Student Onboarding:** Full registration workflow with unique admission numbers (`APX-YYYY-XXXX`).
-- **Directory & Filters:** Searchable directory with real-time filters by branch, grade, and active/inactive status (`/students`).
-- **Guardian Linking:** Multi-guardian relationship management with primary contacts, emergency phones, and occupations.
-- **Digital Student ID Cards:** Formatted printable student ID cards featuring embedded dynamic QR codes for rapid scanner check-in (`/students/{id}/id-card`).
-- **Student History:** Consolidated profile displaying enrolled batches, attendance percentage, fee invoice history, and staff notes.
-
-### 3.3 Academic Management, Batches & Timetable
-- **Master Catalogue:** Subjects, courses, and educational programmes with active status controls (`/academic/subjects`).
-- **Batch Cohorts:** Class batch creation with teacher assignment, monthly fee structures, and capacity limits (`/academic/batches`).
-- **Timetable Scheduling:** Weekly timetable configuration with conflict prevention (`/timetable`).
-- **Session Generator:** Date-specific session scheduler with classroom room numbers and assigned lecturers (`/timetable/sessions`).
-
-### 3.4 Rapid Attendance & Camera QR Scanner Engine
-- **Session Register:** Manual roll-call attendance register with status options (Present, Absent, Late, Excused) (`/attendance/take`).
-- **Camera QR Scanner:** Interactive real-time HTML5 camera scanner with instant audio-visual confirmation (`/attendance/qr-scanner`).
-- **Attendance History & Audit:** Searchable logs by date and student with controlled correction tracking (`/attendance/history`).
-
-### 3.5 Invoicing, Fee Collection & Receipts
-- **Invoicing Engine:** Batch and ad-hoc invoice creation with automated due date tracking (`/fees/invoices/create`).
-- **Partial Payments:** Incremental payment recording with real-time outstanding balance calculation (`/fees/collect-payment`).
-- **Overpayment Defense:** Server-side validation blocking allocations exceeding outstanding invoice amounts.
-- **Printable Receipts:** Formatted A4/thermal printable payment receipts with institute branding (`/fees/receipt/{id}`).
-- **Defaulters Tracking:** Dedicated aged defaulters report with direct guardian contact information (`/fees/outstanding`).
-- **Controlled Refunds:** Formal refund requests with general ledger adjustment entries.
-
-### 3.6 Double-Entry General Ledger Accounting
-- **Standard Chart of Accounts:** 5-tier account hierarchy (1000 Assets, 2000 Liabilities, 3000 Equity, 4000 Income, 5000 Expenses).
-- **Balanced Journal Posting:** Strict server-side invariant requiring $\sum \text{Debits} = \sum \text{Credits}$ on every transaction.
-- **Trial Balance:** Live ledger verification confirming exact equilibrium across all ledger accounts (`/accounting/trial-balance`).
-- **Profit & Loss Statement:** Real-time income statement calculating gross fee revenue, expenses, and net surplus (`/accounting/profit-loss`).
-- **Balance Sheet:** Real-time Statement of Financial Position verifying:
-  $$\text{Total Assets} = \text{Total Liabilities} + \text{Equity} + \text{Current Period Net Surplus}$$
-  Accessible at `/accounting/balance-sheet`.
-- **Cash & Bank Accounts:** Multi-account tracking of physical cash counters and institutional bank balances (`/accounting/cash-bank`).
-- **Expense Categorization:** Direct recording of operational overheads with receipt attachments (`/expenses`).
-
-### 3.7 Teacher Compensation & HR
-- **Compensation Formula Engine:** Automated calculation based on % of fee collection, hourly teaching rates, or flat monthly stipends (`/teacher-payments/calculate`).
-- **Payment Disbursements:** Voucher generation and settlement tracking (`/teacher-payments`).
-- **Printable Statements:** Detailed compensation statements for individual lecturers (`/teacher-payments/{id}/statement`).
-
-### 3.8 Examination Management & Performance
-- **Examination Setup:** Exam creation by batch, subject, maximum marks, and date (`/examinations`).
-- **Marks Entry:** Batch-wide grade book entry with automatic percentage calculation (`/examinations/marks-entry`).
-- **Results Publishing:** Publish results with automated grade assignments (A, B, C, S, F) and batch ranking (`/examinations/results`).
-
-### 3.9 Coursework, LMS & Student Submissions
-- **Document Handouts:** Teacher upload and distribution of lesson notes and PDF study packs (`/academic/materials`).
-- **Homework Assignments:** Coursework creation with submission deadlines and download briefs (`/academic/assignments`).
-- **Student Online Submissions:** Enrolled students can submit solutions and coursework text/links directly (`/academic/assignments/submit`).
-- **Teacher Grading Workflow:** Teachers review student submissions, assign marks, and provide written feedback (`/academic/assignments/grade`).
-
-### 3.10 Student & Parent Dedicated Portals
-- **Student Portal (`/portal/student`):** Personal dashboard displaying timetable schedules, attendance %, exam results, fee balances, and study materials.
-- **Parent Portal (`/portal/parent`):** Multi-child switcher, attendance turnout %, fee balances, and child exam report cards.
-- **Anti-IDOR Defense:** Server-side ownership verification preventing parents from accessing unauthorized student records.
-
-### 3.11 Centralized Reporting Centre
-- **Consolidated Navigation Hub:** Dedicated report centre at `/reports`.
-- **7 Analytical Reports:** Attendance Reports, Fee Collections, Outstanding Balances, Teacher Payments, Operational Expenses, and Student Performance.
-
-### 3.12 System Backups & Disaster Recovery
-- **Built-in Backup Manager:** Administrative snapshot creation, download, and database restoration directly in the browser (`/settings/backups`).
+```
+TuitionPro ERP/
+├── app/
+│   ├── Controllers/        # HTTP request handlers (20 controllers, grouped by domain)
+│   ├── Core/               # Custom MVC core — Router, Request, Response, Database, App
+│   ├── Helpers/            # Global utility functions (auth_user, e, url, format_currency)
+│   ├── Middleware/         # Security pipeline — Auth, Role, CSRF, JWT, Tenant
+│   ├── Models/             # Data access models with automatic tenant scoping (35 models)
+│   └── Services/           # Business logic — Billing, Accounting, Tenant, Audit, JWT
+├── config/                 # App, database, institute, and JWT configuration files
+├── database/
+│   ├── migrations/         # 5 versioned SQL migration files (001–005)
+│   └── seeds/              # Role, permission, and demo institute seed data
+├── public/                 # Web root — index.php, CSS, JS, SVG assets
+│   └── assets/
+│       ├── css/style.css   # Main stylesheet (6-colour design system)
+│       ├── js/app.js       # Client-side interactions and QR scanner
+│       └── images/         # SVG logo assets
+├── resources/views/        # PHP view templates (grouped by module)
+├── routes/web.php          # All application route definitions
+├── storage/                # Logs, backups, and secure file uploads (git-ignored)
+├── tests/                  # Native PHP automated test suites (5 suites, 149 tests)
+├── .env.example            # Environment configuration template
+├── .gitignore              # Protects credentials, logs, uploads, and vendor/
+└── README.md               # This file
+```
 
 ---
 
-## 4. User Roles & RBAC Permission Matrix
+## 🚀 Installation
 
-TuitionPro ERP enforces a 14-role access hierarchy with **strict server-side data isolation**:
+### Prerequisites
 
-### 4.1 Supported User Roles
-| Role Slug | Display Name | Access Scope & Dedicated Experience |
-|---|---|---|
-| `super_admin` | Platform Super Administrator | Platform Dashboard (`/platform/dashboard`), tenant lifecycle, platform health |
-| `support_admin` | Platform Support Administrator | Monitored tenant diagnostics and support administration |
-| `institute_owner` | Institute Owner / Director | Executive Dashboard with full financials, general ledger, and staff management |
-| `institute_admin` | Institute Administrator | Operational Dashboard with academics, student admissions, and daily billing |
-| `branch_manager` | Branch Manager | Operations restricted strictly to assigned branch campus |
-| `accountant` | Accountant | Executive Financial Dashboard, General Ledger, Trial Balance, P&L, Balance Sheet, Payroll |
-| `receptionist` | Receptionist | **Dedicated Front-Desk Dashboard** (zero GL/payroll/profit exposure; HTTP 403 on accounting routes) |
-| `cashier` | Cashier | Counter fee collections, invoice receipt generation, daily cash settlement |
-| `admissions_officer` | Admissions Officer | Student inquiries, registrations, batch enrollment, document verification |
-| `academic_coordinator`| Academic Coordinator | Timetable, class sessions, teacher assignments, and examination coordination |
-| `hr_manager` | HR Manager | Teacher profiles, workload monitoring, and teacher payment processing |
-| `teacher` | Teacher | **Dedicated Academic Dashboard** (assigned classes/students only; HTTP 403 on fees/accounting) |
-| `student` | Student | Dedicated Student Portal (`/portal/student`) |
-| `parent` | Parent / Guardian | Dedicated Parent Portal (`/portal/parent`) with anti-IDOR child switcher |
+- PHP **8.2+** with extensions: `pdo_mysql`, `mbstring`, `openssl`, `json`, `gd`, `fileinfo`, `curl`
+- MySQL **8.0+** or MariaDB **10.4+**
+- Apache 2.4+ with `mod_rewrite` enabled — or Nginx 1.20+ — or PHP built-in server for development
+- Composer 2.x
 
-### 4.2 Comprehensive Permission Matrix
-| Permission Token | Owner | Admin | Branch Mgr | Accountant | Receptionist | Cashier | Teacher | Student / Parent |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| `students.view` | [x] | [x] | [x] | [ ] | [x] | [ ] | [x] (Assigned) | [x] (Self/Child) |
-| `students.create` | [x] | [x] | [x] | [ ] | [x] | [ ] | [ ] | [ ] |
-| `students.edit` | [x] | [x] | [x] | [ ] | [x] | [ ] | [ ] | [ ] |
-| `students.delete` | [x] | [x] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
-| `fees.view` | [x] | [x] | [x] | [x] | [x] | [x] | [ ] | [x] (Own dues) |
-| `fees.create_invoice` | [x] | [x] | [ ] | [x] | [ ] | [ ] | [ ] | [ ] |
-| `fees.collect_payment`| [x] | [x] | [x] | [x] | [x] | [x] | [ ] | [ ] |
-| `fees.refund` | [x] | [x] | [ ] | [x] | [ ] | [ ] | [ ] | [ ] |
-| `attendance.view` | [x] | [x] | [x] | [ ] | [x] | [ ] | [x] | [x] (Self/Child) |
-| `attendance.record` | [x] | [x] | [x] | [ ] | [x] | [ ] | [x] | [ ] |
-| `attendance.correct` | [x] | [x] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
-| `academic.manage` | [x] | [x] | [x] | [ ] | [ ] | [ ] | [ ] | [ ] |
-| `timetable.manage` | [x] | [x] | [x] | [ ] | [ ] | [ ] | [ ] | [ ] |
-| `teachers.manage` | [x] | [x] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
-| `teacher_payments.view`|[x] | [ ] | [ ] | [x] | [ ] | [ ] | [ ] | [ ] |
-| `teacher_payments.manage`|[x]| [ ] | [ ] | [x] | [ ] | [ ] | [ ] | [ ] |
-| `expenses.manage` | [x] | [x] | [ ] | [x] | [ ] | [ ] | [ ] | [ ] |
-| `accounts.view` | [x] | [x] | [ ] | [x] | [ ] | [ ] | [ ] | [ ] |
-| `journals.post` | [x] | [ ] | [ ] | [x] | [ ] | [ ] | [ ] | [ ] |
-| `reports.academic` | [x] | [x] | [x] | [ ] | [ ] | [ ] | [x] (Assigned) | [ ] |
-| `reports.financial` | [x] | [x] | [ ] | [x] | [ ] | [ ] | [ ] | [ ] |
-| `settings.manage` | [x] | [x] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+### Quick Start (XAMPP / Local Development)
 
----
-
-## 5. Security Architecture & Threat Defense (OWASP Top 10)
-
-1. **Authentication:** RFC 7519 HS256 JSON Web Tokens with single-use rotating refresh tokens and database persistence (`refresh_tokens`).
-2. **Brute-Force Lockout:** Automatic IP and account rate-limiting after 5 consecutive failed login attempts.
-3. **Strict Route Protection:** `RoleMiddleware` intercepts unpermitted route access on the server and returns `HTTP 403 Forbidden`.
-4. **Anti-CSRF:** Synchronizer token verification on all state-changing `POST`, `PUT`, and `DELETE` requests.
-5. **Anti-XSS:** 100% output escaping through the global `e()` helper.
-6. **SQL Injection Defense:** 100% prepared PDO statements with parameterized input bindings.
-7. **Anti-IDOR:** Server-side resource ownership validation across all student, parent, and invoice endpoints.
-8. **File Security:** Whitelisted MIME types, randomized filenames (`bin2hex(random_bytes(16))`), and executable extension blocking.
-9. **Audit Trail:** Immutable logging of all sensitive security and financial events via `AuditService`.
-
----
-
-## 6. Database Architecture
-
-The TuitionPro database architecture enforces referential integrity through foreign keys, cascade safety rules, and tenant scoping across **61 active relational tables**:
-
-- **Tenancy & Platform:** `tenants`, `subscription_plans`, `subscriptions`, `branches`, `system_settings`
-- **Identity & Security:** `users`, `roles`, `permissions`, `role_permissions`, `refresh_tokens`, `login_attempts`, `audit_logs`
-- **Admissions & Students:** `student_enquiries`, `enquiry_followups`, `students`, `guardians`, `student_guardians`, `student_documents`, `student_notes`
-- **Academics & Timetable:** `academic_years`, `subjects`, `courses`, `batches`, `enrollments`, `class_schedules`, `class_sessions`
-- **Attendance:** `attendance_records`, `attendance_corrections`
-- **Billing & Invoices:** `fee_types`, `invoices`, `invoice_items`, `payments`, `payment_allocations`, `refunds`
-- **General Ledger Accounting:** `chart_of_accounts`, `financial_accounts`, `journal_entries`, `journal_lines`, `accounting_periods`
-- **Teacher Compensation & HR:** `teachers`, `teacher_availability`, `teacher_payment_rules`, `teacher_payment_periods`, `teacher_payment_calculations`, `teacher_payments`
-- **Examinations & LMS:** `examinations`, `grading_rules`, `exam_marks`, `learning_materials`, `assignments`, `student_submissions`
-- **Expenses & Operations:** `expense_categories`, `expenses`, `expense_payments`, `announcements`, `notifications`, `backup_records`
-
----
-
-## 7. REST API Endpoints Overview
-
-For external mobile clients and API integrations:
-
-| Endpoint | Method | Role Scope | Description |
-|---|---|---|---|
-| `/api/auth/token` | `POST` | Public | Issue JWT access token (15m) & refresh token (7d) |
-| `/api/auth/refresh` | `POST` | Public | Rotate refresh token and issue new access token |
-| `/api/auth/revoke` | `POST` | Authenticated | Explicitly revoke active refresh token on logout |
-| `/api/students` | `GET` | Staff | Paginated student directory with search filters |
-| `/api/attendance/scan-qr`| `POST` | Staff | Process QR attendance payload from camera scanner |
-| `/api/fees/collect-payment`| `POST` | Staff | Record student fee payment and generate receipt number |
-
----
-
-## 8. Installation & Quick Start
-
-### 8.1 Prerequisites
-- PHP 8.2 or higher (`pdo_mysql`, `mbstring`, `openssl`, `json`, `gd`, `fileinfo`, `curl` extensions)
-- MySQL 8.0+ or MariaDB 10.4+
-- Apache 2.4+ (with `mod_rewrite` enabled) or Nginx 1.20+
-
-### 8.2 Setup Instructions (Standalone Mode)
 ```bash
 # 1. Clone the repository
 git clone https://github.com/VishwaSashintha/TUITION-ERP.git
 cd TUITION-ERP
 
-# 2. Configure environment
-cp .env.example .env
-# Edit .env with your database credentials and institute profile
+# 2. Install PHP dependencies
+composer install
 
-# 3. Create the MySQL database
+# 3. Configure environment
+cp .env.example .env
+# Open .env and set your database credentials and institute profile
+
+# 4. Create database
 mysql -u root -p -e "CREATE DATABASE tuitionpro CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
-# 4. Run versioned migrations in order
+# 5. Run migrations in order
 mysql -u root -p tuitionpro < database/migrations/001_initial_schema.sql
 mysql -u root -p tuitionpro < database/migrations/002_jwt_auth_schema.sql
 mysql -u root -p tuitionpro < database/migrations/003_seed_role_permissions.sql
 mysql -u root -p tuitionpro < database/migrations/004_seed_additional_roles.sql
 mysql -u root -p tuitionpro < database/migrations/005_student_enquiries_schema.sql
 
-# 5. Set storage directory permissions
-chmod -R 775 storage/
-
 # 6. Start development server
 php -S localhost:8080 -t public
 ```
 
-### 8.3 Web Server VirtualHost Configuration
+Open **http://localhost:8080** in your browser.
 
-#### Apache VirtualHost
+### Apache VirtualHost
+
 ```apache
 <VirtualHost *:80>
-    ServerName your-institute-domain.lk
-    DocumentRoot /var/www/tuitionpro/public
+    ServerName yourinstitute.local
+    DocumentRoot /path/to/TUITION-ERP/public
 
-    <Directory /var/www/tuitionpro/public>
+    <Directory /path/to/TUITION-ERP/public>
         AllowOverride All
         Require all granted
     </Directory>
 </VirtualHost>
 ```
 
-#### Nginx Configuration (Multi-Institute Platform Mode)
+### Nginx (Multi-Institute / Production)
+
 ```nginx
 server {
-    listen 80;
-    server_name tuitionpro.lk *.tuitionpro.lk;
-    return 301 https://$host$request_uri;
-}
-
-server {
     listen 443 ssl http2;
-    server_name tuitionpro.lk *.tuitionpro.lk;
+    server_name yourdomain.lk *.yourdomain.lk;
 
-    ssl_certificate /etc/letsencrypt/live/tuitionpro.lk/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/tuitionpro.lk/privkey.pem;
-
-    root /var/www/tuitionpro/public;
-    index index.php index.html;
+    root /var/www/TUITION-ERP/public;
+    index index.php;
 
     location / {
         try_files $uri $uri/ /index.php?$query_string;
@@ -329,85 +323,157 @@ server {
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
         fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-        include fastcgi_params;
     }
 
-    location ~ /\. {
-        deny all;
-    }
+    location ~ /\. { deny all; }
 }
 ```
 
 ---
 
-## 9. Default Evaluation Credentials
+## ⚙️ Configuration
 
-| Role | Tenant Code | Email / Username | Password | Dashboard Experience |
-|---|:---:|---|---|---|
-| **Platform Super Admin** | `apex` | `superadmin@tuitionpro.lk` | `SuperAdmin@2026` | Platform Overview (`/platform/dashboard`) |
-| **Institute Owner** | `apex` | `owner@apex.lk` | `Password@123` | Executive Dashboard (`/dashboard`) |
-| **Receptionist** | `apex` | `receptionist@apex.lk` | `Password@123` | Front-Desk Dashboard (`/dashboard`) |
-| **Teacher** | `apex` | `teacher@apex.lk` | `Password@123` | Teacher Dashboard (`/dashboard`) |
-| **Student** | `apex` | `student@apex.lk` | `Password@123` | Student Academic Portal (`/portal/student`) |
-| **Parent** | `apex` | `parent@apex.lk` | `Password@123` | Parent Multi-Child Portal (`/portal/parent`) |
+Copy `.env.example` to `.env` and set the following variables:
+
+```env
+# Application
+APP_NAME="TuitionPro ERP"
+APP_ENV=production
+APP_URL=https://yourdomain.lk
+APP_SECRET_KEY=your-32-character-random-secret-key
+
+# Institute Profile (Standalone Mode)
+INSTITUTE_NAME="Your Institute Name"
+INSTITUTE_CODE=yourcode
+INSTITUTE_CURRENCY=LKR
+INSTITUTE_CURRENCY_SYMBOL="Rs. "
+
+# JWT Authentication
+JWT_SECRET=your-64-character-random-signing-key
+JWT_ACCESS_TTL=900         # 15 minutes
+JWT_REFRESH_TTL=604800     # 7 days
+
+# Database
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=tuitionpro
+DB_USERNAME=your_db_user
+DB_PASSWORD=your_db_password
+
+# Mail (SMTP)
+MAIL_HOST=your-smtp-host
+MAIL_PORT=587
+MAIL_USERNAME=your-smtp-user
+MAIL_PASSWORD=your-smtp-password
+MAIL_FROM_ADDRESS=noreply@yourdomain.lk
+```
+
+> **Never commit your `.env` file.** It is excluded by `.gitignore`.
 
 ---
 
-## 10. Automated Test Suite Verification
+## 🧪 Automated Tests
 
-TuitionPro ERP features an automated test harness with **149 out of 149 tests passing (100% pass rate)**:
+TuitionPro ERP includes a comprehensive native PHP test harness:
 
 ```bash
-# Run all test suites
-php tests/test_jwt_auth.php
-php tests/test_backend_core.php
-php tests/test_e2e_workflows.php
-php tests/test_http_routes.php
-php tests/test_role_dashboards.php
+php tests/test_jwt_auth.php        # JWT security tests
+php tests/test_backend_core.php    # Core business logic tests
+php tests/test_e2e_workflows.php   # End-to-end workflow tests
+php tests/test_http_routes.php     # HTTP route coverage tests
+php tests/test_role_dashboards.php # RBAC and dashboard tests
 ```
 
-| Suite | Focus Area | Result |
+| Suite | Focus | Result |
 |---|---|:---:|
-| `test_jwt_auth.php` | JWT signing, tamper rejection, token rotation, replay defense, lockout | **16 / 16 PASS** |
-| `test_backend_core.php` | Multi-tenant isolation, fee invoicing, double-entry balance, trial balance | **16 / 16 PASS** |
-| `test_e2e_workflows.php` | Student admission, batch enrollment, session, QR attendance, payments | **28 / 28 PASS** |
-| `test_http_routes.php` | 62 public & authenticated routes return HTTP 200/302 | **62 / 62 PASS** |
-| `test_role_dashboards.php` | Role dashboard dispatch, front-desk/teacher 403 blocks, Anti-IDOR | **27 / 27 PASS** |
-| **Total** | **Comprehensive System Verification** | **149 / 149 PASS (100%)** |
+| `test_jwt_auth.php` | JWT signing, tamper rejection, refresh rotation, replay defense, brute-force lockout | **16 / 16** ✅ |
+| `test_backend_core.php` | Multi-tenant isolation, invoicing, double-entry balance, trial balance | **16 / 16** ✅ |
+| `test_e2e_workflows.php` | Student admission → enrolment → session → QR attendance → payment | **28 / 28** ✅ |
+| `test_http_routes.php` | 62 application routes returning correct HTTP status | **62 / 62** ✅ |
+| `test_role_dashboards.php` | Role dashboard dispatch, 403 blocks, anti-IDOR ownership checks | **27 / 27** ✅ |
+| **Total** | | **149 / 149** ✅ |
 
 ---
 
-## 11. Project Directory Structure
+## 🔑 Evaluation Credentials
 
-```
-TuitionPro ERP/
-├── app/
-│   ├── Controllers/          # HTTP request handlers grouped by domain
-│   ├── Core/                 # Pure PHP MVC Core (Router, Request, Response, Database)
-│   ├── Helpers/              # Global utility helpers (auth_user, e, url, format_currency)
-│   ├── Middleware/           # Security filters (Auth, Role, CSRF, JWT, Tenant)
-│   ├── Models/               # Data access models with automatic tenant scoping
-│   └── Services/             # Business logic (Billing, Accounting, Tenant, Audit, JWT)
-├── config/                   # System configuration files (app, database, institute, jwt)
-├── database/
-│   ├── migrations/           # Versioned SQL migrations (001 to 005)
-│   └── seeds/                # Seed scripts for roles and demonstration institutes
-├── public/                   # Public web root (index.php, CSS, JS, images, uploads)
-│   └── assets/
-│       ├── css/              # Main stylesheet (style.css) with approved 6-color palette
-│       └── js/               # Client-side scripts (app.js, qr-scanner.js)
-├── resources/
-│   └── views/                # Modular PHP view templates
-├── storage/                  # Logs, backups, and secure file uploads
-├── tests/                    # Native PHP automated test suites
-├── .env.example              # Environment configuration template
-├── .gitignore                # Git exclusion rules protecting credentials and logs
-└── README.md                 # Single central documentation and release guide
-```
+| Role | Tenant | Email | Password |
+|---|:---:|---|---|
+| Platform Super Admin | `apex` | `superadmin@tuitionpro.lk` | `SuperAdmin@2026` |
+| Institute Owner | `apex` | `owner@apex.lk` | `Password@123` |
+| Receptionist | `apex` | `receptionist@apex.lk` | `Password@123` |
+| Teacher | `apex` | `teacher@apex.lk` | `Password@123` |
+| Student | `apex` | `student@apex.lk` | `Password@123` |
+| Parent | `apex` | `parent@apex.lk` | `Password@123` |
 
 ---
 
-## 12. License & Intellectual Property
+## 🗄 Database
 
-Copyright &copy; 2026 TuitionPro ERP. All rights reserved. Commercial & proprietary software.
+61 InnoDB tables across the following domains:
+
+| Domain | Tables |
+|---|---|
+| **Platform & Tenancy** | `tenants`, `subscription_plans`, `subscriptions`, `branches`, `system_settings` |
+| **Identity & Security** | `users`, `roles`, `permissions`, `role_permissions`, `refresh_tokens`, `login_attempts`, `audit_logs` |
+| **Admissions & Students** | `student_enquiries`, `enquiry_followups`, `students`, `guardians`, `student_guardians`, `student_documents`, `student_notes` |
+| **Academics & Timetable** | `academic_years`, `subjects`, `courses`, `batches`, `enrollments`, `class_schedules`, `class_sessions` |
+| **Attendance** | `attendance_records`, `attendance_corrections` |
+| **Billing & Invoices** | `fee_types`, `invoices`, `invoice_items`, `payments`, `payment_allocations`, `refunds` |
+| **General Ledger** | `chart_of_accounts`, `financial_accounts`, `journal_entries`, `journal_lines`, `accounting_periods` |
+| **Teacher & HR** | `teachers`, `teacher_availability`, `teacher_payment_rules`, `teacher_payment_periods`, `teacher_payment_calculations`, `teacher_payments` |
+| **Examinations & LMS** | `examinations`, `grading_rules`, `exam_marks`, `learning_materials`, `assignments`, `student_submissions` |
+| **Operations** | `expense_categories`, `expenses`, `expense_payments`, `announcements`, `notifications`, `backup_records` |
+
+---
+
+## 📈 Project Status
+
+> **Development Stage** — Core modules implemented and passing automated tests.
+> Not yet validated for production deployment at scale.
+
+| Module | Status |
+|---|:---:|
+| Authentication & RBAC | ✅ Complete |
+| Student Management & Enquiries | ✅ Complete |
+| Academic Management & Timetable | ✅ Complete |
+| Attendance (Manual + QR Camera) | ✅ Complete |
+| Fee Invoicing & Payment Collection | ✅ Complete |
+| Double-Entry General Ledger | ✅ Complete |
+| Teacher Compensation | ✅ Complete |
+| Examinations & Marks | ✅ Complete |
+| LMS — Materials & Assignments | ✅ Complete |
+| Student & Parent Portals | ✅ Complete |
+| Reports Centre | ✅ Complete |
+| System Backups | ✅ Complete |
+| Multi-Tenant Platform Dashboard | ✅ Complete |
+| Email / SMS Notification Delivery | ⚙️ Config-ready (driver integration pending) |
+
+---
+
+## 🔭 Planned Improvements
+
+- Mobile-responsive progressive web application (PWA)
+- Online payment gateway integration (Stripe / PayHere)
+- Push notification delivery
+- Advanced analytics and reporting dashboards
+- Batch SMS dispatch via local gateway
+- SAML / OAuth2 SSO support
+
+---
+
+## 👨‍💻 Author
+
+**Developer:** Vishwa Sashintha
+
+**GitHub:** [github.com/VishwaSashintha](https://github.com/VishwaSashintha)
+
+**Repository:** [github.com/VishwaSashintha/TUITION-ERP](https://github.com/VishwaSashintha/TUITION-ERP)
+
+---
+
+## 📄 License
+
+Copyright © 2026 TuitionPro ERP. All rights reserved.
+
+This software is proprietary and commercially licensed. Unauthorized copying, distribution, or modification is prohibited.

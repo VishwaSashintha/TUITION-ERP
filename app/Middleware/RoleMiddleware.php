@@ -44,14 +44,21 @@ class RoleMiddleware implements MiddlewareInterface
                     'uri'          => $request->getUri(),
                 ]);
 
-                if ($request->isAjax()) {
+                $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
+                if ($request->isAjax() || str_contains($accept, 'application/json')) {
                     Response::json(['error' => 'Forbidden: insufficient role permissions.'], 403);
                     return null;
                 }
 
+                http_response_code(403);
+                $viewPath = VIEW_PATH . '/errors/403.php';
+                if (file_exists($viewPath)) {
+                    require $viewPath;
+                    return null;
+                }
+
                 flash('error', 'You do not have permission to access this module.');
-                $referer = $_SERVER['HTTP_REFERER'] ?? url('dashboard');
-                Response::redirect($referer);
+                Response::redirect(url('dashboard'));
                 return null;
             }
         }

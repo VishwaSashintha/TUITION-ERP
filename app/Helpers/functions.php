@@ -204,6 +204,56 @@ if (!function_exists('auth_id')) {
     }
 }
 
+if (!function_exists('auth_check')) {
+    /**
+     * Check if a user is currently authenticated.
+     */
+    function auth_check(): bool
+    {
+        return auth_user() !== null;
+    }
+}
+
+if (!function_exists('auth_role')) {
+    /**
+     * Get the authenticated user's role identifier.
+     */
+    function auth_role(): ?string
+    {
+        $user = auth_user();
+        return $user['role_name'] ?? null;
+    }
+}
+
+if (!function_exists('has_role')) {
+    /**
+     * Determine if current user matches one or more allowed roles.
+     */
+    function has_role(array|string $roles): bool
+    {
+        $currentRole = auth_role();
+        if ($currentRole === null) {
+            return false;
+        }
+        if ($currentRole === 'super_admin') {
+            return true;
+        }
+        $allowed = is_array($roles) ? $roles : array_map('trim', explode(',', $roles));
+        return in_array($currentRole, $allowed, true);
+    }
+}
+
+if (!function_exists('has_permission')) {
+    /**
+     * Determine if current user has a specific permission.
+     */
+    function has_permission(string $permission): bool
+    {
+        $service = new \App\Services\PermissionService();
+        return $service->hasPermission($permission);
+    }
+}
+
 if (!function_exists('current_tenant_id')) {
     /**
      * Get the active tenant ID from session context.

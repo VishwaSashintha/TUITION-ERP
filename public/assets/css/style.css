@@ -1,41 +1,68 @@
 /**
  * TuitionPro ERP — Master SaaS Design System
  * 
- * Palette:
- * Primary: #6C4EE3
- * Primary Dark: #5638C4
- * Accent: #FF7A59
- * Background: #F7F6FB
- * Neutral Dark: #1E1B4B
- * Surface: #FFFFFF
+ * Exact 6-Color Palette:
+ * - Black:    #0C0C0C
+ * - Green:    #4BA95F
+ * - Sky Blue: #77DDFA
+ * - Orange:   #FEA339
+ * - Purple:   #9985FB
+ * - Coral:    #FF908D
+ *
+ * Typography:
+ * - Application font: Roboto
+ * - Numbers / KPIs:   Poppins SemiBold 700
  */
 
 :root {
-    --primary: #6C4EE3;
-    --primary-dark: #5638C4;
-    --primary-light: #ECE8FD;
-    --accent: #FF7A59;
-    --accent-light: #FFF0EB;
-    --bg-main: #F7F6FB;
-    --text-main: #1E1B4B;
+    /* Exact 6-Color Palette */
+    --tp-black: #0C0C0C;
+    --tp-green: #4BA95F;
+    --tp-sky-blue: #77DDFA;
+    --tp-orange: #FEA339;
+    --tp-purple: #9985FB;
+    --tp-coral: #FF908D;
+
+    /* Semantic Theme Mappings */
+    --primary: #9985FB;
+    --primary-dark: #7E6AE8;
+    --primary-light: #F2EFFF;
+    --accent: #FEA339;
+    --accent-light: #FFF6EC;
+    --success: #4BA95F;
+    --success-light: #EDF7F0;
+    --info: #77DDFA;
+    --info-light: #EDFBFE;
+    --danger: #FF908D;
+    --danger-light: #FFF1F0;
+    --warning: #FEA339;
+
+    --bg-main: #F8FAFC;
+    --text-main: #0C0C0C;
     --text-muted: #64748B;
     --card-bg: #FFFFFF;
     --border-color: #E2E8F0;
     --sidebar-width: 260px;
     --topbar-height: 70px;
-    --success: #10B981;
-    --warning: #F59E0B;
-    --danger: #EF4444;
-    --info: #3B82F6;
 }
 
 body {
     background-color: var(--bg-main);
     color: var(--text-main);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
     font-size: 0.925rem;
     overflow-x: hidden;
     min-height: 100vh;
+}
+
+button, input, select, textarea, .nav, .table, h1, h2, h3, h4, h5, h6 {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+/* ─── Numbers / Statistics Typography ────────────────────────────────────── */
+.stat-value, .kpi-number, .currency-amount, .number-font, .stat-num, .fw-number {
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 700 !important;
 }
 
 /* ─── Typography & Links ─────────────────────────────────────────────────── */
@@ -230,15 +257,72 @@ a:hover {
     font-size: 1.5rem;
 }
 
-.stat-icon.primary { background: var(--primary-light); color: var(--primary); }
-.stat-icon.accent  { background: var(--accent-light); color: var(--accent); }
-.stat-icon.success { background: #D1FAE5; color: var(--success); }
-.stat-icon.warning { background: #FEF3C7; color: var(--warning); }
-.stat-icon.danger  { background: #FEE2E2; color: var(--danger); }
+.stat-icon.primary, .stat-icon.tp-purple   { background: var(--primary-light); color: var(--tp-purple); }
+.stat-icon.accent,  .stat-icon.tp-orange   { background: var(--accent-light); color: var(--tp-orange); }
+.stat-icon.success, .stat-icon.tp-green    { background: var(--success-light); color: var(--tp-green); }
+.stat-icon.info,    .stat-icon.tp-sky-blue { background: var(--info-light); color: #0284C7; }
+.stat-icon.danger,  .stat-icon.tp-coral    { background: var(--danger-light); color: var(--tp-coral); }
+.stat-icon.dark,    .stat-icon.tp-black    { background: #F1F5F9; color: var(--tp-black); }
+
+/* Exact 6-Color Badges */
+.badge-tp-purple   { background-color: var(--primary-light); color: #6D56E2; }
+.badge-tp-green    { background-color: var(--success-light); color: #2E7D32; }
+.badge-tp-sky-blue { background-color: var(--info-light); color: #0369A1; }
+.badge-tp-orange   { background-color: var(--accent-light); color: #C26A00; }
+.badge-tp-coral    { background-color: var(--danger-light); color: #D32F2F; }
+.badge-tp-black    { background-color: #F1F5F9; color: var(--tp-black); }
+
+/* Exact 6-Color Backgrounds & Text */
+.bg-tp-purple   { background-color: var(--tp-purple) !important; color: #FFFFFF !important; }
+.bg-tp-green    { background-color: var(--tp-green) !important; color: #FFFFFF !important; }
+.bg-tp-sky-blue { background-color: var(--tp-sky-blue) !important; color: var(--tp-black) !important; }
+.bg-tp-orange   { background-color: var(--tp-orange) !important; color: #FFFFFF !important; }
+.bg-tp-coral    { background-color: var(--tp-coral) !important; color: #FFFFFF !important; }
+.bg-tp-black    { background-color: var(--tp-black) !important; color: #FFFFFF !important; }
+
+.text-tp-purple   { color: var(--tp-purple) !important; }
+.text-tp-green    { color: var(--tp-green) !important; }
+.text-tp-sky-blue { color: #0284C7 !important; }
+.text-tp-orange   { color: var(--tp-orange) !important; }
+.text-tp-coral    { color: var(--tp-coral) !important; }
+.text-tp-black    { color: var(--tp-black) !important; }
+
+/* Quick Action Cards */
+.quick-action-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem 1.15rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    color: var(--text-main);
+}
+
+.quick-action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(12, 12, 12, 0.08);
+    border-color: var(--primary);
+    color: var(--primary-dark);
+}
+
+.quick-action-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
 
 .stat-value {
     font-size: 1.6rem;
-    font-weight: 800;
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 700 !important;
     line-height: 1.2;
     color: var(--text-main);
 }

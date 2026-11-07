@@ -64,7 +64,14 @@ class PlatformController extends Controller
             );
         }
 
-        // 2. System Statistics
+        // 2. System & Platform-Wide Statistics
+        $totalTenants = (int) $this->db->queryOne("SELECT COUNT(*) AS c FROM `tenants` WHERE `deleted_at` IS NULL")['c'];
+        $activeTenants = (int) $this->db->queryOne("SELECT COUNT(*) AS c FROM `tenants` WHERE `status` = 'active' AND `deleted_at` IS NULL")['c'];
+        $inactiveTenants = max(0, $totalTenants - $activeTenants);
+        $totalPlatformUsers = (int) $this->db->queryOne("SELECT COUNT(*) AS c FROM `users` WHERE `deleted_at` IS NULL")['c'];
+        $totalAllStudents = (int) $this->db->queryOne("SELECT COUNT(*) AS c FROM `students` WHERE `deleted_at` IS NULL")['c'];
+        $totalAllTeachers = (int) $this->db->queryOne("SELECT COUNT(*) AS c FROM `teachers` WHERE `deleted_at` IS NULL")['c'];
+
         $totalTables = (int) $this->db->queryOne("SELECT COUNT(*) AS c FROM information_schema.tables WHERE table_schema = DATABASE()")['c'];
         $activeTokens = (int) $this->db->queryOne("SELECT COUNT(*) AS c FROM `refresh_tokens` WHERE `revoked_at` IS NULL AND `expires_at` > NOW()")['c'];
         $totalAudits = (int) $this->db->queryOne("SELECT COUNT(*) AS c FROM `audit_logs`")['c'];
@@ -89,14 +96,20 @@ class PlatformController extends Controller
         );
 
         $this->render('platform/dashboard', [
-            'title'           => 'System Administration Overview',
-            'activeMenu'      => 'platform_dashboard',
-            'activeInstitute' => $activeInstitute,
-            'totalTables'     => $totalTables,
-            'activeTokens'    => $activeTokens,
-            'totalAudits'     => $totalAudits,
-            'systemInfo'      => $systemInfo,
-            'recentAudits'    => $recentAudits,
+            'title'              => 'System Administration Overview',
+            'activeMenu'         => 'platform_dashboard',
+            'activeInstitute'    => $activeInstitute,
+            'totalTenants'       => $totalTenants,
+            'activeTenants'      => $activeTenants,
+            'inactiveTenants'    => $inactiveTenants,
+            'totalPlatformUsers' => $totalPlatformUsers,
+            'totalAllStudents'   => $totalAllStudents,
+            'totalAllTeachers'   => $totalAllTeachers,
+            'totalTables'        => $totalTables,
+            'activeTokens'       => $activeTokens,
+            'totalAudits'        => $totalAudits,
+            'systemInfo'         => $systemInfo,
+            'recentAudits'       => $recentAudits,
         ]);
     }
 

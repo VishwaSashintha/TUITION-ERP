@@ -53,28 +53,23 @@ class ParentPortalController extends Controller
             );
         }
 
-        if (empty($children)) {
-            // Fallback: any student
-            $children = $this->db->query(
-                "SELECT st.*, br.name AS branch_name FROM `students` st JOIN `branches` br ON st.branch_id = br.id WHERE st.`tenant_id` = :tid AND st.`deleted_at` IS NULL LIMIT 2",
-                ['tid' => $tenantId]
-            );
-        }
-
-        if ($selectedChildId <= 0 && !empty($children)) {
-            $selectedChildId = (int) $children[0]['id'];
-        }
-
+        // Validate child access: strictly prevent IDOR
         $activeChild = null;
-        foreach ($children as $c) {
-            if ((int)$c['id'] === $selectedChildId) {
-                $activeChild = $c;
-                break;
+        if (!empty($children)) {
+            if ($selectedChildId > 0) {
+                foreach ($children as $c) {
+                    if ((int)$c['id'] === $selectedChildId) {
+                        $activeChild = $c;
+                        break;
+                    }
+                }
             }
-        }
-        if (!$activeChild && !empty($children)) {
-            $activeChild = $children[0];
-            $selectedChildId = (int)$activeChild['id'];
+            if (!$activeChild) {
+                $activeChild = $children[0];
+                $selectedChildId = (int) $activeChild['id'];
+            }
+        } else {
+            $selectedChildId = 0;
         }
 
         // Attendance stats for selected child

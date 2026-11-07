@@ -14,7 +14,7 @@ $branchName = $user['branch_name'] ?? 'Main Branch';
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
@@ -39,7 +39,7 @@ $branchName = $user['branch_name'] ?? 'Main Branch';
         </div>
 
         <nav class="sidebar-nav">
-            <!-- Developer / System Super Admin Nav -->
+            <!-- ─── Developer / Platform Super Admin ────────────────────── -->
             <?php if (in_array($role, ['super_admin', 'support_admin'], true)): ?>
                 <div class="nav-section-title">System Administration</div>
                 <a href="<?= url('platform/dashboard') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'platform_dashboard' ? 'active' : '' ?>">
@@ -53,68 +53,54 @@ $branchName = $user['branch_name'] ?? 'Main Branch';
                 </a>
             <?php endif; ?>
 
-            <!-- Institute Core Navigation -->
-            <?php if (!in_array($role, ['super_admin', 'support_admin', 'student', 'parent'], true)): ?>
+            <!-- ─── Institute Admin / Owner / Branch Manager ─────────────── -->
+            <?php if (in_array($role, ['institute_owner', 'institute_admin', 'branch_manager'], true)): ?>
                 <div class="nav-section-title">Main</div>
                 <a href="<?= url('dashboard') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'dashboard' ? 'active' : '' ?>">
-                    <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                    <i class="bi bi-grid-1x2-fill"></i> Executive Dashboard
                 </a>
 
-                <!-- Students & Academics -->
-                <?php if (in_array($role, ['institute_owner', 'institute_admin', 'branch_manager', 'receptionist'], true)): ?>
-                    <div class="nav-section-title">Academic & Students</div>
-                    <a href="<?= url('students') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'students' ? 'active' : '' ?>">
-                        <i class="bi bi-people-fill"></i> Students
-                    </a>
-                    <a href="<?= url('academic/batches') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'batches' ? 'active' : '' ?>">
-                        <i class="bi bi-collection-fill"></i> Classes & Batches
-                    </a>
-                    <a href="<?= url('academic/subjects') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'subjects' ? 'active' : '' ?>">
-                        <i class="bi bi-book-half"></i> Subjects
-                    </a>
-                    <a href="<?= url('academic/materials') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'materials' ? 'active' : '' ?>">
-                        <i class="bi bi-file-earmark-pdf"></i> Study Materials
-                    </a>
-                    <a href="<?= url('academic/assignments') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'assignments' ? 'active' : '' ?>">
-                        <i class="bi bi-pencil-square"></i> Assignments
-                    </a>
-                <?php endif; ?>
+                <div class="nav-section-title">Academic & Students</div>
+                <a href="<?= url('students') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'students' ? 'active' : '' ?>">
+                    <i class="bi bi-people-fill"></i> Students Directory
+                </a>
+                <a href="<?= url('academic/batches') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'batches' ? 'active' : '' ?>">
+                    <i class="bi bi-collection-fill"></i> Classes & Batches
+                </a>
+                <a href="<?= url('academic/subjects') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'subjects' ? 'active' : '' ?>">
+                    <i class="bi bi-book-half"></i> Subjects
+                </a>
+                <a href="<?= url('academic/materials') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'materials' ? 'active' : '' ?>">
+                    <i class="bi bi-file-earmark-pdf"></i> Study Materials
+                </a>
+                <a href="<?= url('academic/assignments') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'assignments' ? 'active' : '' ?>">
+                    <i class="bi bi-pencil-square"></i> Assignments
+                </a>
+                <a href="<?= url('teachers') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'teachers' ? 'active' : '' ?>">
+                    <i class="bi bi-person-video3"></i> Teachers
+                </a>
 
-                <!-- Teachers -->
-                <?php if (in_array($role, ['institute_owner', 'institute_admin'], true)): ?>
-                    <a href="<?= url('teachers') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'teachers' ? 'active' : '' ?>">
-                        <i class="bi bi-person-video3"></i> Teachers
-                    </a>
-                <?php endif; ?>
+                <div class="nav-section-title">Scheduling & Exams</div>
+                <a href="<?= url('timetable') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'timetable' ? 'active' : '' ?>">
+                    <i class="bi bi-calendar3"></i> Timetable
+                </a>
+                <a href="<?= url('attendance') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'attendance' ? 'active' : '' ?>">
+                    <i class="bi bi-check2-square"></i> Attendance
+                </a>
+                <a href="<?= url('examinations') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'examinations' ? 'active' : '' ?>">
+                    <i class="bi bi-journal-check"></i> Examinations
+                </a>
 
-                <!-- Timetable & Attendance -->
-                <?php if (in_array($role, ['institute_owner', 'institute_admin', 'branch_manager', 'teacher', 'receptionist'], true)): ?>
-                    <div class="nav-section-title">Scheduling</div>
-                    <a href="<?= url('timetable') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'timetable' ? 'active' : '' ?>">
-                        <i class="bi bi-calendar3"></i> Timetable
-                    </a>
-                    <a href="<?= url('attendance') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'attendance' ? 'active' : '' ?>">
-                        <i class="bi bi-check2-square"></i> Attendance
-                    </a>
-                    <a href="<?= url('examinations') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'examinations' ? 'active' : '' ?>">
-                        <i class="bi bi-journal-check"></i> Examinations
-                    </a>
-                <?php endif; ?>
-
-                <!-- Finance & Accounting -->
-                <?php if (in_array($role, ['institute_owner', 'institute_admin', 'accountant', 'receptionist'], true)): ?>
-                    <div class="nav-section-title">Financials</div>
-                    <a href="<?= url('fees/invoices') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'invoices' ? 'active' : '' ?>">
-                        <i class="bi bi-receipt"></i> Student Invoices
-                    </a>
-                    <a href="<?= url('fees/outstanding') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'outstanding' ? 'active' : '' ?>">
-                        <i class="bi bi-exclamation-circle"></i> Outstanding Fees
-                    </a>
-                <?php endif; ?>
-
+                <div class="nav-section-title">Finance & Billing</div>
+                <a href="<?= url('fees/invoices') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'invoices' ? 'active' : '' ?>">
+                    <i class="bi bi-receipt"></i> Student Invoices
+                </a>
+                <a href="<?= url('fees/outstanding') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'outstanding' ? 'active' : '' ?>">
+                    <i class="bi bi-exclamation-circle"></i> Outstanding Fees
+                </a>
                 <?php if (in_array($role, ['institute_owner', 'accountant'], true)): ?>
                     <a href="<?= url('teacher-payments') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'teacher_payments' ? 'active' : '' ?>">
-                        <i class="bi bi-wallet2"></i> Teacher Payments
+                        <i class="bi bi-wallet2"></i> Teacher Payroll
                     </a>
                     <a href="<?= url('expenses') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'expenses' ? 'active' : '' ?>">
                         <i class="bi bi-cash-stack"></i> Expenses
@@ -127,51 +113,157 @@ $branchName = $user['branch_name'] ?? 'Main Branch';
                     </a>
                 <?php endif; ?>
 
-                <!-- Reports -->
-                <?php if (in_array($role, ['institute_owner', 'institute_admin', 'accountant'], true)): ?>
-                    <div class="nav-section-title">Business Intelligence</div>
-                    <a href="<?= url('reports') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'reports' ? 'active' : '' ?>">
-                        <i class="bi bi-bar-chart-line-fill"></i> Analytics & Reports
-                    </a>
-                <?php endif; ?>
+                <div class="nav-section-title">Analytics & Config</div>
+                <a href="<?= url('reports') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'reports' ? 'active' : '' ?>">
+                    <i class="bi bi-bar-chart-line-fill"></i> Analytics & Reports
+                </a>
+                <a href="<?= url('communication/announcements') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'announcements' ? 'active' : '' ?>">
+                    <i class="bi bi-megaphone-fill"></i> Announcements
+                </a>
+                <a href="<?= url('settings/branches') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'branches' ? 'active' : '' ?>">
+                    <i class="bi bi-diagram-3"></i> Branches
+                </a>
+                <a href="<?= url('settings/users') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'users' ? 'active' : '' ?>">
+                    <i class="bi bi-person-gear"></i> Staff Users
+                </a>
+                <a href="<?= url('settings') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'settings' ? 'active' : '' ?>">
+                    <i class="bi bi-sliders"></i> Institute Settings
+                </a>
+                <a href="<?= url('settings/backups') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'backups' ? 'active' : '' ?>">
+                    <i class="bi bi-database-down"></i> Backups
+                </a>
+            <?php endif; ?>
 
-                <!-- Communication -->
+            <!-- ─── Accountant Navigation ─────────────────────────────────── -->
+            <?php if ($role === 'accountant'): ?>
+                <div class="nav-section-title">Main</div>
+                <a href="<?= url('dashboard') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'dashboard' ? 'active' : '' ?>">
+                    <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                </a>
+
+                <div class="nav-section-title">Fee Management</div>
+                <a href="<?= url('fees/invoices') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'invoices' ? 'active' : '' ?>">
+                    <i class="bi bi-receipt"></i> Student Invoices
+                </a>
+                <a href="<?= url('fees/outstanding') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'outstanding' ? 'active' : '' ?>">
+                    <i class="bi bi-exclamation-circle"></i> Outstanding Fees
+                </a>
+
+                <div class="nav-section-title">Financial Accounting</div>
+                <a href="<?= url('teacher-payments') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'teacher_payments' ? 'active' : '' ?>">
+                    <i class="bi bi-wallet2"></i> Teacher Payroll
+                </a>
+                <a href="<?= url('expenses') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'expenses' ? 'active' : '' ?>">
+                    <i class="bi bi-cash-stack"></i> Expenses
+                </a>
+                <a href="<?= url('accounting/cash-bank') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'cash_bank' ? 'active' : '' ?>">
+                    <i class="bi bi-bank"></i> Cash & Bank
+                </a>
+                <a href="<?= url('expenses/trial-balance') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'trial_balance' ? 'active' : '' ?>">
+                    <i class="bi bi-calculator"></i> Accounting Ledger
+                </a>
+
+                <div class="nav-section-title">Reports</div>
+                <a href="<?= url('reports') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'reports' ? 'active' : '' ?>">
+                    <i class="bi bi-bar-chart-line-fill"></i> Financial Reports
+                </a>
+                <a href="<?= url('communication/announcements') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'announcements' ? 'active' : '' ?>">
+                    <i class="bi bi-megaphone-fill"></i> Announcements
+                </a>
+            <?php endif; ?>
+
+            <!-- ─── Receptionist Navigation ───────────────────────────────── -->
+            <?php if ($role === 'receptionist'): ?>
+                <div class="nav-section-title">Main</div>
+                <a href="<?= url('dashboard') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'dashboard' ? 'active' : '' ?>">
+                    <i class="bi bi-grid-1x2-fill"></i> Front-Desk Dashboard
+                </a>
+
+                <div class="nav-section-title">Front Desk Operations</div>
+                <a href="<?= url('students') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'students' ? 'active' : '' ?>">
+                    <i class="bi bi-people-fill"></i> Student Directory
+                </a>
+                <a href="<?= url('academic/batches') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'batches' ? 'active' : '' ?>">
+                    <i class="bi bi-collection-fill"></i> Enrolments & Batches
+                </a>
+                <a href="<?= url('timetable') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'timetable' ? 'active' : '' ?>">
+                    <i class="bi bi-calendar3"></i> Class Timetable
+                </a>
+                <a href="<?= url('attendance') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'attendance' ? 'active' : '' ?>">
+                    <i class="bi bi-check2-square"></i> Record Attendance
+                </a>
+                <a href="<?= url('attendance/qr-scanner') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'qr_scanner' ? 'active' : '' ?>">
+                    <i class="bi bi-qr-code-scan"></i> QR Fast Scanner
+                </a>
+
+                <div class="nav-section-title">Fee Collections</div>
+                <a href="<?= url('fees/invoices') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'invoices' ? 'active' : '' ?>">
+                    <i class="bi bi-receipt"></i> Invoices & Receipts
+                </a>
+                <a href="<?= url('fees/outstanding') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'outstanding' ? 'active' : '' ?>">
+                    <i class="bi bi-exclamation-circle"></i> Fee Follow-ups
+                </a>
+
                 <div class="nav-section-title">Communication</div>
                 <a href="<?= url('communication/announcements') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'announcements' ? 'active' : '' ?>">
                     <i class="bi bi-megaphone-fill"></i> Announcements
                 </a>
-
-                <!-- Settings -->
-                <?php if (in_array($role, ['institute_owner', 'institute_admin'], true)): ?>
-                    <div class="nav-section-title">Administration</div>
-                    <a href="<?= url('settings/branches') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'branches' ? 'active' : '' ?>">
-                        <i class="bi bi-diagram-3"></i> Branches
-                    </a>
-                    <a href="<?= url('settings/users') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'users' ? 'active' : '' ?>">
-                        <i class="bi bi-person-gear"></i> Staff Users
-                    </a>
-                    <a href="<?= url('settings') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'settings' ? 'active' : '' ?>">
-                        <i class="bi bi-sliders"></i> Institute Settings
-                    </a>
-                    <a href="<?= url('settings/backups') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'backups' ? 'active' : '' ?>">
-                        <i class="bi bi-database-down"></i> Backups
-                    </a>
-                <?php endif; ?>
             <?php endif; ?>
 
-            <!-- Student Portal Navigation -->
-            <?php if ($role === 'student'): ?>
-                <div class="nav-section-title">Student Portal</div>
-                <a href="<?= url('portal/student/dashboard') ?>" class="sidebar-link active">
-                    <i class="bi bi-person-badge"></i> My Portal
+            <!-- ─── Teacher Navigation ────────────────────────────────────── -->
+            <?php if ($role === 'teacher'): ?>
+                <div class="nav-section-title">Main</div>
+                <a href="<?= url('dashboard') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'dashboard' ? 'active' : '' ?>">
+                    <i class="bi bi-grid-1x2-fill"></i> Teacher Dashboard
+                </a>
+
+                <div class="nav-section-title">My Classroom</div>
+                <a href="<?= url('academic/batches') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'batches' ? 'active' : '' ?>">
+                    <i class="bi bi-collection-fill"></i> My Assigned Batches
+                </a>
+                <a href="<?= url('timetable') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'timetable' ? 'active' : '' ?>">
+                    <i class="bi bi-calendar3"></i> Class Schedule
+                </a>
+                <a href="<?= url('attendance') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'attendance' ? 'active' : '' ?>">
+                    <i class="bi bi-check2-square"></i> Take Attendance
+                </a>
+
+                <div class="nav-section-title">Coursework & Exams</div>
+                <a href="<?= url('academic/materials') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'materials' ? 'active' : '' ?>">
+                    <i class="bi bi-file-earmark-pdf"></i> Study Materials
+                </a>
+                <a href="<?= url('academic/assignments') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'assignments' ? 'active' : '' ?>">
+                    <i class="bi bi-pencil-square"></i> Assignments
+                </a>
+                <a href="<?= url('examinations') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'examinations' ? 'active' : '' ?>">
+                    <i class="bi bi-journal-check"></i> Examinations & Marks
+                </a>
+
+                <div class="nav-section-title">Communication</div>
+                <a href="<?= url('communication/announcements') ?>" class="sidebar-link <?= ($activeMenu ?? '') === 'announcements' ? 'active' : '' ?>">
+                    <i class="bi bi-megaphone-fill"></i> Institute Notices
                 </a>
             <?php endif; ?>
 
-            <!-- Parent Portal Navigation -->
+            <!-- ─── Student Portal Navigation ─────────────────────────────── -->
+            <?php if ($role === 'student'): ?>
+                <div class="nav-section-title">Student Portal</div>
+                <a href="<?= url('portal/student/dashboard') ?>" class="sidebar-link active">
+                    <i class="bi bi-person-badge"></i> My Academic Portal
+                </a>
+                <a href="<?= url('communication/announcements') ?>" class="sidebar-link">
+                    <i class="bi bi-megaphone"></i> Announcements
+                </a>
+            <?php endif; ?>
+
+            <!-- ─── Parent Portal Navigation ──────────────────────────────── -->
             <?php if ($role === 'parent'): ?>
                 <div class="nav-section-title">Parent Portal</div>
                 <a href="<?= url('portal/parent/dashboard') ?>" class="sidebar-link active">
                     <i class="bi bi-people"></i> My Children
+                </a>
+                <a href="<?= url('communication/announcements') ?>" class="sidebar-link">
+                    <i class="bi bi-megaphone"></i> Announcements
                 </a>
             <?php endif; ?>
         </nav>

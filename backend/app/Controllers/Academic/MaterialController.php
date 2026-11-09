@@ -183,7 +183,10 @@ class MaterialController extends Controller
             return;
         }
 
-        $fullPath = ROOT_PATH . '/' . ltrim($material['file_path'], '/');
+        $fullPath = STORAGE_PATH . '/uploads/materials/' . basename($material['file_path']);
+        if (!file_exists($fullPath)) {
+            $fullPath = ROOT_PATH . '/' . ltrim($material['file_path'], '/');
+        }
         if (!file_exists($fullPath)) {
             $this->redirect(url('academic/materials'), 'error', 'Attachment file is missing from storage.');
             return;

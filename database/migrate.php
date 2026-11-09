@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 //Migration
 
-require_once dirname(__DIR__) . '/public/index.php';
+$backendBootstrap = dirname(__DIR__) . '/backend/public/index.php';
+if (!file_exists($backendBootstrap)) {
+    $backendBootstrap = dirname(__DIR__) . '/public/index.php';
+}
+require_once $backendBootstrap;
 
 use App\Core\Database;
 

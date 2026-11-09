@@ -2,43 +2,55 @@
 
 # ─── Environment & Secrets ─────────────────────────────────────────────────────
 .env
+backend/.env
 *.env.local
 *.env.production
+*.env.staging
 
-# ─── Composer ──────────────────────────────────────────────────────────────────
+# ─── Dependencies ──────────────────────────────────────────────────────────────
 vendor/
+backend/vendor/
 composer.lock
+backend/composer.lock
+node_modules/
+package-lock.json
 
-# ─── Storage (non-committed runtime data) ─────────────────────────────────────
+# ─── Storage (Runtime data & user uploads) ─────────────────────────────────────
 storage/logs/*.log
 storage/cache/*
 storage/backups/*
 storage/temp/*
 storage/uploads/*
 
-# Keep storage directory structure
-!storage/logs/.gitkeep
-!storage/cache/.gitkeep
-!storage/backups/.gitkeep
-!storage/temp/.gitkeep
-!storage/uploads/.gitkeep
-!storage/uploads/students/.gitkeep
-!storage/uploads/teachers/.gitkeep
-!storage/uploads/materials/.gitkeep
-!storage/uploads/assignments/.gitkeep
-!storage/uploads/expenses/.gitkeep
+backend/storage/logs/*.log
+backend/storage/cache/*
+backend/storage/backups/*
+backend/storage/temp/*
+backend/storage/uploads/*
 
-# ─── IDE ───────────────────────────────────────────────────────────────────────
+# Preserve storage directory structure via .gitkeep
+!backend/storage/logs/.gitkeep
+!backend/storage/cache/.gitkeep
+!backend/storage/backups/.gitkeep
+!backend/storage/temp/.gitkeep
+!backend/storage/uploads/.gitkeep
+!backend/storage/uploads/students/.gitkeep
+!backend/storage/uploads/teachers/.gitkeep
+!backend/storage/uploads/materials/.gitkeep
+!backend/storage/uploads/assignments/.gitkeep
+!backend/storage/uploads/expenses/.gitkeep
+
+# ─── Database Backups & Dumps ──────────────────────────────────────────────────
+# Ignore SQL dump archives anywhere except versioned migrations
+*.sql
+!database/migrations/*.sql
+
+# ─── IDE & OS Files ────────────────────────────────────────────────────────────
 .vscode/
 .idea/
 *.code-workspace
 .DS_Store
 Thumbs.db
-
-# ─── PHP ───────────────────────────────────────────────────────────────────────
+desktop.ini
 *.log
 *.cache
-
-# ─── OS Files ──────────────────────────────────────────────────────────────────
-desktop.ini
-

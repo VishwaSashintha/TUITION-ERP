@@ -196,7 +196,7 @@ class SettingsController extends Controller
 
     public function backups(Request $request): void
     {
-        $backupDir = dirname(__DIR__, 2) . '/storage/backups';
+        $backupDir = defined('STORAGE_PATH') ? STORAGE_PATH . '/backups' : dirname(__DIR__, 3) . '/backend/storage/backups';
         if (!is_dir($backupDir)) {
             mkdir($backupDir, 0755, true);
         }
@@ -221,7 +221,7 @@ class SettingsController extends Controller
 
     public function createBackup(Request $request): void
     {
-        $backupDir = dirname(__DIR__, 2) . '/storage/backups';
+        $backupDir = defined('STORAGE_PATH') ? STORAGE_PATH . '/backups' : dirname(__DIR__, 3) . '/backend/storage/backups';
         if (!is_dir($backupDir)) {
             mkdir($backupDir, 0755, true);
         }
@@ -266,7 +266,7 @@ class SettingsController extends Controller
     public function downloadBackup(Request $request): void
     {
         $filename  = basename((string)$request->query('file'));
-        $backupDir = dirname(__DIR__, 2) . '/storage/backups';
+        $backupDir = defined('STORAGE_PATH') ? STORAGE_PATH . '/backups' : dirname(__DIR__, 3) . '/backend/storage/backups';
         $filepath  = $backupDir . '/' . $filename;
 
         if (empty($filename) || !file_exists($filepath) || !str_ends_with($filename, '.sql')) {
@@ -284,7 +284,7 @@ class SettingsController extends Controller
     public function restoreBackup(Request $request): void
     {
         $filename  = basename((string)$request->input('filename'));
-        $backupDir = dirname(__DIR__, 2) . '/storage/backups';
+        $backupDir = defined('STORAGE_PATH') ? STORAGE_PATH . '/backups' : dirname(__DIR__, 3) . '/backend/storage/backups';
         $filepath  = $backupDir . '/' . $filename;
 
         if (empty($filename) || !file_exists($filepath) || !str_ends_with($filename, '.sql')) {

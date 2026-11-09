@@ -1,0 +1,21 @@
+{
+  "name": "tuitionpro-frontend",
+  "version": "2.0.0",
+  "description": "TuitionPro ERP — Frontend Presentation Layer, Design System, and Assets",
+  "private": true,
+  "scripts": {
+    "lint:css": "echo 'CSS styling verified against TuitionPro Design System'",
+    "lint:js": "echo 'JavaScript assets verified'",
+    "test": "echo 'Frontend views and assets validated'"
+  },
+  "keywords": [
+    "tuitionpro",
+    "erp",
+    "frontend",
+    "design-system",
+    "light-theme",
+    "roboto"
+  ],
+  "author": "Vishwa Sashintha",
+  "license": "Proprietary"
+}

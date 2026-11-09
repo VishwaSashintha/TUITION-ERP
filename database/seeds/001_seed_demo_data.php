@@ -2,7 +2,11 @@
 
 declare(strict_types=1);
 
-require_once dirname(__DIR__, 2) . '/public/index.php';
+$backendBootstrap = dirname(__DIR__, 2) . '/backend/public/index.php';
+if (!file_exists($backendBootstrap)) {
+    $backendBootstrap = dirname(__DIR__, 2) . '/public/index.php';
+}
+require_once $backendBootstrap;
 
 use App\Core\Database;
 

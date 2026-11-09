@@ -16,15 +16,15 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "app/"
+            "App\\": "backend/app/"
         },
         "files": [
-            "app/Helpers/functions.php"
+            "backend/app/Helpers/functions.php"
         ]
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "backend/tests/"
         }
     },
     "scripts": {
@@ -36,4 +36,3 @@
     },
     "minimum-stability": "stable"
 }
-

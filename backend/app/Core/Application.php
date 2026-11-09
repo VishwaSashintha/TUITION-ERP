@@ -77,7 +77,11 @@ class Application
     private function initRouter(): void
     {
         $this->router = new Router();
-        $routeFiles   = glob(ROOT_PATH . '/routes/*.php');
+        $routesDir = defined('ROUTES_PATH') ? ROUTES_PATH : ROOT_PATH . '/backend/routes';
+        if (!is_dir($routesDir)) {
+            $routesDir = ROOT_PATH . '/routes';
+        }
+        $routeFiles = glob($routesDir . '/*.php') ?: [];
         foreach ($routeFiles as $routeFile) {
             require $routeFile;
         }

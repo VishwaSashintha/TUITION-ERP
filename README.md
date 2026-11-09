@@ -145,32 +145,42 @@ TuitionPro ERP enforces a 14-role hierarchy. Each role receives a dedicated dash
 
 ```
 TuitionPro ERP/
-├── app/
-│   ├── Controllers/        # HTTP request handlers organized by domain (20 controllers)
-│   ├── Core/               # Custom MVC core: Router, Request, Response, Database, Application
-│   ├── Helpers/            # Global utility functions: auth_user, e, url, format_currency
-│   ├── Middleware/         # Request pipeline: Auth, Role, CSRF, JWT, Tenant
-│   ├── Models/             # Database models with automatic tenant scoping (35 models)
-│   └── Services/           # Business logic: BillingService, AccountingService, JwtService, AuditService, TenantManager
-├── config/                 # Application, database, institute, and JWT configuration files
-├── database/
-│   ├── migrations/         # Five versioned SQL migration files (001 through 005)
-│   ├── seeds/              # Role, permission, and demonstration institute seed data
-│   └── migrate.php         # Database migration and seeding automation utility
-├── public/                 # Web root: index.php, CSS, JavaScript, and image assets
-│   └── assets/
-│       ├── css/style.css   # Main stylesheet
-│       ├── js/app.js       # Client-side scripts including QR scanner
-│       └── images/         # SVG logo files
-├── resources/views/        # PHP view templates organized by module
-├── routes/web.php          # All application route definitions
-├── storage/                # Runtime logs, backups, and file uploads (excluded from version control)
-├── tests/                  # Native PHP automated test suites
+├── backend/                # Server-side application, core engine, and APIs
+│   ├── app/                # Controllers, Models, Services, Middleware, Core, Helpers
+│   ├── config/             # Application and institute configuration files
+│   ├── public/             # HTTP server document root (index.php, .htaccess)
+│   ├── routes/             # Route registrations (web.php)
+│   ├── storage/            # Runtime logs, backups, and user uploads (gitignored)
+│   ├── tests/              # 150 automated verification tests (5 test suites)
+│   ├── composer.json       # Backend PHP dependency manifest and PSR-4 autoloader
+│   └── README.md           # Backend architectural documentation
+├── frontend/               # Client-side presentation layer and design system
+│   ├── assets/             # CSS design tokens, JS modules, brand SVG assets
+│   ├── languages/          # Language localization resources
+│   ├── views/              # 67 UI views organized across 18 functional domains
+│   ├── package.json        # Frontend manifest and scripts
+│   └── README.md           # UI/UX design system & Roboto typography guide
+├── database/               # Database schemas, migrations, and seeds
+│   ├── migrations/         # 5 versioned SQL migration files (001 through 005)
+│   ├── seeds/              # Demonstration seed data (001_seed_demo_data.php)
+│   ├── migrate.php         # Migration runner and seeding utility
+│   └── README.md           # Database setup and schema documentation
+├── scripts/                # Automated operational and development utility scripts
+│   ├── start.bat           # Local development server launcher
+│   ├── setup.bat           # Automated environment and database installer
+│   ├── test.bat            # 150 automated test suite runner
+│   ├── backup.bat          # SQL database backup utility
+│   └── README.md           # Script usage and automation reference
+├── public/                 # Root forwarder entry point for backward compatibility
+│   ├── index.php           # Gateway forwarding to backend/public/index.php
+│   └── .htaccess           # Apache rewrite rules
+├── setup.bat               # Root one-click local setup shortcut (calls scripts\setup.bat)
+├── start.bat               # Root one-click local server shortcut (calls scripts\start.bat)
+├── composer.json           # Root Composer manifest
+├── requirements.txt        # System requirements and PHP extensions manifest
 ├── .env.example            # Environment configuration template
-├── .gitignore              # Version control exclusion rules
-├── setup.bat               # Windows one-click local setup script
-├── start.bat               # Windows one-click development server startup script
-└── README.md               # Project documentation
+├── .gitignore              # Git ignore rules protecting databases, logs, uploads, secrets
+└── README.md               # Main project documentation
 ```
 
 ---
@@ -269,8 +279,13 @@ php database/migrate.php --fresh --seed
 
 **4. Start the application**
 
+Using the one-click launcher:
+```cmd
+start.bat
+```
+Or with the PHP built-in server:
 ```bash
-php -S localhost:8080 -t public
+php -S localhost:8080 -t backend/public backend/public/index.php
 ```
 
 Open `http://localhost:8080` in your web browser.
@@ -280,9 +295,9 @@ Open `http://localhost:8080` in your web browser.
 ```apache
 <VirtualHost *:80>
     ServerName yourinstitute.local
-    DocumentRoot /path/to/TUITION-ERP/public
+    DocumentRoot /path/to/TUITION-ERP/backend/public
 
-    <Directory /path/to/TUITION-ERP/public>
+    <Directory /path/to/TUITION-ERP/backend/public>
         AllowOverride All
         Require all granted
     </Directory>
@@ -295,7 +310,7 @@ Open `http://localhost:8080` in your web browser.
 server {
     listen 80;
     server_name yourdomain.lk;
-    root /var/www/TUITION-ERP/public;
+    root /var/www/TUITION-ERP/backend/public;
     index index.php;
 
     location / {
@@ -455,14 +470,20 @@ The following security controls are implemented:
 
 ## Automated Tests
 
-The project includes a native PHP test harness covering authentication security, business logic, end-to-end workflows, HTTP route coverage, and role-based access control.
+The project includes a comprehensive test harness covering authentication security, business logic, end-to-end workflows, HTTP route coverage, and role-based access control.
 
+To run all 150 automated tests in a single command:
+```cmd
+scripts\test.bat
+```
+
+Or execute test suites individually:
 ```bash
-php tests/test_jwt_auth.php
-php tests/test_backend_core.php
-php tests/test_e2e_workflows.php
-php tests/test_http_routes.php
-php tests/test_role_dashboards.php
+php backend/tests/test_jwt_auth.php
+php backend/tests/test_backend_core.php
+php backend/tests/test_e2e_workflows.php
+php backend/tests/test_http_routes.php
+php backend/tests/test_role_dashboards.php
 ```
 
 | Suite | Coverage | Tests |

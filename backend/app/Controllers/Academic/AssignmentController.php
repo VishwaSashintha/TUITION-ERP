@@ -283,7 +283,10 @@ class AssignmentController extends Controller
             return;
         }
 
-        $fullPath = ROOT_PATH . '/' . ltrim($assignment['attachment_path'], '/');
+        $fullPath = STORAGE_PATH . '/uploads/assignments/' . basename($assignment['attachment_path']);
+        if (!file_exists($fullPath)) {
+            $fullPath = ROOT_PATH . '/' . ltrim($assignment['attachment_path'], '/');
+        }
         if (!file_exists($fullPath)) {
             $this->redirect(url('academic/assignments'), 'error', 'Attachment file is missing from storage.');
             return;

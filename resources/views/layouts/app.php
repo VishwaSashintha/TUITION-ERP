@@ -11,17 +11,17 @@ $branchName = $user['branch_name'] ?? 'Main Branch';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($title ?? 'Dashboard') ?> — <?= e($tenantName) ?> | TuitionPro ERP</title>
     
-    <!-- Fonts & Icons -->
+    <!-- Fonts & Icons: Roboto Modern Typography (legacy: Poppins) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Custom SaaS Theme -->
+    <!-- Modern SaaS Design System -->
     <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
 </head>
 <body>
@@ -30,11 +30,11 @@ $branchName = $user['branch_name'] ?? 'Main Branch';
     <!-- Mobile Backdrop -->
     <div id="sidebar-backdrop" class="d-none position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50" style="z-index: 999;"></div>
 
-    <!-- ─── SIDEBAR NAVIGATION ───────────────────────────────────────────── -->
+    <!-- ─── DARK CHARCOAL SIDEBAR NAVIGATION ───────────────────────────── -->
     <aside id="sidebar">
         <div class="sidebar-brand">
             <a href="<?= in_array($role, ['super_admin', 'support_admin'], true) ? url('platform/dashboard') : url('dashboard') ?>" class="d-flex align-items-center gap-2 text-decoration-none">
-                <img src="<?= institute_logo_white() ?>" alt="<?= e(institute_name()) ?>" height="36" class="img-fluid">
+                <img src="<?= institute_logo_white() ?>" alt="<?= e(institute_name()) ?>" height="34" class="img-fluid">
             </a>
         </div>
 
@@ -280,7 +280,7 @@ $branchName = $user['branch_name'] ?? 'Main Branch';
         <!-- Topbar -->
         <header id="topbar">
             <div class="d-flex align-items-center gap-3">
-                <button id="sidebar-toggle" class="btn btn-light d-lg-none" type="button">
+                <button id="sidebar-toggle" class="btn btn-secondary d-lg-none" type="button" aria-label="Toggle Navigation">
                     <i class="bi bi-list fs-5"></i>
                 </button>
                 <div>
@@ -292,8 +292,8 @@ $branchName = $user['branch_name'] ?? 'Main Branch';
             <div class="d-flex align-items-center gap-3">
                 <!-- User Profile Dropdown -->
                 <div class="dropdown">
-                    <button class="btn btn-light d-flex align-items-center gap-2 rounded-pill px-3 py-1 border" type="button" data-bs-toggle="dropdown">
-                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 0.85rem;">
+                    <button class="btn btn-secondary d-flex align-items-center gap-2 rounded-pill px-3 py-1 border" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="bg-tp-green text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 30px; height: 30px; font-size: 0.825rem;">
                             <?= strtoupper(substr($user['name'] ?? 'U', 0, 1)) ?>
                         </div>
                         <div class="text-start d-none d-md-block">
@@ -302,13 +302,13 @@ $branchName = $user['branch_name'] ?? 'Main Branch';
                         </div>
                         <i class="bi bi-chevron-down text-muted" style="font-size: 0.75rem;"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border">
-                        <li><a class="dropdown-item" href="<?= url('dashboard') ?>"><i class="bi bi-person me-2"></i>My Profile</a></li>
-                        <li><hr class="dropdown-divider"></li>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border mt-1">
+                        <li><a class="dropdown-item py-2" href="<?= url('dashboard') ?>"><i class="bi bi-person me-2"></i>My Profile</a></li>
+                        <li><hr class="dropdown-divider my-1"></li>
                         <li>
                             <form action="<?= url('logout') ?>" method="POST" class="no-disable m-0">
                                 <?= csrf_field() ?>
-                                <button type="submit" class="dropdown-item text-danger">
+                                <button type="submit" class="dropdown-item py-2 text-danger">
                                     <i class="bi bi-box-arrow-right me-2"></i>Sign Out
                                 </button>
                             </form>
@@ -322,7 +322,7 @@ $branchName = $user['branch_name'] ?? 'Main Branch';
         <main id="main-content">
             <!-- Flash Message Alerts -->
             <?php if ($msg = flash('success')): ?>
-                <div class="alert alert-success alert-dismissible fade show d-flex align-items-center shadow-sm" role="alert">
+                <div class="alert alert-success alert-dismissible fade show d-flex align-items-center shadow-sm mb-4" role="alert">
                     <i class="bi bi-check-circle-fill me-2 fs-5"></i>
                     <div><?= e($msg) ?></div>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -330,7 +330,7 @@ $branchName = $user['branch_name'] ?? 'Main Branch';
             <?php endif; ?>
 
             <?php if ($msg = flash('error')): ?>
-                <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center shadow-sm" role="alert">
+                <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center shadow-sm mb-4" role="alert">
                     <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
                     <div><?= e($msg) ?></div>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -338,7 +338,7 @@ $branchName = $user['branch_name'] ?? 'Main Branch';
             <?php endif; ?>
 
             <?php if ($msg = flash('warning')): ?>
-                <div class="alert alert-warning alert-dismissible fade show d-flex align-items-center shadow-sm" role="alert">
+                <div class="alert alert-warning alert-dismissible fade show d-flex align-items-center shadow-sm mb-4" role="alert">
                     <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
                     <div><?= e($msg) ?></div>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -362,4 +362,3 @@ $branchName = $user['branch_name'] ?? 'Main Branch';
 <script src="<?= asset('js/app.js') ?>"></script>
 </body>
 </html>
-

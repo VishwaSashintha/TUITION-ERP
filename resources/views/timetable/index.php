@@ -1,6 +1,6 @@
 <div class="row align-items-center mb-4">
     <div class="col-md-7">
-        <h2 class="h3 fw-bold mb-1">Weekly Timetable</h2>
+        <h4 class="fw-bold mb-1 text-tp-black">Weekly Timetable</h4>
         <p class="text-muted mb-0">Master recurring schedule matrix with conflict detection and automated session generation.</p>
     </div>
     <div class="col-md-5 text-md-end mt-3 mt-md-0 d-flex gap-2 justify-content-md-end">
@@ -13,19 +13,19 @@
     </div>
 </div>
 
-<div class="card border-0 shadow-sm mb-4">
+<div class="card mb-4">
     <div class="card-body p-3 bg-light rounded d-flex flex-wrap align-items-center justify-content-between gap-3">
         <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-magic fs-4 text-primary"></i>
+            <i class="bi bi-magic fs-4 text-tp-green"></i>
             <div>
-                <strong class="d-block">Bulk Session Generator</strong>
+                <strong class="d-block text-tp-black">Bulk Session Generator</strong>
                 <small class="text-muted">Generate actual calendar session dates from active weekly recurring schedules.</small>
             </div>
         </div>
         <form action="<?= url('timetable/generate-sessions') ?>" method="POST" class="d-flex align-items-center gap-2">
             <?= csrf_field() ?>
-            <input type="month" name="year_month" class="form-control form-control-sm" value="<?= date('Y-m') ?>" required>
-            <button type="submit" class="btn btn-sm btn-dark text-nowrap">
+            <input type="month" name="year_month" class="form-control" style="min-height: 38px; width: auto;" value="<?= date('Y-m') ?>" required>
+            <button type="submit" class="btn btn-secondary text-nowrap">
                 <i class="bi bi-gear-fill me-1"></i> Generate Month Sessions
             </button>
         </form>
@@ -48,12 +48,12 @@
         $slots = $byDay[$dow] ?? [];
     ?>
     <div class="col-xl-4 col-md-6">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold mb-0 text-dark">
-                    <span class="badge bg-primary me-2"><?= substr($dayName, 0, 3) ?></span><?= $dayName ?>
-                </h5>
-                <span class="badge bg-light text-muted border"><?= count($slots) ?> Slots</span>
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold mb-0 text-tp-black">
+                    <span class="badge badge-purple me-2"><?= substr($dayName, 0, 3) ?></span><?= $dayName ?>
+                </h6>
+                <span class="badge badge-dark"><?= count($slots) ?> Slots</span>
             </div>
             <div class="card-body p-3">
                 <?php if (empty($slots)): ?>
@@ -64,16 +64,16 @@
                 <?php else: ?>
                     <div class="d-flex flex-column gap-2">
                         <?php foreach ($slots as $slot): ?>
-                            <div class="p-3 border rounded bg-light hover-shadow transition">
+                            <div class="p-3 border rounded bg-light">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">
+                                    <span class="badge badge-info px-2 py-1 font-monospace">
                                         <i class="bi bi-clock me-1"></i><?= date('h:i A', strtotime($slot['start_time'])) ?> - <?= date('h:i A', strtotime($slot['end_time'])) ?>
                                     </span>
-                                    <span class="badge bg-secondary-subtle text-secondary small">
+                                    <span class="badge badge-dark small">
                                         <i class="bi bi-geo-alt me-1"></i><?= e($slot['classroom'] ?? 'Room 1') ?>
                                     </span>
                                 </div>
-                                <h6 class="fw-bold mb-1 text-primary"><?= e($slot['batch_name']) ?></h6>
+                                <h6 class="fw-bold mb-1 text-tp-black"><?= e($slot['batch_name']) ?></h6>
                                 <div class="small text-muted mb-1">
                                     <i class="bi bi-book me-1"></i><?= e($slot['subject_name']) ?>
                                 </div>
@@ -94,16 +94,16 @@
 <!-- Add Schedule Slot Modal -->
 <div class="modal fade" id="addSlotModal" tabindex="-1" aria-labelledby="addSlotModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="addSlotModalLabel">Add Recurring Schedule Slot</h5>
+        <div class="modal-content" style="border-radius: 12px; border: 1px solid var(--border-color);">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold text-tp-black" id="addSlotModalLabel">Add Recurring Schedule Slot</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="<?= url('timetable/schedule') ?>" method="POST">
                 <?= csrf_field() ?>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">Select Batch <span class="text-danger">*</span></label>
+                        <label class="form-label">Select Batch <span class="text-danger">*</span></label>
                         <select name="batch_id" class="form-select" required>
                             <option value="">-- Choose Batch --</option>
                             <?php foreach ($batches as $b): ?>
@@ -114,7 +114,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">Day of Week <span class="text-danger">*</span></label>
+                        <label class="form-label">Day of Week <span class="text-danger">*</span></label>
                         <select name="day_of_week" class="form-select" required>
                             <option value="1">Monday</option>
                             <option value="2">Tuesday</option>
@@ -128,17 +128,17 @@
 
                     <div class="row g-2 mb-3">
                         <div class="col-6">
-                            <label class="form-label small fw-bold">Start Time <span class="text-danger">*</span></label>
+                            <label class="form-label">Start Time <span class="text-danger">*</span></label>
                             <input type="time" name="start_time" class="form-control" required>
                         </div>
                         <div class="col-6">
-                            <label class="form-label small fw-bold">End Time <span class="text-danger">*</span></label>
+                            <label class="form-label">End Time <span class="text-danger">*</span></label>
                             <input type="time" name="end_time" class="form-control" required>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">Classroom / Hall</label>
+                        <label class="form-label">Classroom / Hall</label>
                         <input type="text" name="classroom" class="form-control" placeholder="e.g. Hall A, Lab 2, Room 101">
                     </div>
 
@@ -146,7 +146,7 @@
                         <i class="bi bi-shield-check me-1"></i> The system automatically checks for teacher and classroom conflicts before scheduling.
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer border-top">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Schedule Slot</button>
                 </div>
@@ -154,4 +154,3 @@
         </div>
     </div>
 </div>
-

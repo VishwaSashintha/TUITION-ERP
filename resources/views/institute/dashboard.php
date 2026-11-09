@@ -1,30 +1,30 @@
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>
         <div class="d-flex align-items-center gap-2 mb-1">
-            <h4 class="fw-bold mb-0">Executive Dashboard</h4>
-            <span class="badge badge-tp-purple px-2 py-1">Institute Management</span>
+            <h4 class="fw-bold mb-0 text-tp-black">Executive Dashboard</h4>
+            <span class="badge badge-purple px-2 py-1">Institute Management</span>
         </div>
         <p class="text-muted mb-0">Real-time overview of academic operations, fee collections, attendance, and financial health.</p>
     </div>
     <div class="d-flex flex-wrap gap-2">
-        <a href="<?= url('students/create') ?>" class="btn btn-primary-custom" style="background-color: var(--tp-purple); border-color: var(--tp-purple);">
+        <a href="<?= url('students/create') ?>" class="btn btn-primary">
             <i class="bi bi-person-plus-fill"></i> New Admission
         </a>
-        <a href="<?= url('fees/invoices/create') ?>" class="btn btn-outline-dark">
+        <a href="<?= url('fees/invoices/create') ?>" class="btn btn-secondary">
             <i class="bi bi-file-earmark-plus"></i> Issue Invoice
         </a>
-        <a href="<?= url('attendance') ?>" class="btn btn-outline-secondary">
+        <a href="<?= url('attendance') ?>" class="btn btn-secondary">
             <i class="bi bi-calendar-check"></i> Take Attendance
         </a>
-        <a href="<?= url('expenses/create') ?>" class="btn btn-outline-danger" style="border-color: var(--tp-coral); color: #d32f2f;">
+        <a href="<?= url('expenses/create') ?>" class="btn btn-danger">
             <i class="bi bi-cash-stack"></i> Record Expense
         </a>
     </div>
 </div>
 
-<!-- ─── 1. OVERVIEW KPI CARDS (Exact 6-Color Palette & Poppins 700) ────────── -->
+<!-- ─── 1. OVERVIEW KPI CARDS (Standard 4 per row | Roboto Tabular Numbers) ─── -->
 <div class="row g-3 mb-4">
-    <!-- Total & Active Students (Purple: #9985FB) -->
+    <!-- Active Students (Purple) -->
     <div class="col-xl-3 col-sm-6">
         <div class="stat-card">
             <div class="stat-icon tp-purple">
@@ -38,7 +38,7 @@
         </div>
     </div>
 
-    <!-- Active Batches (Orange: #FEA339) -->
+    <!-- Active Batches (Orange) -->
     <div class="col-xl-3 col-sm-6">
         <div class="stat-card">
             <div class="stat-icon tp-orange">
@@ -52,7 +52,7 @@
         </div>
     </div>
 
-    <!-- Fee Collections (Green: #4BA95F) -->
+    <!-- Fee Collections (Green) -->
     <div class="col-xl-3 col-sm-6">
         <div class="stat-card">
             <div class="stat-icon tp-green">
@@ -66,7 +66,7 @@
         </div>
     </div>
 
-    <!-- Outstanding Fees (Coral: #FF908D) -->
+    <!-- Outstanding Fees (Coral) -->
     <div class="col-xl-3 col-sm-6">
         <div class="stat-card">
             <div class="stat-icon tp-coral">
@@ -80,7 +80,7 @@
         </div>
     </div>
 
-    <!-- Today's Attendance Rate (Sky Blue: #77DDFA) -->
+    <!-- Today's Attendance Rate (Sky Blue) -->
     <div class="col-xl-3 col-sm-6">
         <div class="stat-card">
             <div class="stat-icon tp-sky-blue">
@@ -94,7 +94,7 @@
         </div>
     </div>
 
-    <!-- Today's Classes (Orange: #FEA339) -->
+    <!-- Today's Classes (Orange) -->
     <div class="col-xl-3 col-sm-6">
         <div class="stat-card">
             <div class="stat-icon tp-orange">
@@ -108,7 +108,7 @@
         </div>
     </div>
 
-    <!-- Operating Expenses (Coral: #FF908D) -->
+    <!-- Operating Expenses (Coral) -->
     <div class="col-xl-3 col-sm-6">
         <div class="stat-card">
             <div class="stat-icon tp-coral">
@@ -122,7 +122,7 @@
         </div>
     </div>
 
-    <!-- Cash & Bank / Net Surplus (Green / Black) -->
+    <!-- Cash & Bank / Net Surplus (Charcoal) -->
     <div class="col-xl-3 col-sm-6">
         <div class="stat-card">
             <div class="stat-icon tp-black">
@@ -141,15 +141,15 @@
 <div class="row g-3 mb-4">
     <!-- Income vs Expense Bar Chart -->
     <div class="col-lg-8">
-        <div class="card-custom h-100">
-            <div class="card-header-custom">
+        <div class="card h-100">
+            <div class="card-header">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-tp-purple px-2 py-1"><i class="bi bi-bar-chart-fill"></i></span>
                     <h6 class="fw-bold mb-0">Financial Performance & Cash Flow (LKR)</h6>
                 </div>
                 <span class="badge bg-light text-dark border">Audited System Ledgers</span>
             </div>
-            <div class="p-3">
+            <div class="card-body">
                 <canvas id="financialChart" style="max-height: 270px; width: 100%;"></canvas>
             </div>
         </div>
@@ -157,14 +157,14 @@
 
     <!-- Attendance Breakdown Doughnut Chart -->
     <div class="col-lg-4">
-        <div class="card-custom h-100">
-            <div class="card-header-custom">
+        <div class="card h-100">
+            <div class="card-header">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-tp-sky-blue px-2 py-1"><i class="bi bi-pie-chart-fill"></i></span>
                     <h6 class="fw-bold mb-0">Today's Attendance Breakdown</h6>
                 </div>
             </div>
-            <div class="p-3 d-flex flex-column align-items-center justify-content-center">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center">
                 <div style="width: 180px; height: 180px;">
                     <canvas id="attendanceDoughnut"></canvas>
                 </div>
@@ -194,13 +194,13 @@
 <div class="row g-3 mb-4">
     <!-- Today's Sessions -->
     <div class="col-lg-6">
-        <div class="card-custom h-100">
-            <div class="card-header-custom">
+        <div class="card h-100">
+            <div class="card-header">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-tp-orange px-2 py-1"><i class="bi bi-calendar-event"></i></span>
                     <h6 class="fw-bold mb-0">Today's Class Sessions</h6>
                 </div>
-                <a href="<?= url('timetable') ?>" class="btn btn-sm btn-link text-decoration-none">View All &rarr;</a>
+                <a href="<?= url('timetable') ?>" class="btn btn-sm btn-link text-decoration-none p-0 text-tp-green">View All &rarr;</a>
             </div>
             <div class="table-responsive">
                 <table class="table table-custom">
@@ -227,12 +227,12 @@
                                         <?= substr($s['start_time'], 0, 5) ?> - <?= substr($s['end_time'], 0, 5) ?>
                                     </td>
                                     <td>
-                                        <div class="fw-bold"><?= e($s['batch_name']) ?></div>
+                                        <div class="fw-bold text-tp-black"><?= e($s['batch_name']) ?></div>
                                         <small class="text-muted"><?= e($s['subject_name']) ?></small>
                                     </td>
                                     <td><?= e($s['teacher_name']) ?></td>
                                     <td>
-                                        <span class="badge badge-custom badge-<?= $s['status'] === 'completed' ? 'success' : 'warning' ?>">
+                                        <span class="badge badge-<?= $s['status'] === 'completed' ? 'success' : 'warning' ?>">
                                             <?= ucfirst($s['status']) ?>
                                         </span>
                                     </td>
@@ -247,13 +247,13 @@
 
     <!-- Recent Payments -->
     <div class="col-lg-6">
-        <div class="card-custom h-100">
-            <div class="card-header-custom">
+        <div class="card h-100">
+            <div class="card-header">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-tp-green px-2 py-1"><i class="bi bi-cash"></i></span>
                     <h6 class="fw-bold mb-0">Recent Fee Receipts</h6>
                 </div>
-                <a href="<?= url('fees/invoices') ?>" class="btn btn-sm btn-link text-decoration-none">All Receipts &rarr;</a>
+                <a href="<?= url('fees/invoices') ?>" class="btn btn-sm btn-link text-decoration-none p-0 text-tp-green">All Receipts &rarr;</a>
             </div>
             <div class="table-responsive">
                 <table class="table table-custom">
@@ -277,17 +277,17 @@
                             <?php foreach ($recentPayments as $p): ?>
                                 <tr>
                                     <td>
-                                        <span class="badge bg-light text-dark border font-monospace"><?= e($p['receipt_number']) ?></span>
+                                        <span class="badge badge-dark"><?= e($p['receipt_number']) ?></span>
                                     </td>
                                     <td>
-                                        <div class="fw-semibold"><?= e($p['student_name']) ?></div>
+                                        <div class="fw-semibold text-tp-black"><?= e($p['student_name']) ?></div>
                                         <small class="text-muted"><?= e($p['admission_number']) ?></small>
                                     </td>
                                     <td class="fw-number fw-bold text-tp-green">
                                         <?= format_currency($p['amount']) ?>
                                     </td>
                                     <td>
-                                        <span class="badge bg-light text-dark border text-uppercase" style="font-size: 0.7rem;">
+                                        <span class="badge badge-dark text-uppercase" style="font-size: 0.7rem;">
                                             <?= e($p['payment_method']) ?>
                                         </span>
                                     </td>
@@ -305,15 +305,15 @@
 <div class="row g-3">
     <!-- Recent Student Admissions -->
     <div class="col-lg-4">
-        <div class="card-custom h-100">
-            <div class="card-header-custom">
+        <div class="card h-100">
+            <div class="card-header">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-tp-purple px-2 py-1"><i class="bi bi-person-check-fill"></i></span>
                     <h6 class="fw-bold mb-0">Recent Admissions</h6>
                 </div>
-                <a href="<?= url('students') ?>" class="btn btn-sm btn-link text-decoration-none">Directory &rarr;</a>
+                <a href="<?= url('students') ?>" class="btn btn-sm btn-link text-decoration-none p-0 text-tp-green">Directory &rarr;</a>
             </div>
-            <div class="p-3">
+            <div class="card-body">
                 <?php if (empty($recentAdmissions)): ?>
                     <p class="text-muted text-center py-3 mb-0">No recent student admissions.</p>
                 <?php else: ?>
@@ -321,10 +321,10 @@
                         <?php foreach ($recentAdmissions as $adm): ?>
                             <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center border-bottom">
                                 <div>
-                                    <div class="fw-semibold"><?= e($adm['full_name']) ?></div>
+                                    <div class="fw-semibold text-tp-black"><?= e($adm['full_name']) ?></div>
                                     <small class="text-muted"><?= e($adm['admission_number']) ?> &bull; <?= e($adm['branch_name'] ?? 'Main') ?></small>
                                 </div>
-                                <span class="badge badge-tp-purple font-monospace" style="font-size: 0.75rem;">
+                                <span class="badge badge-purple" style="font-size: 0.75rem;">
                                     <?= format_date($adm['admission_date'] ?? $adm['created_at']) ?>
                                 </span>
                             </div>
@@ -337,15 +337,15 @@
 
     <!-- Outstanding Fee Alerts -->
     <div class="col-lg-4">
-        <div class="card-custom h-100">
-            <div class="card-header-custom">
+        <div class="card h-100">
+            <div class="card-header">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-tp-coral px-2 py-1"><i class="bi bi-exclamation-triangle-fill"></i></span>
                     <h6 class="fw-bold mb-0">Outstanding Fee Alerts</h6>
                 </div>
-                <a href="<?= url('fees/outstanding') ?>" class="btn btn-sm btn-link text-decoration-none">Follow-up &rarr;</a>
+                <a href="<?= url('fees/outstanding') ?>" class="btn btn-sm btn-link text-decoration-none p-0 text-tp-coral">Follow-up &rarr;</a>
             </div>
-            <div class="p-3">
+            <div class="card-body">
                 <?php if (empty($defaulters)): ?>
                     <p class="text-muted text-center py-3 mb-0">No outstanding fee balances.</p>
                 <?php else: ?>
@@ -353,7 +353,7 @@
                         <?php foreach ($defaulters as $def): ?>
                             <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center border-bottom">
                                 <div>
-                                    <div class="fw-semibold text-truncate" style="max-width: 170px;"><?= e($def['student_name']) ?></div>
+                                    <div class="fw-semibold text-truncate text-tp-black" style="max-width: 170px;"><?= e($def['student_name']) ?></div>
                                     <small class="text-muted"><?= e($def['invoice_number']) ?></small>
                                 </div>
                                 <div class="text-end">
@@ -370,14 +370,14 @@
 
     <!-- Recent Institute Activities / Audit Logs -->
     <div class="col-lg-4">
-        <div class="card-custom h-100">
-            <div class="card-header-custom">
+        <div class="card h-100">
+            <div class="card-header">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-tp-black px-2 py-1"><i class="bi bi-clock-history"></i></span>
                     <h6 class="fw-bold mb-0">Recent Activities</h6>
                 </div>
             </div>
-            <div class="p-3">
+            <div class="card-body">
                 <?php if (empty($recentActivities)): ?>
                     <p class="text-muted text-center py-3 mb-0">No recent system activity recorded.</p>
                 <?php else: ?>
@@ -385,10 +385,10 @@
                         <?php foreach ($recentActivities as $act): ?>
                             <div class="list-group-item px-0 py-2 border-bottom">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="badge badge-tp-black text-uppercase" style="font-size: 0.65rem;"><?= e($act['action']) ?></span>
+                                    <span class="badge badge-dark text-uppercase" style="font-size: 0.65rem;"><?= e($act['action']) ?></span>
                                     <small class="text-muted" style="font-size: 0.7rem;"><?= format_datetime($act['created_at']) ?></small>
                                 </div>
-                                <div class="text-truncate mt-1" style="font-size: 0.8rem;"><?= e($act['details'] ?? 'System activity') ?></div>
+                                <div class="text-truncate mt-1 text-tp-black" style="font-size: 0.8rem;"><?= e($act['details'] ?? 'System activity') ?></div>
                                 <small class="text-muted" style="font-size: 0.7rem;">By <?= e($act['user_name']) ?></small>
                             </div>
                         <?php endforeach; ?>
@@ -416,10 +416,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         <?= (float)($financials['net_profit'] ?? 0) ?>
                     ],
                     backgroundColor: [
-                        '#9985FB',
-                        '#4BA95F',
-                        '#FF908D',
-                        '#FEA339'
+                        '#9985FB', // Purple
+                        '#4BA95F', // Green
+                        '#FF908D', // Coral
+                        '#FEA339'  // Orange
                     ],
                     borderRadius: 8,
                     maxBarThickness: 48
@@ -442,7 +442,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            font: { family: 'Poppins', size: 11 },
+                            font: { family: 'Roboto', size: 11 },
                             callback: function (val) {
                                 return 'Rs. ' + Number(val).toLocaleString();
                             }

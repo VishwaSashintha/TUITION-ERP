@@ -1,27 +1,27 @@
 <!-- Student Header -->
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div class="d-flex align-items-center gap-3">
-        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold fs-3 text-white bg-tp-purple" style="width: 60px; height: 60px;">
+        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold fs-3 text-white bg-tp-green" style="width: 56px; height: 56px;">
             <?= strtoupper(substr($student['full_name'] ?? 'ST', 0, 2)) ?>
         </div>
         <div>
             <div class="d-flex align-items-center gap-2 mb-1">
-                <h4 class="fw-bold mb-0"><?= e($student['full_name'] ?? 'Student') ?></h4>
-                <span class="badge badge-tp-purple px-2 py-1">Student Portal</span>
+                <h4 class="fw-bold mb-0 text-tp-black"><?= e($student['full_name'] ?? 'Student') ?></h4>
+                <span class="badge badge-purple px-2 py-1">Student Portal</span>
             </div>
             <small class="text-muted font-monospace">Admission: <?= e($student['admission_number'] ?? 'N/A') ?> &bull; Branch: <?= e($student['branch_name'] ?? 'Main') ?></small>
         </div>
     </div>
     <div class="d-flex gap-2">
-        <a href="<?= url('communication/announcements') ?>" class="btn btn-outline-dark">
+        <a href="<?= url('communication/announcements') ?>" class="btn btn-secondary">
             <i class="bi bi-megaphone"></i> Notice Board
         </a>
     </div>
 </div>
 
-<!-- ─── STUDENT STAT KPI CARDS (Exact 6-Color Palette & Poppins 700) ──────── -->
+<!-- ─── STUDENT STAT KPI CARDS (Standard 4 per row | Tabular Figures) ────── -->
 <div class="row g-3 mb-4">
-    <!-- Active Batches (Purple: #9985FB) -->
+    <!-- Active Batches (Purple) -->
     <div class="col-xl-3 col-sm-6">
         <div class="stat-card">
             <div class="stat-icon tp-purple">
@@ -35,7 +35,7 @@
         </div>
     </div>
 
-    <!-- Attendance Rate % (Green: #4BA95F) -->
+    <!-- Attendance Rate % (Green) -->
     <div class="col-xl-3 col-sm-6">
         <div class="stat-card">
             <div class="stat-icon tp-green">
@@ -49,7 +49,7 @@
         </div>
     </div>
 
-    <!-- Active Assignments (Orange: #FEA339) -->
+    <!-- Active Assignments (Orange) -->
     <div class="col-xl-3 col-sm-6">
         <div class="stat-card">
             <div class="stat-icon tp-orange">
@@ -63,7 +63,7 @@
         </div>
     </div>
 
-    <!-- Study Materials (Sky Blue: #77DDFA) -->
+    <!-- Study Materials (Sky Blue) -->
     <div class="col-xl-3 col-sm-6">
         <div class="stat-card">
             <div class="stat-icon tp-sky-blue">
@@ -82,8 +82,8 @@
     <!-- Left Column: Batches & Results -->
     <div class="col-lg-8">
         <!-- My Enrolled Batches -->
-        <div class="card-custom mb-4">
-            <div class="card-header-custom">
+        <div class="card mb-4">
+            <div class="card-header">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-tp-purple px-2 py-1"><i class="bi bi-mortarboard"></i></span>
                     <h6 class="fw-bold mb-0">My Enrolled Classes & Batches</h6>
@@ -107,7 +107,7 @@
                         <?php else: ?>
                             <?php foreach ($batches as $b): ?>
                                 <tr>
-                                    <td class="fw-bold text-tp-purple"><?= e($b['name']) ?></td>
+                                    <td class="fw-bold text-tp-black"><?= e($b['name']) ?></td>
                                     <td><?= e($b['subject_name']) ?></td>
                                     <td><i class="bi bi-person me-1 text-muted"></i><?= e($b['teacher_name']) ?></td>
                                     <td class="text-end fw-number fw-bold"><?= format_currency($b['monthly_fee']) ?></td>
@@ -120,8 +120,8 @@
         </div>
 
         <!-- Academic Performance & Results -->
-        <div class="card-custom mb-4">
-            <div class="card-header-custom">
+        <div class="card mb-4">
+            <div class="card-header">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-tp-orange px-2 py-1"><i class="bi bi-trophy-fill"></i></span>
                     <h6 class="fw-bold mb-0">Recent Examination Results</h6>
@@ -147,7 +147,7 @@
                         <?php else: ?>
                             <?php foreach ($results as $r): ?>
                                 <tr>
-                                    <td class="fw-bold"><?= e($r['exam_name']) ?></td>
+                                    <td class="fw-bold text-tp-black"><?= e($r['exam_name']) ?></td>
                                     <td><?= e($r['subject_name']) ?></td>
                                     <td class="text-muted" style="font-size: 0.825rem;"><?= format_date($r['exam_date']) ?></td>
                                     <td class="text-center fw-number fw-bold">
@@ -160,7 +160,7 @@
                                     </td>
                                     <td class="text-center">
                                         <?php if ($r['rank_in_batch']): ?>
-                                            <span class="badge badge-tp-orange fw-number">#<?= $r['rank_in_batch'] ?></span>
+                                            <span class="badge badge-warning fw-number">#<?= $r['rank_in_batch'] ?></span>
                                         <?php else: ?>
                                             —
                                         <?php endif; ?>
@@ -174,13 +174,13 @@
         </div>
 
         <!-- Class Study Materials -->
-        <div class="card-custom">
-            <div class="card-header-custom">
+        <div class="card">
+            <div class="card-header">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-tp-sky-blue px-2 py-1"><i class="bi bi-file-earmark-pdf"></i></span>
                     <h6 class="fw-bold mb-0">Learning Materials & Notes</h6>
                 </div>
-                <span class="badge bg-light text-dark border"><?= count($materials ?? []) ?> Items</span>
+                <span class="badge badge-dark"><?= count($materials ?? []) ?> Items</span>
             </div>
             <div class="table-responsive">
                 <table class="table table-custom">
@@ -200,21 +200,21 @@
                         <?php else: ?>
                             <?php foreach ($materials as $m): ?>
                                 <tr>
-                                    <td class="fw-bold text-dark">
+                                    <td class="fw-bold text-tp-black">
                                         <i class="bi bi-file-earmark-text me-2 text-tp-purple"></i><?= e($m['title']) ?>
                                     </td>
                                     <td>
-                                        <span class="badge bg-light text-dark border"><?= e($m['batch_name']) ?></span>
+                                        <span class="badge badge-dark"><?= e($m['batch_name']) ?></span>
                                         <small class="text-muted d-block"><?= e($m['subject_name']) ?></small>
                                     </td>
-                                    <td><span class="badge badge-tp-sky-blue text-uppercase"><?= e($m['material_type']) ?></span></td>
+                                    <td><span class="badge badge-info text-uppercase"><?= e($m['material_type']) ?></span></td>
                                     <td class="text-end">
                                         <?php if (!empty($m['file_path'])): ?>
-                                            <a href="<?= url('academic/materials/download/' . $m['id']) ?>" class="btn btn-sm btn-outline-dark" style="font-size: 0.75rem;">
+                                            <a href="<?= url('academic/materials/download/' . $m['id']) ?>" class="btn btn-sm btn-secondary" style="font-size: 0.75rem; padding: 2px 10px;">
                                                 <i class="bi bi-download"></i> Download
                                             </a>
                                         <?php elseif (!empty($m['external_link'])): ?>
-                                            <a href="<?= e($m['external_link']) ?>" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary" style="font-size: 0.75rem;">
+                                            <a href="<?= e($m['external_link']) ?>" target="_blank" rel="noopener" class="btn btn-sm btn-secondary" style="font-size: 0.75rem; padding: 2px 10px;">
                                                 <i class="bi bi-box-arrow-up-right"></i> Link
                                             </a>
                                         <?php else: ?>
@@ -233,30 +233,30 @@
     <!-- Right Column: Assignments & Invoices -->
     <div class="col-lg-4">
         <!-- Assignments Card -->
-        <div class="card-custom mb-4">
-            <div class="card-header-custom">
+        <div class="card mb-4">
+            <div class="card-header">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-tp-orange px-2 py-1"><i class="bi bi-pencil-square"></i></span>
                     <h6 class="fw-bold mb-0">Assignments & Tasks</h6>
                 </div>
-                <span class="badge bg-light text-dark border"><?= count($assignments ?? []) ?></span>
+                <span class="badge badge-dark"><?= count($assignments ?? []) ?></span>
             </div>
-            <div class="p-3">
+            <div class="card-body">
                 <?php if (empty($assignments)): ?>
                     <p class="text-muted text-center py-4 mb-0">No active assignments assigned.</p>
                 <?php else: ?>
                     <div class="d-flex flex-column gap-3">
                         <?php foreach ($assignments as $asn): ?>
                             <div class="p-3 bg-light rounded-3 border-start border-4 border-warning">
-                                <h6 class="fw-bold mb-1 text-dark"><?= e($asn['title']) ?></h6>
+                                <h6 class="fw-bold mb-1 text-tp-black"><?= e($asn['title']) ?></h6>
                                 <div class="small text-muted mb-2">
-                                    <span class="badge bg-secondary-subtle text-dark"><?= e($asn['batch_name']) ?></span>
+                                    <span class="badge badge-dark"><?= e($asn['batch_name']) ?></span>
                                     <span class="ms-1">Max Marks: <?= (int)$asn['max_marks'] ?></span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center small">
-                                    <span class="text-danger fw-bold"><i class="bi bi-clock me-1"></i>Due: <?= format_date($asn['due_date']) ?></span>
+                                    <span class="text-tp-coral fw-bold"><i class="bi bi-clock me-1"></i>Due: <?= format_date($asn['due_date']) ?></span>
                                     <?php if (!empty($asn['attachment_path'])): ?>
-                                        <a href="<?= url('academic/assignments/download/' . $asn['id']) ?>" class="btn btn-sm btn-outline-dark py-1 px-2" style="font-size: 0.7rem;">
+                                        <a href="<?= url('academic/assignments/download/' . $asn['id']) ?>" class="btn btn-sm btn-secondary py-1 px-2" style="font-size: 0.7rem;">
                                             <i class="bi bi-paperclip"></i> Task File
                                         </a>
                                     <?php endif; ?>
@@ -269,14 +269,14 @@
         </div>
 
         <!-- Fee Invoices for this Student -->
-        <div class="card-custom mb-4">
-            <div class="card-header-custom">
+        <div class="card mb-4">
+            <div class="card-header">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-tp-green px-2 py-1"><i class="bi bi-receipt"></i></span>
                     <h6 class="fw-bold mb-0">My Tuition Invoices</h6>
                 </div>
             </div>
-            <div class="p-3">
+            <div class="card-body">
                 <?php if (empty($invoices)): ?>
                     <p class="text-muted text-center py-3 mb-0">No invoices issued.</p>
                 <?php else: ?>
@@ -303,21 +303,21 @@
         </div>
 
         <!-- Notice Board -->
-        <div class="card-custom">
-            <div class="card-header-custom">
+        <div class="card">
+            <div class="card-header">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-tp-black px-2 py-1"><i class="bi bi-megaphone-fill"></i></span>
                     <h6 class="fw-bold mb-0">Notice Board</h6>
                 </div>
             </div>
-            <div class="p-3">
+            <div class="card-body">
                 <?php if (empty($announcements)): ?>
                     <p class="text-muted text-center py-3 mb-0">No active notices.</p>
                 <?php else: ?>
                     <div class="list-group list-group-flush">
                         <?php foreach ($announcements as $an): ?>
                             <div class="list-group-item px-0 py-2 border-bottom">
-                                <div class="fw-bold mb-1 text-dark" style="font-size: 0.85rem;"><?= e($an['title']) ?></div>
+                                <div class="fw-bold mb-1 text-tp-black" style="font-size: 0.85rem;"><?= e($an['title']) ?></div>
                                 <p class="text-muted mb-1 text-truncate" style="font-size: 0.8rem;"><?= e(strip_tags($an['content'])) ?></p>
                                 <small class="text-muted" style="font-size: 0.7rem;"><i class="bi bi-clock me-1"></i><?= format_date($an['published_at']) ?></small>
                             </div>

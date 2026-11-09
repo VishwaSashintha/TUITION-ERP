@@ -18,8 +18,7 @@ backend/
 ├── public/                 # HTTP server document root (index.php, .htaccess)
 ├── routes/                 # Route registrations (web.php)
 ├── storage/                # Runtime data: logs/, cache/, backups/, temp/, uploads/
-├── tests/                  # 150 automated verification tests across 5 test suites
-└── composer.json           # Backend dependency manifest and PSR-4 autoloader
+└── tests/                  # 150 automated verification tests across 5 test suites
 ```
 
 ## Core Design Principles
@@ -44,3 +43,4 @@ php tests/test_jwt_auth.php
 php tests/test_role_dashboards.php
 php tests/test_http_routes.php
 ```
+

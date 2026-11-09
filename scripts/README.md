@@ -15,3 +15,4 @@ This directory contains automated batch scripts for operating, configuring, test
 
 - All scripts automatically detect PHP if installed in `C:\xampp\php` without requiring manual environment variable changes.
 - Root shortcuts (`start.bat` and `setup.bat`) are provided in the repository root for one-click developer convenience.
+

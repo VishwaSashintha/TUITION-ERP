@@ -15,7 +15,6 @@ frontend/
 │       ├── logo.svg        # Standard brand SVG logo
 │       ├── logo-white.svg  # Light brand SVG logo for dark backgrounds
 │       └── logo-mark.svg   # Compact brand mark icon
-├── languages/              # Localization files
 ├── views/                  # 67 UI views organized across 18 functional domains
 │   ├── academic/           # Batches, subjects, learning materials, assignments
 │   ├── attendance/         # Session roll-call sheets, live QR scanner, history
@@ -50,3 +49,4 @@ frontend/
   - Coral Alert: `#FF908D` (Expense indicators and danger badges)
 - **Universal Typography:** Google Fonts Roboto enforced globally across all UI elements, headings, body text, form controls, buttons, tables, and Chart.js instances.
 - **Tabular Numerics:** All currency figures, invoice sums, and metrics enforce `font-variant-numeric: tabular-nums` for alignment.
+

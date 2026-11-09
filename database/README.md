@@ -40,3 +40,4 @@ php database\migrate.php --fresh --seed
 - Production database archives are stored in `backend/storage/backups/`.
 - All `.sql` backup files are excluded from Git version control via `.gitignore`.
 - Backups can be triggered through the Settings UI (`/settings/backups`) or via `scripts\backup.bat`.
+

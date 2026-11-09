@@ -1,5 +1,10 @@
 @echo off
-setlocal
+setlocal enabledelayedexpansion
+
+REM ======================================================
+REM TuitionPro ERP - Automated Test Suite Runner
+REM ======================================================
+
 echo ======================================================
 echo TuitionPro ERP - Automated Test Suite Runner
 echo ======================================================
@@ -18,6 +23,16 @@ if %errorlevel% neq 0 (
 
 if exist "..\backend\tests" (
     cd ..
+)
+
+REM Check if server is running on port 8080 for HTTP test suites
+set "STARTED_SERVER=0"
+netstat -an 2>nul | findstr /c:":8080" | findstr "LISTEN" >nul 2>nul
+if %errorlevel% neq 0 (
+    echo [INFO] HTTP server not detected on port 8080. Starting temporary test server...
+    start "TuitionPro Test Server" /min cmd /c "php -S localhost:8080 -t backend\public backend\public\index.php"
+    set "STARTED_SERVER=1"
+    ping 127.0.0.1 -n 3 >nul
 )
 
 echo [1/5] Running Backend Core and Multi-Tenant Tests...
@@ -48,6 +63,10 @@ echo.
 echo ======================================================
 echo ALL 150 AUTOMATED TESTS PASSED SUCCESSFULLY!
 echo ======================================================
+
+if "!STARTED_SERVER!"=="1" (
+    call scripts\stop.bat >nul 2>&1
+)
 exit /b 0
 
 :test_fail
@@ -55,4 +74,7 @@ echo.
 echo ======================================================
 echo [FAIL] One or more automated tests encountered an error.
 echo ======================================================
+if "!STARTED_SERVER!"=="1" (
+    call scripts\stop.bat >nul 2>&1
+)
 exit /b 1

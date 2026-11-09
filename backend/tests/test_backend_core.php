@@ -29,6 +29,10 @@ class BackendTestSuite
 
     public function runAll(): void
     {
+        // Clear rate limiter for test IP to avoid lockout pollution from prior runs
+        (new \App\Services\RateLimiter())->clear('127.0.0.1', 'apex.owner@tuitionpro.lk');
+        (new \App\Services\RateLimiter())->clear('127.0.0.1', 'superadmin@tuitionpro.lk');
+
         echo "\n======================================================\n";
         echo "TUITIONPRO ERP — AUTOMATED BACKEND VERIFICATION SUITE\n";
         echo "======================================================\n\n";

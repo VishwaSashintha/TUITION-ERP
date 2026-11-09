@@ -45,6 +45,12 @@ backend/storage/uploads/*
 *.sql
 !database/migrations/*.sql
 
+# ─── Launcher Tools ─────────────────────────────────────────────────────────────
+# Composer PHAR downloaded at runtime - not committed
+tools/composer.phar
+# Startup log (runtime generated)
+backend/storage/logs/startup.log
+
 # ─── IDE & OS Files ────────────────────────────────────────────────────────────
 .vscode/
 .idea/

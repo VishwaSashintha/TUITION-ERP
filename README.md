@@ -166,16 +166,20 @@ TuitionPro ERP/
 │   ├── migrate.php         # Migration runner and seeding utility
 │   └── README.md           # Database setup and schema documentation
 ├── scripts/                # Automated operational and development utility scripts
-│   ├── start.bat           # Local development server launcher
-│   ├── setup.bat           # Automated environment and database installer
+│   ├── start.bat           # One-click launcher with pre-flight checks and browser open
+│   ├── stop.bat            # Graceful server shutdown utility
+│   ├── setup.bat           # Safe database migration utility
 │   ├── test.bat            # 150 automated test suite runner
 │   ├── backup.bat          # SQL database backup utility
+│   ├── launcher.php        # Pre-flight inspection and startup engine
+│   ├── open_browser.php    # Background HTTP health-check and browser trigger
 │   └── README.md           # Script usage and automation reference
 ├── public/                 # Root forwarder entry point for backward compatibility
 │   ├── index.php           # Gateway forwarding to backend/public/index.php
 │   └── .htaccess           # Apache rewrite rules
-├── setup.bat               # Root one-click local setup shortcut (calls scripts\setup.bat)
-├── start.bat               # Root one-click local server shortcut (calls scripts\start.bat)
+├── start.bat               # Root one-click launcher (double-click to run everything)
+├── stop.bat                # Root one-click server stop shortcut
+├── setup.bat               # Migration utility shortcut
 ├── composer.json           # Root Composer manifest
 ├── requirements.txt        # System requirements and PHP extensions manifest
 ├── .env.example            # Environment configuration template
@@ -204,33 +208,24 @@ TuitionPro ERP/
 
 ## Installation and Setup
 
-### Quick Setup for Windows (XAMPP)
+### One-Click Startup for Windows (Recommended)
 
-1. Start Apache and MySQL services in your XAMPP Control Panel.
-2. Open a command prompt or PowerShell window in the project root directory.
-3. Run the automated setup script:
+Simply double-click **`start.bat`** in the project root directory.
 
-```bat
-setup.bat
-```
+You do **not** need to open a terminal, install dependencies manually, start services manually, or run a separate setup script.
 
-This script automatically:
-- Creates `.env` from `.env.example` if it does not already exist.
-- Creates the `tuitionpro` database if missing.
-- Applies all migrations in sequential order.
-- Populates standard roles, permissions, chart of accounts, and demonstration evaluation accounts.
+`start.bat` automatically:
+1. Detects your PHP installation (supports XAMPP, PATH, and custom directories) and verifies version compatibility (PHP 8.2+).
+2. Verifies all required PHP extensions (`pdo`, `pdo_mysql`, `mbstring`, `openssl`, `curl`, `json`, `ctype`, `fileinfo`, `gd`, `zip`).
+3. Creates `.env` from `.env.example` if it does not already exist, preserving any existing configuration.
+4. Detects and starts the MySQL service automatically if it is not running.
+5. Verifies database connectivity and initializes the schema safely without overwriting or destroying any existing data.
+6. Verifies Composer packages and autoloading.
+7. Checks port 8080 and prevents duplicate server instances.
+8. Starts the application and performs an HTTP health check.
+9. Automatically opens **`http://localhost:8080`** in your default web browser.
 
-4. Start the application:
-
-```bat
-start.bat
-```
-
-5. Open your browser and navigate to:
-
-```
-http://localhost:8080
-```
+To stop the server at any time, press `Ctrl+C` in the command window, or double-click **`stop.bat`**.
 
 ### Manual Installation (Cross-Platform: Linux, macOS, Windows)
 
@@ -433,9 +428,8 @@ Follow this sequence to evaluate the core modules:
 ## Application Shutdown
 
 To stop the development server:
-- Switch to the terminal window running `php -S` or `start.bat`.
-- Press `Ctrl + C` (or `Ctrl + Break`).
-- When prompted `Terminate batch job (Y/N)?`, type `Y` and press Enter.
+- Double-click **`stop.bat`** in the project root directory, or
+- Switch to the command window running `start.bat` and press `Ctrl + C` (or `Ctrl + Break`). When prompted `Terminate batch job (Y/N)?`, type `Y` and press Enter.
 
 ---
 

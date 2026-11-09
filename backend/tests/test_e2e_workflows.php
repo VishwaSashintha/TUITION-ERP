@@ -31,6 +31,10 @@ function assertCondition(bool $condition, string $description): void
 echo "======================================================\n";
 echo "TUITIONPRO ERP — COMPREHENSIVE E2E WORKFLOW TEST SUITE\n";
 echo "======================================================\n\n";
+
+// Clear rate limiter for test IP to avoid lockout pollution from prior runs
+(new \App\Services\RateLimiter())->clear('127.0.0.1', 'apex.owner@tuitionpro.lk');
+
 //Authentication
 echo "1. Simulating Institute Owner Authentication & Session Initialization...\n";
 
